@@ -118,51 +118,41 @@ struct QuoteWidgetEntryView: View {
     @Environment(\.widgetFamily) var family
     
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                // Thin white border
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(Color.white)
-                
-                // Dark content area (inset to show border)
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+        ZStack {
+            if let quote = entry.quote {
+                VStack(spacing: 6) {
+                    // Category tag
+                    Text(quote.category.uppercased())
+                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .foregroundColor(Color(red: 0.4, green: 0.8, blue: 0.8)) // Teal
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(
+                            Capsule()
+                                .fill(Color(red: 0.4, green: 0.8, blue: 0.8).opacity(0.15))
                         )
-                    )
-                    .padding(2) // Creates thin white border
-                
-                if let quote = entry.quote {
-                    VStack(spacing: 6) {
-                        // Category tag
-                        Text(quote.category.uppercased())
-                            .font(.system(size: 9, weight: .semibold, design: .rounded))
-                            .foregroundColor(Color(red: 0.4, green: 0.8, blue: 0.8)) // Teal
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
-                            .background(
-                                Capsule()
-                                    .fill(Color(red: 0.4, green: 0.8, blue: 0.8).opacity(0.15))
-                            )
-                        
-                        Text(quote.text)
-                            .font(.system(size: fontSize, weight: .medium, design: .serif))
-                            .foregroundColor(.white)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(family == .systemSmall ? 5 : 7)
-                            .minimumScaleFactor(0.6)
-                        
-                        Text("— \(quote.author)")
-                            .font(.system(size: fontSize * 0.55, weight: .regular, design: .serif))
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
+                    
+                    Text(quote.text)
+                        .font(.system(size: fontSize, weight: .medium, design: .serif))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(family == .systemSmall ? 5 : 7)
+                        .minimumScaleFactor(0.6)
+                    
+                    Text("— \(quote.author)")
+                        .font(.system(size: fontSize * 0.55, weight: .regular, design: .serif))
+                        .foregroundColor(.white.opacity(0.7))
                 }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
             }
+        }
+        .containerBackground(for: .widget) {
+            LinearGradient(
+                colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
         }
     }
     
@@ -182,7 +172,6 @@ struct QuoteWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: QuoteProvider()) { entry in
             QuoteWidgetEntryView(entry: entry)
-                .containerBackground(.clear, for: .widget)
         }
         .configurationDisplayName("Quotes")
         .description("Display your saved quotes.")
@@ -234,47 +223,37 @@ struct AffirmationWidgetEntryView: View {
     @Environment(\.widgetFamily) var family
     
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                // Thin white border
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .fill(Color.white)
-                
-                // Dark content area (inset to show border)
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+        ZStack {
+            if let affirmation = entry.affirmation {
+                VStack(spacing: 6) {
+                    // Category tag - purple for affirmations
+                    Text(affirmation.category.uppercased())
+                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .foregroundColor(Color(red: 0.6, green: 0.4, blue: 0.9)) // Purple
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(
+                            Capsule()
+                                .fill(Color(red: 0.6, green: 0.4, blue: 0.9).opacity(0.15))
                         )
-                    )
-                    .padding(2) // Creates thin white border
-                
-                if let affirmation = entry.affirmation {
-                    VStack(spacing: 6) {
-                        // Category tag - purple for affirmations
-                        Text(affirmation.category.uppercased())
-                            .font(.system(size: 9, weight: .semibold, design: .rounded))
-                            .foregroundColor(Color(red: 0.6, green: 0.4, blue: 0.9)) // Purple
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
-                            .background(
-                                Capsule()
-                                    .fill(Color(red: 0.6, green: 0.4, blue: 0.9).opacity(0.15))
-                            )
-                        
-                        Text(affirmation.text)
-                            .font(.system(size: fontSize, weight: .medium, design: .serif))
-                            .foregroundColor(.white)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(family == .systemSmall ? 5 : 7)
-                            .minimumScaleFactor(0.6)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
+                    
+                    Text(affirmation.text)
+                        .font(.system(size: fontSize, weight: .medium, design: .serif))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(family == .systemSmall ? 5 : 7)
+                        .minimumScaleFactor(0.6)
                 }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
             }
+        }
+        .containerBackground(for: .widget) {
+            LinearGradient(
+                colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
         }
     }
     
@@ -294,7 +273,6 @@ struct AffirmationWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: AffirmationProvider()) { entry in
             AffirmationWidgetEntryView(entry: entry)
-                .containerBackground(.clear, for: .widget)
         }
         .configurationDisplayName("Affirmations")
         .description("Display your saved affirmations.")
