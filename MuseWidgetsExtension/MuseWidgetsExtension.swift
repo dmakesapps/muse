@@ -137,8 +137,8 @@ struct QuoteWidgetEntryView: View {
     
     var body: some View {
         ZStack {
-            // Dark content area - thin rainbow border
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
+            // Dark content area - ultra thin hairline rainbow border
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
@@ -146,7 +146,7 @@ struct QuoteWidgetEntryView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .padding(0.5) // Ultra thin rainbow border
+                .padding(1) // Hairline rainbow border
             
             if let quote = entry.quote {
                 VStack(spacing: 6) {
@@ -273,8 +273,8 @@ struct AffirmationWidgetEntryView: View {
     
     var body: some View {
         ZStack {
-            // Dark content area - thin rainbow border
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
+            // Dark content area - ultra thin hairline rainbow border
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
@@ -282,7 +282,7 @@ struct AffirmationWidgetEntryView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .padding(0.5) // Ultra thin rainbow border
+                .padding(1) // Hairline rainbow border
             
             if let affirmation = entry.affirmation {
                 VStack(spacing: 6) {
