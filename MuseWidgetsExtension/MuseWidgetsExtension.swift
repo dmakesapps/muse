@@ -119,12 +119,19 @@ struct QuoteWidgetEntryView: View {
     
     var body: some View {
         ZStack {
-            // Dark gradient background
-            LinearGradient(
-                colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            // Dark gradient background with rounded corners
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
+                )
             
             if let quote = entry.quote {
                 VStack(spacing: 8) {
@@ -224,12 +231,19 @@ struct AffirmationWidgetEntryView: View {
     
     var body: some View {
         ZStack {
-            // Dark gradient background
-            LinearGradient(
-                colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            // Dark gradient background with rounded corners
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
+                )
             
             if let affirmation = entry.affirmation {
                 VStack(spacing: 8) {
