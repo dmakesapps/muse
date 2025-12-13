@@ -76,15 +76,15 @@ struct FeedView: View {
                         // Page content - centered using GeometryReader
                         GeometryReader { geo in
                             VStack(spacing: 16) {
-                                // Category tag
+                                // Category tag - purple for affirmations, teal for quotes
                                 Text(item.category.uppercased())
                                     .font(.system(size: 11, weight: .semibold, design: .rounded))
-                                    .foregroundColor(.museAccentBlue)
+                                    .foregroundColor(item.tagColor)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
                                     .background(
                                         Capsule()
-                                            .fill(Color.museAccentBlue.opacity(0.15))
+                                            .fill(item.tagColor.opacity(0.15))
                                     )
                                 
                                 Text(item.text)
@@ -318,14 +318,21 @@ struct AnyContentItem: Identifiable {
     let text: String
     let author: String?
     let category: String
+    let isAffirmation: Bool
     let affirmation: Affirmation?
     let quote: Quote?
+    
+    // Tag color based on content type
+    var tagColor: Color {
+        isAffirmation ? .museGradientStart : .museTeal // Purple for affirmations, teal for quotes
+    }
     
     init(affirmation: Affirmation) {
         self.id = affirmation.id
         self.text = affirmation.text
         self.author = nil
         self.category = affirmation.category
+        self.isAffirmation = true
         self.affirmation = affirmation
         self.quote = nil
     }
@@ -335,6 +342,7 @@ struct AnyContentItem: Identifiable {
         self.text = quote.text
         self.author = quote.author
         self.category = quote.category
+        self.isAffirmation = false
         self.affirmation = nil
         self.quote = quote
     }
@@ -801,6 +809,7 @@ struct FavoritesView: View {
                                             text: affirmation.text,
                                             author: nil,
                                             category: affirmation.category,
+                                            isAffirmation: true,
                                             onDelete: {
                                                 storage.removeAffirmation(affirmation)
                                             }
@@ -835,6 +844,7 @@ struct FavoritesView: View {
                                             text: quote.text,
                                             author: quote.author,
                                             category: quote.category,
+                                            isAffirmation: false,
                                             onDelete: {
                                                 storage.removeQuote(quote)
                                             }
@@ -901,15 +911,15 @@ struct FavoritesFeedView: View {
                     ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                         GeometryReader { geo in
                             VStack(spacing: 16) {
-                                // Category tag
+                                // Category tag - purple for affirmations, teal for quotes
                                 Text(item.category.uppercased())
                                     .font(.system(size: 11, weight: .semibold, design: .rounded))
-                                    .foregroundColor(.museAccentBlue)
+                                    .foregroundColor(item.tagColor)
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 6)
                                     .background(
                                         Capsule()
-                                            .fill(Color.museAccentBlue.opacity(0.15))
+                                            .fill(item.tagColor.opacity(0.15))
                                     )
                                 
                                 Text(item.text)
@@ -980,19 +990,24 @@ struct FavoriteCard: View {
     let text: String
     let author: String?
     let category: String
+    let isAffirmation: Bool
     let onDelete: () -> Void
+    
+    private var tagColor: Color {
+        isAffirmation ? .museGradientStart : .museTeal
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Category tag
+            // Category tag - purple for affirmations, teal for quotes
             Text(category.uppercased())
                 .font(.system(size: 10, weight: .semibold, design: .rounded))
-                .foregroundColor(.museAccentBlue)
+                .foregroundColor(tagColor)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
                 .background(
                     Capsule()
-                        .fill(Color.museAccentBlue.opacity(0.15))
+                        .fill(tagColor.opacity(0.15))
                 )
             
             Text(text)
