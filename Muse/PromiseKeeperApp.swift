@@ -17,7 +17,7 @@ struct MuseApp: App {
     }
     
     private func createModelContainer() -> ModelContainer {
-        let schema = Schema([Promise.self, Message.self, UserProfile.self, NotificationAgent.self])
+        let schema = Schema([Promise.self, Message.self, UserProfile.self, NotificationAgent.self, AffirmationSession.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         
         do {
