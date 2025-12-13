@@ -137,8 +137,8 @@ struct QuoteWidgetEntryView: View {
     
     var body: some View {
         ZStack {
-            // Dark content area with padding to show rainbow border
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
+            // Dark content area - thin rainbow border
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
@@ -146,7 +146,7 @@ struct QuoteWidgetEntryView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .padding(2) // Shows rainbow border
+                .padding(0.5) // Ultra thin rainbow border
             
             if let quote = entry.quote {
                 VStack(spacing: 6) {
@@ -172,8 +172,8 @@ struct QuoteWidgetEntryView: View {
                         .font(.system(size: fontSize * 0.55, weight: .regular, design: .serif))
                         .foregroundColor(.white.opacity(0.7))
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
             }
         }
         .containerBackground(for: .widget) {
@@ -273,8 +273,8 @@ struct AffirmationWidgetEntryView: View {
     
     var body: some View {
         ZStack {
-            // Dark content area with padding to show rainbow border
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
+            // Dark content area - thin rainbow border
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
@@ -282,7 +282,7 @@ struct AffirmationWidgetEntryView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .padding(2) // Shows rainbow border
+                .padding(0.5) // Ultra thin rainbow border
             
             if let affirmation = entry.affirmation {
                 VStack(spacing: 6) {
@@ -304,8 +304,8 @@ struct AffirmationWidgetEntryView: View {
                         .lineLimit(family == .systemSmall ? 5 : 7)
                         .minimumScaleFactor(0.6)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
             }
         }
         .containerBackground(for: .widget) {
