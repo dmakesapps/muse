@@ -47,57 +47,56 @@ struct FeedView: View {
                         .foregroundColor(.museLightGray)
                 }
             } else {
-                // Vertical swipe feed with smooth animations
-                TabView(selection: $currentIndex) {
-                    ForEach(Array(filteredContent.enumerated()), id: \.element.id) { index, item in
-                        // Page content - centered using GeometryReader
-                        GeometryReader { geo in
-                            ZStack {
-                                // Solid background to prevent transparency during scroll
-                                Color.museDeepNavy
-                                
-                                VStack(spacing: 16) {
-                                    // Category tag - purple for affirmations, teal for quotes
-                                    Text(item.category.uppercased())
-                                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                                        .foregroundColor(item.tagColor)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(
-                                            Capsule()
-                                                .fill(item.tagColor.opacity(0.15))
-                                        )
+                // Vertical swipe feed using native vertical paging
+                GeometryReader { geometry in
+                    ScrollView(.vertical, showsIndicators: false) {
+                        LazyVStack(spacing: 0) {
+                            ForEach(Array(filteredContent.enumerated()), id: \.element.id) { index, item in
+                                // Each page fills the screen
+                                ZStack {
+                                    Color.museDeepNavy
                                     
-                                    Text(item.text)
-                                        .font(.system(size: fontSizeFor(text: item.text), weight: .medium, design: .serif))
-                                        .foregroundColor(.museSoftWhite)
-                                        .multilineTextAlignment(.center)
-                                        .lineSpacing(8)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                    
-                                    if let author = item.author {
-                                        Text("— \(author)")
-                                            .font(.system(size: fontSizeFor(text: item.text) * 0.65, weight: .regular, design: .serif))
-                                            .foregroundColor(.museLightGray)
+                                    VStack(spacing: 16) {
+                                        // Category tag
+                                        Text(item.category.uppercased())
+                                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                            .foregroundColor(item.tagColor)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 6)
+                                            .background(
+                                                Capsule()
+                                                    .fill(item.tagColor.opacity(0.15))
+                                            )
+                                        
+                                        Text(item.text)
+                                            .font(.system(size: fontSizeFor(text: item.text), weight: .medium, design: .serif))
+                                            .foregroundColor(.museSoftWhite)
+                                            .multilineTextAlignment(.center)
+                                            .lineSpacing(8)
+                                        
+                                        if let author = item.author {
+                                            Text("— \(author)")
+                                                .font(.system(size: fontSizeFor(text: item.text) * 0.65, weight: .regular, design: .serif))
+                                                .foregroundColor(.museLightGray)
+                                        }
                                     }
+                                    .padding(.horizontal, 40)
                                 }
-                                .padding(.horizontal, 40)
+                                .frame(width: geometry.size.width, height: geometry.size.height)
+                                .id(index)
                             }
-                            .frame(width: geo.size.width, height: geo.size.height)
                         }
-                        .background(Color.museDeepNavy)
-                        .rotationEffect(.degrees(-90))
-                        .tag(index)
+                        .scrollTargetLayout()
                     }
+                    .scrollTargetBehavior(.paging)
+                    .scrollPosition(id: Binding(
+                        get: { currentIndex },
+                        set: { if let newValue = $0 { currentIndex = newValue } }
+                    ))
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .rotationEffect(.degrees(90))
-                .animation(.smooth(duration: 0.3), value: currentIndex)
                 .ignoresSafeArea()
                 .onChange(of: selectedCategory) { _, _ in
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        currentIndex = 0
-                    }
+                    currentIndex = 0
                 }
             }
             
