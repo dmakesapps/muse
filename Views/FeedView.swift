@@ -168,7 +168,7 @@ struct FeedView: View {
                     }
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 60)
+                .padding(.top, 10)
                 
                 Spacer()
                 
@@ -479,11 +479,12 @@ struct ContentCard: View {
 struct MixPopupView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var storage = StorageService.shared
+    @State private var showFavorites = false
     
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(hex: "F5E6D3") // Light beige background
+                Color.museDeepNavy
                     .ignoresSafeArea()
                 
                 ScrollView {
@@ -493,11 +494,11 @@ struct MixPopupView: View {
                             Button(action: { dismiss() }) {
                                 Image(systemName: "xmark")
                                     .font(.system(size: 16, weight: .medium))
-                                    .foregroundColor(Color(hex: "8B6F47"))
+                                    .foregroundColor(.museSoftWhite)
                                     .frame(width: 32, height: 32)
                                     .background(
                                         Circle()
-                                            .fill(Color(hex: "E8D5C4"))
+                                            .fill(Color.museDarkGray)
                                     )
                             }
                             
@@ -506,12 +507,12 @@ struct MixPopupView: View {
                             Button(action: {}) {
                                 Text("Unlock all")
                                     .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(Color(hex: "8B6F47"))
+                                    .foregroundColor(.museSoftWhite)
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 8)
                                     .background(
                                         Capsule()
-                                            .fill(Color(hex: "E8D5C4"))
+                                            .fill(Color.museDarkGray)
                                     )
                             }
                         }
@@ -521,19 +522,19 @@ struct MixPopupView: View {
                         // Title
                         Text("What do you want to focus on?")
                             .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundColor(.museSoftWhite)
                             .padding(.horizontal, 20)
                         
                         // Make your own mix button
                         Button(action: {}) {
                             Text("Make your own mix")
                                 .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(Color(hex: "8B6F47"))
+                                .foregroundColor(.museSoftWhite)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 14)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .fill(Color(hex: "E8D5C4"))
+                                        .stroke(Color.museMediumGray.opacity(0.5), lineWidth: 1.5)
                                 )
                         }
                         .padding(.horizontal, 20)
@@ -543,25 +544,30 @@ struct MixPopupView: View {
                             MixCategoryCard(
                                 title: "General",
                                 icon: "globe",
-                                isLocked: false
+                                isLocked: false,
+                                action: {}
                             )
                             
                             MixCategoryCard(
                                 title: "Reframe Thoughts (AI)",
                                 icon: "brain.head.profile",
-                                isLocked: true
+                                isLocked: true,
+                                action: {}
                             )
                             
                             MixCategoryCard(
                                 title: "Favorites",
                                 icon: "heart.fill",
-                                isLocked: false
+                                isLocked: false,
+                                count: storage.savedAffirmations.count + storage.savedQuotes.count,
+                                action: { showFavorites = true }
                             )
                             
                             MixCategoryCard(
                                 title: "My own affirmations",
                                 icon: "pencil",
-                                isLocked: false
+                                isLocked: false,
+                                action: {}
                             )
                         }
                         .padding(.horizontal, 20)
@@ -569,7 +575,7 @@ struct MixPopupView: View {
                         // Most popular section
                         Text("Most popular")
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(.museSoftWhite)
                             .padding(.horizontal, 20)
                             .padding(.top, 8)
                         
@@ -577,13 +583,15 @@ struct MixPopupView: View {
                             MixCategoryCard(
                                 title: "Christianity",
                                 icon: "book.closed",
-                                isLocked: false
+                                isLocked: false,
+                                action: {}
                             )
                             
                             MixCategoryCard(
-                                title: "routine",
+                                title: "Routine",
                                 icon: "sunrise",
-                                isLocked: true
+                                isLocked: true,
+                                action: {}
                             )
                         }
                         .padding(.horizontal, 20)
@@ -597,6 +605,9 @@ struct MixPopupView: View {
                     EmptyView()
                 }
             }
+            .sheet(isPresented: $showFavorites) {
+                FavoritesView()
+            }
         }
     }
 }
@@ -606,39 +617,359 @@ struct MixCategoryCard: View {
     let title: String
     let icon: String
     let isLocked: Bool
+    var count: Int = 0
+    let action: () -> Void
     
     var body: some View {
-        Button(action: {}) {
+        Button(action: action) {
             VStack(spacing: 12) {
                 ZStack {
                     Circle()
-                        .fill(Color(hex: "E8D5C4").opacity(0.3))
+                        .fill(Color.museDarkGray)
                         .frame(width: 60, height: 60)
                     
                     Image(systemName: icon)
                         .font(.system(size: 24))
-                        .foregroundColor(.white)
+                        .foregroundColor(.museSoftWhite)
                 }
                 
                 Text(title)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.white)
+                    .foregroundColor(.museSoftWhite)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                 
                 if isLocked {
                     Image(systemName: "lock.fill")
                         .font(.system(size: 10))
-                        .foregroundColor(Color(hex: "E8D5C4"))
+                        .foregroundColor(.museLightGray)
+                } else if count > 0 {
+                    Text("\(count) saved")
+                        .font(.system(size: 10))
+                        .foregroundColor(.museLightGray)
                 }
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 20)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(hex: "E8D5C4").opacity(0.2))
+                    .fill(Color.museDarkGray.opacity(0.5))
             )
         }
+    }
+}
+
+// MARK: - Favorites View
+struct FavoritesView: View {
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var storage = StorageService.shared
+    @State private var selectedTab = 0
+    @State private var showFeed = false
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.museDeepNavy
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Header
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.museSoftWhite)
+                                .frame(width: 32, height: 32)
+                                .background(
+                                    Circle()
+                                        .fill(Color.museDarkGray)
+                                )
+                        }
+                        
+                        Spacer()
+                        
+                        Text("Favorites")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.museSoftWhite)
+                        
+                        Spacer()
+                        
+                        // Placeholder for symmetry
+                        Color.clear
+                            .frame(width: 32, height: 32)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .padding(.bottom, 16)
+                    
+                    // Tab selector
+                    HStack(spacing: 0) {
+                        Button {
+                            withAnimation { selectedTab = 0 }
+                        } label: {
+                            Text("Affirmations")
+                                .font(.system(size: 15, weight: selectedTab == 0 ? .semibold : .regular))
+                                .foregroundColor(selectedTab == 0 ? .museSoftWhite : .museLightGray)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                        }
+                        
+                        Button {
+                            withAnimation { selectedTab = 1 }
+                        } label: {
+                            Text("Quotes")
+                                .font(.system(size: 15, weight: selectedTab == 1 ? .semibold : .regular))
+                                .foregroundColor(selectedTab == 1 ? .museSoftWhite : .museLightGray)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                        }
+                    }
+                    .background(
+                        Capsule()
+                            .fill(Color.museDarkGray.opacity(0.6))
+                    )
+                    .padding(.bottom, 20)
+                    
+                    // Show in Feed button
+                    if (selectedTab == 0 && !storage.savedAffirmations.isEmpty) ||
+                       (selectedTab == 1 && !storage.savedQuotes.isEmpty) {
+                        Button(action: { showFeed = true }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "play.fill")
+                                    .font(.system(size: 14))
+                                Text("Show in Feed")
+                                    .font(.system(size: 15, weight: .medium))
+                            }
+                            .foregroundColor(.museSoftWhite)
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 12)
+                            .background(
+                                Capsule()
+                                    .fill(Color.museAccentBlue)
+                            )
+                        }
+                        .padding(.bottom, 20)
+                    }
+                    
+                    // Content
+                    if selectedTab == 0 {
+                        // Affirmations
+                        if storage.savedAffirmations.isEmpty {
+                            Spacer()
+                            VStack(spacing: 16) {
+                                Image(systemName: "heart")
+                                    .font(.system(size: 48))
+                                    .foregroundColor(.museLightGray.opacity(0.5))
+                                Text("No saved affirmations yet")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.museLightGray)
+                                Text("Tap the heart icon to save")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.museLightGray.opacity(0.7))
+                            }
+                            Spacer()
+                        } else {
+                            ScrollView {
+                                LazyVStack(spacing: 16) {
+                                    ForEach(storage.savedAffirmations) { affirmation in
+                                        FavoriteCard(
+                                            text: affirmation.text,
+                                            author: nil,
+                                            onDelete: {
+                                                storage.removeAffirmation(affirmation)
+                                            }
+                                        )
+                                    }
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.bottom, 40)
+                            }
+                        }
+                    } else {
+                        // Quotes
+                        if storage.savedQuotes.isEmpty {
+                            Spacer()
+                            VStack(spacing: 16) {
+                                Image(systemName: "heart")
+                                    .font(.system(size: 48))
+                                    .foregroundColor(.museLightGray.opacity(0.5))
+                                Text("No saved quotes yet")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.museLightGray)
+                                Text("Tap the heart icon to save")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.museLightGray.opacity(0.7))
+                            }
+                            Spacer()
+                        } else {
+                            ScrollView {
+                                LazyVStack(spacing: 16) {
+                                    ForEach(storage.savedQuotes) { quote in
+                                        FavoriteCard(
+                                            text: quote.text,
+                                            author: quote.author,
+                                            onDelete: {
+                                                storage.removeQuote(quote)
+                                            }
+                                        )
+                                    }
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.bottom, 40)
+                            }
+                        }
+                    }
+                }
+            }
+            .fullScreenCover(isPresented: $showFeed) {
+                FavoritesFeedView(showAffirmations: selectedTab == 0)
+            }
+        }
+    }
+}
+
+// MARK: - Favorites Feed View
+struct FavoritesFeedView: View {
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var storage = StorageService.shared
+    let showAffirmations: Bool
+    @State private var currentIndex = 0
+    
+    private var items: [AnyContentItem] {
+        if showAffirmations {
+            return storage.savedAffirmations.map { AnyContentItem(affirmation: $0) }
+        } else {
+            return storage.savedQuotes.map { AnyContentItem(quote: $0) }
+        }
+    }
+    
+    private func fontSizeFor(text: String) -> CGFloat {
+        let wordCount = text.split(separator: " ").count
+        switch wordCount {
+        case 0...5: return 32
+        case 6...10: return 28
+        case 11...15: return 24
+        case 16...20: return 22
+        default: return 20
+        }
+    }
+    
+    var body: some View {
+        ZStack {
+            Color.museDeepNavy
+                .ignoresSafeArea()
+            
+            if items.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "heart")
+                        .font(.system(size: 48))
+                        .foregroundColor(.museLightGray.opacity(0.5))
+                    Text("No favorites to show")
+                        .font(.system(size: 16))
+                        .foregroundColor(.museLightGray)
+                }
+            } else {
+                // Vertical swipe feed
+                TabView(selection: $currentIndex) {
+                    ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                        GeometryReader { geo in
+                            VStack(spacing: 16) {
+                                Text(item.text)
+                                    .font(.system(size: fontSizeFor(text: item.text), weight: .medium, design: .serif))
+                                    .foregroundColor(.museSoftWhite)
+                                    .multilineTextAlignment(.center)
+                                    .lineSpacing(8)
+                                
+                                if let author = item.author {
+                                    Text("— \(author)")
+                                        .font(.system(size: fontSizeFor(text: item.text) * 0.65, weight: .regular, design: .serif))
+                                        .foregroundColor(.museLightGray)
+                                }
+                            }
+                            .padding(.horizontal, 40)
+                            .frame(width: geo.size.width, height: geo.size.height)
+                        }
+                        .background(Color.museDeepNavy)
+                        .rotationEffect(.degrees(-90))
+                        .tag(index)
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .rotationEffect(.degrees(90))
+                .ignoresSafeArea()
+            }
+            
+            // Close button overlay
+            VStack {
+                HStack {
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.museSoftWhite)
+                            .frame(width: 40, height: 40)
+                            .background(
+                                Circle()
+                                    .fill(Color.museDarkGray.opacity(0.8))
+                            )
+                    }
+                    
+                    Spacer()
+                    
+                    // Counter
+                    if !items.isEmpty {
+                        Text("\(currentIndex + 1) / \(items.count)")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.museSoftWhite)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(Color.museDarkGray.opacity(0.8))
+                            )
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 60)
+                
+                Spacer()
+            }
+        }
+    }
+}
+
+// MARK: - Favorite Card
+struct FavoriteCard: View {
+    let text: String
+    let author: String?
+    let onDelete: () -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(text)
+                .font(.system(size: 16, weight: .medium, design: .serif))
+                .foregroundColor(.museSoftWhite)
+                .multilineTextAlignment(.leading)
+            
+            if let author = author {
+                Text("— \(author)")
+                    .font(.system(size: 14, weight: .regular, design: .serif))
+                    .foregroundColor(.museLightGray)
+            }
+            
+            HStack {
+                Spacer()
+                Button(action: onDelete) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 14))
+                        .foregroundColor(.museLightGray)
+                }
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.museDarkGray.opacity(0.5))
+        )
     }
 }
 
