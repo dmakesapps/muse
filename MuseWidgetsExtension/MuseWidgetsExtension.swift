@@ -8,81 +8,287 @@
 import WidgetKit
 import SwiftUI
 
-struct Provider: AppIntentTimelineProvider {
-    func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: ConfigurationAppIntent())
-    }
-
-    func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: configuration)
+// MARK: - Shared Data Service
+class SharedDataService {
+    static let shared = SharedDataService()
+    private let appGroupIdentifier = "group.Ephesian28LLC.Muse"
+    
+    private var sharedDefaults: UserDefaults? {
+        UserDefaults(suiteName: appGroupIdentifier)
     }
     
-    func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
-        var entries: [SimpleEntry] = []
-
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
-        let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, configuration: configuration)
-            entries.append(entry)
+    func loadSavedQuotes() -> [WidgetQuote] {
+        guard let defaults = sharedDefaults,
+              let data = defaults.data(forKey: "savedQuotes") else {
+            return []
         }
-
-        return Timeline(entries: entries, policy: .atEnd)
+        
+        do {
+            return try JSONDecoder().decode([WidgetQuote].self, from: data)
+        } catch {
+            print("Error decoding quotes: \(error)")
+            return []
+        }
     }
-
-//    func relevances() async -> WidgetRelevances<ConfigurationAppIntent> {
-//        // Generate a list containing the contexts this widget is relevant in.
-//    }
+    
+    func loadSavedAffirmations() -> [WidgetAffirmation] {
+        guard let defaults = sharedDefaults,
+              let data = defaults.data(forKey: "savedAffirmations") else {
+            return []
+        }
+        
+        do {
+            return try JSONDecoder().decode([WidgetAffirmation].self, from: data)
+        } catch {
+            print("Error decoding affirmations: \(error)")
+            return []
+        }
+    }
 }
 
-struct SimpleEntry: TimelineEntry {
+// MARK: - Widget Models
+struct WidgetQuote: Codable, Identifiable {
+    let id: UUID
+    let text: String
+    let author: String
+    let category: String
+    
+    init(id: UUID = UUID(), text: String, author: String, category: String) {
+        self.id = id
+        self.text = text
+        self.author = author
+        self.category = category
+    }
+}
+
+struct WidgetAffirmation: Codable, Identifiable {
+    let id: UUID
+    let text: String
+    let category: String
+    
+    init(id: UUID = UUID(), text: String, category: String) {
+        self.id = id
+        self.text = text
+        self.category = category
+    }
+}
+
+// MARK: - Quote Widget
+struct QuoteEntry: TimelineEntry {
     let date: Date
-    let configuration: ConfigurationAppIntent
+    let quote: WidgetQuote?
 }
 
-struct MuseWidgetsExtensionEntryView : View {
-    var entry: Provider.Entry
-
-    var body: some View {
-        VStack {
-            Text("Time:")
-            Text(entry.date, style: .time)
-
-            Text("Favorite Emoji:")
-            Text(entry.configuration.favoriteEmoji)
-        }
-    }
-}
-
-struct MuseWidgetsExtension: Widget {
-    let kind: String = "MuseWidgetsExtension"
-
-    var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
-            MuseWidgetsExtensionEntryView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
-        }
-    }
-}
-
-extension ConfigurationAppIntent {
-    fileprivate static var smiley: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "😀"
-        return intent
+struct QuoteProvider: TimelineProvider {
+    func placeholder(in context: Context) -> QuoteEntry {
+        QuoteEntry(date: Date(), quote: WidgetQuote(text: "The only way out is through.", author: "Robert Frost", category: "Wisdom"))
     }
     
-    fileprivate static var starEyes: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "🤩"
-        return intent
+    func getSnapshot(in context: Context, completion: @escaping (QuoteEntry) -> Void) {
+        let quotes = SharedDataService.shared.loadSavedQuotes()
+        let quote = quotes.randomElement() ?? WidgetQuote(text: "Save your favorite quotes to see them here.", author: "Muse", category: "Welcome")
+        completion(QuoteEntry(date: Date(), quote: quote))
+    }
+    
+    func getTimeline(in context: Context, completion: @escaping (Timeline<QuoteEntry>) -> Void) {
+        let quotes = SharedDataService.shared.loadSavedQuotes()
+        var entries: [QuoteEntry] = []
+        let currentDate = Date()
+        
+        if quotes.isEmpty {
+            // Show placeholder if no saved quotes
+            let entry = QuoteEntry(date: currentDate, quote: WidgetQuote(text: "Save your favorite quotes to see them here.", author: "Muse", category: "Welcome"))
+            entries.append(entry)
+        } else {
+            // Cycle through saved quotes every hour
+            for hourOffset in 0..<min(quotes.count, 24) {
+                let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
+                let quote = quotes[hourOffset % quotes.count]
+                entries.append(QuoteEntry(date: entryDate, quote: quote))
+            }
+        }
+        
+        let timeline = Timeline(entries: entries, policy: .atEnd)
+        completion(timeline)
     }
 }
 
-#Preview(as: .systemSmall) {
-    MuseWidgetsExtension()
+struct QuoteWidgetEntryView: View {
+    var entry: QuoteProvider.Entry
+    @Environment(\.widgetFamily) var family
+    
+    var body: some View {
+        ZStack {
+            // Dark gradient background
+            LinearGradient(
+                colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            
+            if let quote = entry.quote {
+                VStack(spacing: 8) {
+                    // Category tag
+                    Text(quote.category.uppercased())
+                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .foregroundColor(Color(red: 0.4, green: 0.8, blue: 0.8)) // Teal
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(
+                            Capsule()
+                                .fill(Color(red: 0.4, green: 0.8, blue: 0.8).opacity(0.15))
+                        )
+                    
+                    Text(quote.text)
+                        .font(.system(size: fontSize, weight: .medium, design: .serif))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(family == .systemSmall ? 4 : 6)
+                        .minimumScaleFactor(0.7)
+                    
+                    Text("— \(quote.author)")
+                        .font(.system(size: fontSize * 0.6, weight: .regular, design: .serif))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                .padding()
+            }
+        }
+    }
+    
+    private var fontSize: CGFloat {
+        switch family {
+        case .systemSmall: return 13
+        case .systemMedium: return 15
+        case .systemLarge: return 18
+        default: return 14
+        }
+    }
+}
+
+struct QuoteWidget: Widget {
+    let kind: String = "QuoteWidget"
+    
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: QuoteProvider()) { entry in
+            QuoteWidgetEntryView(entry: entry)
+                .containerBackground(.clear, for: .widget)
+        }
+        .configurationDisplayName("Quotes")
+        .description("Display your saved quotes.")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+    }
+}
+
+// MARK: - Affirmation Widget
+struct AffirmationEntry: TimelineEntry {
+    let date: Date
+    let affirmation: WidgetAffirmation?
+}
+
+struct AffirmationProvider: TimelineProvider {
+    func placeholder(in context: Context) -> AffirmationEntry {
+        AffirmationEntry(date: Date(), affirmation: WidgetAffirmation(text: "I am capable of achieving my goals.", category: "Confidence"))
+    }
+    
+    func getSnapshot(in context: Context, completion: @escaping (AffirmationEntry) -> Void) {
+        let affirmations = SharedDataService.shared.loadSavedAffirmations()
+        let affirmation = affirmations.randomElement() ?? WidgetAffirmation(text: "Save your favorite affirmations to see them here.", category: "Welcome")
+        completion(AffirmationEntry(date: Date(), affirmation: affirmation))
+    }
+    
+    func getTimeline(in context: Context, completion: @escaping (Timeline<AffirmationEntry>) -> Void) {
+        let affirmations = SharedDataService.shared.loadSavedAffirmations()
+        var entries: [AffirmationEntry] = []
+        let currentDate = Date()
+        
+        if affirmations.isEmpty {
+            let entry = AffirmationEntry(date: currentDate, affirmation: WidgetAffirmation(text: "Save your favorite affirmations to see them here.", category: "Welcome"))
+            entries.append(entry)
+        } else {
+            // Cycle through saved affirmations every hour
+            for hourOffset in 0..<min(affirmations.count, 24) {
+                let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
+                let affirmation = affirmations[hourOffset % affirmations.count]
+                entries.append(AffirmationEntry(date: entryDate, affirmation: affirmation))
+            }
+        }
+        
+        let timeline = Timeline(entries: entries, policy: .atEnd)
+        completion(timeline)
+    }
+}
+
+struct AffirmationWidgetEntryView: View {
+    var entry: AffirmationProvider.Entry
+    @Environment(\.widgetFamily) var family
+    
+    var body: some View {
+        ZStack {
+            // Dark gradient background
+            LinearGradient(
+                colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            
+            if let affirmation = entry.affirmation {
+                VStack(spacing: 8) {
+                    // Category tag - purple for affirmations
+                    Text(affirmation.category.uppercased())
+                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .foregroundColor(Color(red: 0.6, green: 0.4, blue: 0.9)) // Purple
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(
+                            Capsule()
+                                .fill(Color(red: 0.6, green: 0.4, blue: 0.9).opacity(0.15))
+                        )
+                    
+                    Text(affirmation.text)
+                        .font(.system(size: fontSize, weight: .medium, design: .serif))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(family == .systemSmall ? 4 : 6)
+                        .minimumScaleFactor(0.7)
+                }
+                .padding()
+            }
+        }
+    }
+    
+    private var fontSize: CGFloat {
+        switch family {
+        case .systemSmall: return 14
+        case .systemMedium: return 16
+        case .systemLarge: return 20
+        default: return 15
+        }
+    }
+}
+
+struct AffirmationWidget: Widget {
+    let kind: String = "AffirmationWidget"
+    
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: AffirmationProvider()) { entry in
+            AffirmationWidgetEntryView(entry: entry)
+                .containerBackground(.clear, for: .widget)
+        }
+        .configurationDisplayName("Affirmations")
+        .description("Display your saved affirmations.")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+    }
+}
+
+// MARK: - Previews
+#Preview("Quote Small", as: .systemSmall) {
+    QuoteWidget()
 } timeline: {
-    SimpleEntry(date: .now, configuration: .smiley)
-    SimpleEntry(date: .now, configuration: .starEyes)
+    QuoteEntry(date: .now, quote: WidgetQuote(text: "The only way out is through.", author: "Robert Frost", category: "Wisdom"))
+}
+
+#Preview("Affirmation Small", as: .systemSmall) {
+    AffirmationWidget()
+} timeline: {
+    AffirmationEntry(date: .now, affirmation: WidgetAffirmation(text: "I am capable of achieving my goals.", category: "Confidence"))
 }
