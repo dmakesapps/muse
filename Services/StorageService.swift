@@ -75,7 +75,8 @@ class StorageService: ObservableObject {
     }
     
     func isQuoteSaved(_ quote: Quote) -> Bool {
-        savedQuotes.contains(where: { $0.id == quote.id })
+        // Check by content (text + author) to match how we save
+        savedQuotes.contains(where: { $0.text == quote.text && $0.author == quote.author })
     }
     
     private func saveQuotes() {
@@ -120,7 +121,8 @@ class StorageService: ObservableObject {
     }
     
     func isAffirmationSaved(_ affirmation: Affirmation) -> Bool {
-        savedAffirmations.contains(where: { $0.id == affirmation.id })
+        // Check by content (text) to match how we save
+        savedAffirmations.contains(where: { $0.text == affirmation.text })
     }
     
     private func saveAffirmations() {

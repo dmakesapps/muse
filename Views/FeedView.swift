@@ -187,10 +187,21 @@ struct FeedView: View {
                     Button(action: {
                         if currentIndex < filteredContent.count {
                             let item = filteredContent[currentIndex]
-                            if let affirmation = item.affirmation {
-                                storage.saveAffirmation(affirmation)
-                            } else if let quote = item.quote {
-                                storage.saveQuote(quote)
+                            // Toggle save state
+                            if item.isSaved(storage: storage) {
+                                // Remove from saved
+                                if let affirmation = item.affirmation {
+                                    storage.removeAffirmation(affirmation)
+                                } else if let quote = item.quote {
+                                    storage.removeQuote(quote)
+                                }
+                            } else {
+                                // Add to saved
+                                if let affirmation = item.affirmation {
+                                    storage.saveAffirmation(affirmation)
+                                } else if let quote = item.quote {
+                                    storage.saveQuote(quote)
+                                }
                             }
                         }
                     }) {
