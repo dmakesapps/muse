@@ -137,7 +137,7 @@ struct QuoteWidgetEntryView: View {
     
     var body: some View {
         ZStack {
-            // Dark content area with stroke border instead
+            // Dark content area with rainbow stroke at edge
             Rectangle()
                 .fill(
                     LinearGradient(
@@ -147,8 +147,8 @@ struct QuoteWidgetEntryView: View {
                     )
                 )
                 .overlay(
-                    // Thin rainbow stroke on the inside edge
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    // Thin rainbow stroke at the edge
+                    RoundedRectangle(cornerRadius: 26, style: .continuous)
                         .strokeBorder(
                             AngularGradient(
                                 colors: rainbowColors,
@@ -158,7 +158,6 @@ struct QuoteWidgetEntryView: View {
                             ),
                             lineWidth: 2
                         )
-                        .padding(4)
                 )
             
             if let quote = entry.quote {
@@ -281,7 +280,7 @@ struct AffirmationWidgetEntryView: View {
     
     var body: some View {
         ZStack {
-            // Dark content area with stroke border instead
+            // Dark content area with rainbow stroke at edge
             Rectangle()
                 .fill(
                     LinearGradient(
@@ -291,8 +290,8 @@ struct AffirmationWidgetEntryView: View {
                     )
                 )
                 .overlay(
-                    // Thin rainbow stroke on the inside edge
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    // Thin rainbow stroke at the edge
+                    RoundedRectangle(cornerRadius: 26, style: .continuous)
                         .strokeBorder(
                             AngularGradient(
                                 colors: rainbowColors,
@@ -302,7 +301,6 @@ struct AffirmationWidgetEntryView: View {
                             ),
                             lineWidth: 2
                         )
-                        .padding(4)
                 )
             
             if let affirmation = entry.affirmation {
