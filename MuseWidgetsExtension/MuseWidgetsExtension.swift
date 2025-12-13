@@ -137,16 +137,17 @@ struct QuoteWidgetEntryView: View {
     
     var body: some View {
         ZStack {
-            // Dark content area - thin rainbow shows through from containerBackground
+            // Rainbow stroke overlay on dark background
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
+                .strokeBorder(
+                    AngularGradient(
+                        colors: rainbowColors,
+                        center: .center,
+                        startAngle: .degrees(gradientRotation),
+                        endAngle: .degrees(gradientRotation + 360)
+                    ),
+                    lineWidth: 3
                 )
-                .padding(2) // Thin 2pt rainbow border
             
             if let quote = entry.quote {
                 VStack(spacing: 6) {
@@ -177,12 +178,11 @@ struct QuoteWidgetEntryView: View {
             }
         }
         .containerBackground(for: .widget) {
-            // Rainbow gradient fills to the edge
-            AngularGradient(
-                colors: rainbowColors,
-                center: .center,
-                startAngle: .degrees(gradientRotation),
-                endAngle: .degrees(gradientRotation + 360)
+            // Dark background fills edge to edge
+            LinearGradient(
+                colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
         }
     }
@@ -273,16 +273,17 @@ struct AffirmationWidgetEntryView: View {
     
     var body: some View {
         ZStack {
-            // Dark content area - thin rainbow shows through from containerBackground
+            // Rainbow stroke overlay on dark background
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
+                .strokeBorder(
+                    AngularGradient(
+                        colors: rainbowColors,
+                        center: .center,
+                        startAngle: .degrees(gradientRotation),
+                        endAngle: .degrees(gradientRotation + 360)
+                    ),
+                    lineWidth: 3
                 )
-                .padding(2) // Thin 2pt rainbow border
             
             if let affirmation = entry.affirmation {
                 VStack(spacing: 6) {
@@ -309,12 +310,11 @@ struct AffirmationWidgetEntryView: View {
             }
         }
         .containerBackground(for: .widget) {
-            // Rainbow gradient fills to the edge
-            AngularGradient(
-                colors: rainbowColors,
-                center: .center,
-                startAngle: .degrees(gradientRotation),
-                endAngle: .degrees(gradientRotation + 360)
+            // Dark background fills edge to edge
+            LinearGradient(
+                colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
         }
     }
