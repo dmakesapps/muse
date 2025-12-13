@@ -2,17 +2,11 @@
 //  AppIntent.swift
 //  MuseWidgets
 //
-//  Created by Davis on 12/13/25.
+//  Placeholder for future configurable widget intents
 //
 
 import WidgetKit
 import AppIntents
 
-struct ConfigurationAppIntent: WidgetConfigurationIntent {
-    static var title: LocalizedStringResource { "Configuration" }
-    static var description: IntentDescription { "This is an example widget." }
-
-    // An example configurable parameter.
-    @Parameter(title: "Favorite Emoji", default: "😃")
-    var favoriteEmoji: String
-}
+// Currently using static widgets - no configuration needed
+// ConfigurationAppIntent can be added here for future configurable widgets

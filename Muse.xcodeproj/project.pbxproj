@@ -131,6 +131,7 @@
 		72EFBA912EEDEFBB00C40084 /* MuseWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MuseWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		72EFBA932EEDEFBB00C40084 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		72EFBA952EEDEFBB00C40084 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		72EFBAB72EEDF03800C40084 /* MuseWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MuseWidgetsExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -191,6 +192,7 @@
 		72E2624E2EC68CF40080CF29 = {
 			isa = PBXGroup;
 			children = (
+				72EFBAB72EEDF03800C40084 /* MuseWidgetsExtension.entitlements */,
 				72E262832EC68E040080CF29 /* Config.swift */,
 				72E262872EC68E040080CF29 /* Models */,
 				72E262882EC68E040080CF29 /* PromiseKeeperApp.swift */,
@@ -800,6 +802,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = MuseWidgetsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 28D2M73B26;
@@ -827,6 +830,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = MuseWidgetsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 28D2M73B26;
