@@ -47,36 +47,42 @@ struct FeedView: View {
                         .foregroundColor(.museLightGray)
                 }
             } else {
-                // Vertical swipe feed
+                // Vertical swipe feed with smooth animations
                 TabView(selection: $currentIndex) {
                     ForEach(Array(filteredContent.enumerated()), id: \.element.id) { index, item in
                         // Page content - centered using GeometryReader
                         GeometryReader { geo in
-                            VStack(spacing: 16) {
-                                // Category tag - purple for affirmations, teal for quotes
-                                Text(item.category.uppercased())
-                                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                                    .foregroundColor(item.tagColor)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(
-                                        Capsule()
-                                            .fill(item.tagColor.opacity(0.15))
-                                    )
+                            ZStack {
+                                // Solid background to prevent transparency during scroll
+                                Color.museDeepNavy
                                 
-                                Text(item.text)
-                                    .font(.system(size: fontSizeFor(text: item.text), weight: .medium, design: .serif))
-                                    .foregroundColor(.museSoftWhite)
-                                    .multilineTextAlignment(.center)
-                                    .lineSpacing(8)
-                                
-                                if let author = item.author {
-                                    Text("— \(author)")
-                                        .font(.system(size: fontSizeFor(text: item.text) * 0.65, weight: .regular, design: .serif))
-                                        .foregroundColor(.museLightGray)
+                                VStack(spacing: 16) {
+                                    // Category tag - purple for affirmations, teal for quotes
+                                    Text(item.category.uppercased())
+                                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                        .foregroundColor(item.tagColor)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
+                                        .background(
+                                            Capsule()
+                                                .fill(item.tagColor.opacity(0.15))
+                                        )
+                                    
+                                    Text(item.text)
+                                        .font(.system(size: fontSizeFor(text: item.text), weight: .medium, design: .serif))
+                                        .foregroundColor(.museSoftWhite)
+                                        .multilineTextAlignment(.center)
+                                        .lineSpacing(8)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                    
+                                    if let author = item.author {
+                                        Text("— \(author)")
+                                            .font(.system(size: fontSizeFor(text: item.text) * 0.65, weight: .regular, design: .serif))
+                                            .foregroundColor(.museLightGray)
+                                    }
                                 }
+                                .padding(.horizontal, 40)
                             }
-                            .padding(.horizontal, 40)
                             .frame(width: geo.size.width, height: geo.size.height)
                         }
                         .background(Color.museDeepNavy)
@@ -86,9 +92,12 @@ struct FeedView: View {
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .rotationEffect(.degrees(90))
+                .animation(.smooth(duration: 0.3), value: currentIndex)
                 .ignoresSafeArea()
                 .onChange(of: selectedCategory) { _, _ in
-                    currentIndex = 0
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        currentIndex = 0
+                    }
                 }
             }
             
