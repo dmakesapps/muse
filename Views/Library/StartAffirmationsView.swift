@@ -675,25 +675,26 @@ struct AffirmationDisplayView: View {
     let duration: StartAffirmationsView.AffirmationDuration
     let onComplete: () -> Void
     
-    @StateObject private var speechService = SpeechService()
     @State private var randomizedAffirmations: [Affirmation] = []
     @State private var currentIndex = 0
     @State private var elapsedTime = 0
     @State private var timer: Timer?
-    @State private var userTimer: Timer?
-    @State private var speechStartTime: Date?
+    @State private var affirmationTimer: Timer?
     @State private var opacity: Double = 1.0
-    @State private var highlightedWordIndex: Int = -1
     @State private var sessionStartTime: Date = Date()
     @State private var completedAffirmations: [String] = []
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    
+    // Time each affirmation displays (in seconds)
+    private let displayDuration: Double = 5.0
     
     var body: some View {
         ZStack {
             Color.museDeepNavy
                 .ignoresSafeArea(.all)
             
+            // Progress bar
             VStack {
                 GeometryReader { geometry in
                     ZStack(alignment: .leading) {
@@ -717,24 +718,25 @@ struct AffirmationDisplayView: View {
                 Spacer()
             }
             
+            // Affirmation text
             if currentIndex < randomizedAffirmations.count {
                 VStack(spacing: 0) {
                     Spacer()
                     
-                    HighlightedAffirmationText(
-                        text: randomizedAffirmations[currentIndex].text,
-                        highlightedIndex: highlightedWordIndex,
-                        highlightColor: .museAccentBlue,
-                        fontSize: 48
-                    )
-                    .padding(.horizontal, 50)
-                    .frame(maxWidth: .infinity)
-                    .opacity(opacity)
+                    Text(randomizedAffirmations[currentIndex].text)
+                        .font(.system(size: 42, weight: .medium, design: .rounded))
+                        .foregroundColor(.museSoftWhite)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(16)
+                        .padding(.horizontal, 40)
+                        .frame(maxWidth: .infinity)
+                        .opacity(opacity)
                     
                     Spacer()
                 }
             }
             
+            // Close button
             VStack {
                 HStack {
                     Spacer()
@@ -775,9 +777,11 @@ struct AffirmationDisplayView: View {
         randomizedAffirmations = affirmations.shuffled()
         currentIndex = 0
         
-        startAffirmationCycle()
+        // Start the affirmation cycle timer
+        scheduleNextAffirmation()
         
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+        // Overall session timer
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             elapsedTime += 1
             if elapsedTime >= duration.seconds {
                 stop()
@@ -785,22 +789,10 @@ struct AffirmationDisplayView: View {
         }
     }
     
-    private func startAffirmationCycle() {
-        guard currentIndex < randomizedAffirmations.count else { return }
-        
-        highlightedWordIndex = -1
-        let affirmation = randomizedAffirmations[currentIndex]
-        let words = affirmation.text.split(separator: " ").map { String($0) }
-        let totalWords = words.count
-        
-        speechService.speak(affirmation.text, wordCallback: { wordIndex in
-            if wordIndex >= 0 && wordIndex < totalWords {
-                self.highlightedWordIndex = wordIndex
-            }
-        }) {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.transitionToNext()
-            }
+    private func scheduleNextAffirmation() {
+        affirmationTimer?.invalidate()
+        affirmationTimer = Timer.scheduledTimer(withTimeInterval: displayDuration, repeats: false) { _ in
+            transitionToNext()
         }
     }
     
@@ -809,35 +801,31 @@ struct AffirmationDisplayView: View {
             completedAffirmations.append(randomizedAffirmations[currentIndex].text)
         }
         
-        speechService.stop()
-        userTimer?.invalidate()
-        userTimer = nil
-        highlightedWordIndex = -1
-        
-        withAnimation(.easeOut(duration: 0.5)) {
+        // Fade out
+        withAnimation(.easeOut(duration: 0.4)) {
             opacity = 0
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            // Move to next affirmation
             currentIndex = (currentIndex + 1) % randomizedAffirmations.count
             
+            // Reshuffle if we've gone through all
             if currentIndex == 0 {
                 randomizedAffirmations = affirmations.shuffled()
             }
             
-            withAnimation(.easeIn(duration: 0.5)) {
+            // Fade in
+            withAnimation(.easeIn(duration: 0.4)) {
                 opacity = 1.0
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                startAffirmationCycle()
-            }
+            // Schedule next transition
+            scheduleNextAffirmation()
         }
     }
     
     private func stop() {
-        speechService.stop()
-        
         let sessionDuration = Date().timeIntervalSince(sessionStartTime)
         let affirmationCount = completedAffirmations.count
         
@@ -856,53 +844,10 @@ struct AffirmationDisplayView: View {
         }
         
         timer?.invalidate()
-        userTimer?.invalidate()
+        affirmationTimer?.invalidate()
         timer = nil
-        userTimer = nil
-        highlightedWordIndex = -1
+        affirmationTimer = nil
         onComplete()
-    }
-}
-
-// MARK: - Highlighted Affirmation Text View
-struct HighlightedAffirmationText: View {
-    let text: String
-    let highlightedIndex: Int
-    let highlightColor: Color
-    let fontSize: CGFloat
-    
-    private var words: [String] {
-        text.split(separator: " ").map { String($0) }
-    }
-    
-    var body: some View {
-        Text(attributedString)
-            .font(.system(size: fontSize, weight: .medium, design: .rounded))
-            .multilineTextAlignment(.center)
-            .lineSpacing(20)
-    }
-    
-    private var attributedString: AttributedString {
-        var attributed = AttributedString()
-        let words = self.words
-        
-        for (index, word) in words.enumerated() {
-            var wordAttributed = AttributedString(word)
-            
-            if index == highlightedIndex {
-                wordAttributed.foregroundColor = highlightColor
-            } else {
-                wordAttributed.foregroundColor = .museSoftWhite
-            }
-            
-            attributed.append(wordAttributed)
-            
-            if index < words.count - 1 {
-                attributed.append(AttributedString(" "))
-            }
-        }
-        
-        return attributed
     }
 }
 
