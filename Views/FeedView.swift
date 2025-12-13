@@ -16,32 +16,9 @@ struct FeedView: View {
     }
     
     // Default quotes
-    @State private var quotes: [Quote] = [
-        Quote(text: "Dreams get you started... Discipline keeps you going.", author: "Unknown", category: "Motivation"),
-        Quote(text: "The only way to do great work is to love what you do", author: "Steve Jobs", category: "Success"),
-        Quote(text: "Success is not final, failure is not fatal: it is the courage to continue that counts", author: "Winston Churchill", category: "Perseverance"),
-        Quote(text: "The future belongs to those who believe in the beauty of their dreams", author: "Eleanor Roosevelt", category: "Dreams"),
-        Quote(text: "It does not matter how slowly you go as long as you do not stop", author: "Confucius", category: "Progress"),
-        Quote(text: "The only person you are destined to become is the person you decide to be", author: "Ralph Waldo Emerson", category: "Self-Determination"),
-        Quote(text: "Believe you can and you're halfway there", author: "Theodore Roosevelt", category: "Confidence"),
-        Quote(text: "You are never too old to set another goal or to dream a new dream", author: "C.S. Lewis", category: "Growth"),
-        Quote(text: "The only way out is through.", author: "Robert Frost", category: "Wisdom"),
-        Quote(text: "You are enough just as you are.", author: "Maya Angelou", category: "Self-Love"),
-    ]
-    
-    // Default affirmations
-    @State private var affirmations: [Affirmation] = [
-        Affirmation(text: "I am capable of achieving my goals", category: "Confidence"),
-        Affirmation(text: "I choose to focus on what I can control", category: "Peace"),
-        Affirmation(text: "I am worthy of success and happiness", category: "Self-Worth"),
-        Affirmation(text: "I trust in my ability to overcome challenges", category: "Strength"),
-        Affirmation(text: "I am grateful for the opportunities in my life", category: "Gratitude"),
-        Affirmation(text: "I refuse to let anyone make me doubt myself. Ever.", category: "Confidence"),
-        Affirmation(text: "I am becoming the person I want to be", category: "Growth"),
-        Affirmation(text: "I deserve to take care of myself", category: "Self-Care"),
-        Affirmation(text: "I am confident, capable, and ready to embrace all the opportunities that come my way.", category: "Confidence"),
-        Affirmation(text: "I am worthy of love, respect, and all the good things life has to offer.", category: "Self-Love"),
-    ]
+    // Content loaded from JSON files
+    @State private var quotes: [Quote] = []
+    @State private var affirmations: [Affirmation] = []
     
     // Filter content by selected category
     private var filteredContent: [AnyContentItem] {
@@ -281,6 +258,15 @@ struct FeedView: View {
         }
         .sheet(isPresented: $showPracticePopup) {
             PracticePopupView()
+        }
+        .onAppear {
+            // Load content from JSON files
+            if quotes.isEmpty {
+                quotes = ContentLoader.shared.loadQuotes().shuffled()
+            }
+            if affirmations.isEmpty {
+                affirmations = ContentLoader.shared.loadAffirmations()
+            }
         }
     }
     
