@@ -908,6 +908,7 @@ struct FavoritesFeedView: View {
                         LazyVStack(spacing: 0) {
                             ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                                 ZStack {
+                                    // Solid background prevents text cutoff during scroll
                                     Color.museDeepNavy
                                     
                                     VStack(spacing: 16) {
@@ -927,6 +928,8 @@ struct FavoritesFeedView: View {
                                             .foregroundColor(.museSoftWhite)
                                             .multilineTextAlignment(.center)
                                             .lineSpacing(8)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .frame(maxWidth: geometry.size.width - 80)
                                         
                                         if let author = item.author {
                                             Text("— \(author)")
