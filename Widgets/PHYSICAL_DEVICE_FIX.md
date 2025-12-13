@@ -91,3 +91,4 @@ The widget extension should be automatically embedded. To verify:
 - [ ] App installs successfully on device
 - [ ] Widget extension appears in device's installed extensions
 
+

@@ -89,28 +89,28 @@ struct ChatBoxView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         QuickActionButton(
-                            icon: "magnifyingglass",
-                            text: "Search the web",
+                            icon: "book",
+                            text: "Journal",
                             action: {
-                                messageText = "Search the web for: "
+                                messageText = "Journal: "
                                 isInputFocused = true
                             }
                         )
                         
                         QuickActionButton(
-                            icon: "doc.text",
-                            text: "Summarize this article",
+                            icon: "target",
+                            text: "Goals",
                             action: {
-                                messageText = "Summarize this article: "
+                                messageText = "Goals: "
                                 isInputFocused = true
                             }
                         )
                         
                         QuickActionButton(
-                            icon: "globe",
-                            text: "Translate this text",
+                            icon: "plus.circle.fill",
+                            text: "Generate +",
                             action: {
-                                messageText = "Translate this text: "
+                                messageText = "Generate: "
                                 isInputFocused = true
                             }
                         )

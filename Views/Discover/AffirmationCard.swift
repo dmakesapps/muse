@@ -4,8 +4,12 @@ struct AffirmationCard: View {
     let affirmation: Affirmation
     @StateObject private var storage = StorageService.shared
     
+    // Computed property that observes storage.savedAffirmations changes
+    // Compare by content (text) since DiscoverView creates new UUIDs
     private var isSaved: Bool {
-        storage.isAffirmationSaved(affirmation)
+        storage.savedAffirmations.contains { savedAffirmation in
+            savedAffirmation.text == affirmation.text
+        }
     }
     
     var body: some View {

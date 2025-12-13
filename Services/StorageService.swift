@@ -61,14 +61,16 @@ class StorageService: ObservableObject {
     
     // MARK: - Quotes
     func saveQuote(_ quote: Quote) {
-        if !savedQuotes.contains(where: { $0.id == quote.id }) {
+        // Check by content (text + author) to prevent duplicates even if UUID differs
+        if !savedQuotes.contains(where: { $0.text == quote.text && $0.author == quote.author }) {
             savedQuotes.append(quote)
             saveQuotes()
         }
     }
     
     func removeQuote(_ quote: Quote) {
-        savedQuotes.removeAll(where: { $0.id == quote.id })
+        // Remove by content (text + author) to handle cases where UUID differs
+        savedQuotes.removeAll(where: { $0.text == quote.text && $0.author == quote.author })
         saveQuotes()
     }
     
@@ -104,14 +106,16 @@ class StorageService: ObservableObject {
     
     // MARK: - Affirmations
     func saveAffirmation(_ affirmation: Affirmation) {
-        if !savedAffirmations.contains(where: { $0.id == affirmation.id }) {
+        // Check by content (text) to prevent duplicates even if UUID differs
+        if !savedAffirmations.contains(where: { $0.text == affirmation.text }) {
             savedAffirmations.append(affirmation)
             saveAffirmations()
         }
     }
     
     func removeAffirmation(_ affirmation: Affirmation) {
-        savedAffirmations.removeAll(where: { $0.id == affirmation.id })
+        // Remove by content (text) to handle cases where UUID differs
+        savedAffirmations.removeAll(where: { $0.text == affirmation.text })
         saveAffirmations()
     }
     

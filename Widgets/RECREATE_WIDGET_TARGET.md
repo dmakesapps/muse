@@ -130,3 +130,4 @@ struct MuseWidgetsBundle: WidgetBundle {
 - [ ] Widget extension embedded in main app
 - [ ] Build succeeds
 
+

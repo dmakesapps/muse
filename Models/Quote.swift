@@ -14,3 +14,4 @@ struct Quote: Identifiable, Codable {
     }
 }
 
+

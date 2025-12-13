@@ -63,3 +63,4 @@ After fixing:
 3. **Rebuild and reinstall**
 4. **Re-add widgets** - they should now show your custom design
 
+

@@ -154,3 +154,4 @@ If after all these steps the widget still doesn't appear:
 - [ ] Both Muse and MuseWidgetsExtension appear in Settings → VPN & Device Management
 - [ ] Widget appears in widget picker
 
+

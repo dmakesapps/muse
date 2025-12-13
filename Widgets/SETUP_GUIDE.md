@@ -99,3 +99,4 @@ I recommend using **Configurable Widgets** (Option B) because:
 
 The configurable widgets will show a settings screen when users add the widget, allowing them to choose their preferred refresh frequency.
 
+

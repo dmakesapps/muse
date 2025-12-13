@@ -74,3 +74,4 @@ After successful installation:
 - When adding widgets, "Muse" should appear in the widget picker
 - You should see "Quote Widget" and "Affirmation Widget" options
 
+

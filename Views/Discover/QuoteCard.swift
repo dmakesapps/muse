@@ -4,8 +4,12 @@ struct QuoteCard: View {
     let quote: Quote
     @StateObject private var storage = StorageService.shared
     
+    // Computed property that observes storage.savedQuotes changes
+    // Compare by content (text + author) since DiscoverView creates new UUIDs
     private var isSaved: Bool {
-        storage.isQuoteSaved(quote)
+        storage.savedQuotes.contains { savedQuote in
+            savedQuote.text == quote.text && savedQuote.author == quote.author
+        }
     }
     
     var body: some View {

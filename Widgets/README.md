@@ -76,3 +76,4 @@ The `StorageService.swift` has been updated to automatically sync data to the Ap
   2. You have saved at least one quote or affirmation in the app
   3. The widget extension has the correct bundle identifier
 
+
