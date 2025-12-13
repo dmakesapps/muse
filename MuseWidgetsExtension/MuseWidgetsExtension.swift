@@ -117,14 +117,39 @@ struct QuoteWidgetEntryView: View {
     var entry: QuoteProvider.Entry
     @Environment(\.widgetFamily) var family
     
+    // Rainbow colors
+    private let rainbowColors: [Color] = [
+        Color(red: 1.0, green: 0.3, blue: 0.3),   // Red
+        Color(red: 1.0, green: 0.6, blue: 0.2),   // Orange
+        Color(red: 1.0, green: 0.9, blue: 0.3),   // Yellow
+        Color(red: 0.3, green: 0.9, blue: 0.4),   // Green
+        Color(red: 0.3, green: 0.7, blue: 1.0),   // Blue
+        Color(red: 0.6, green: 0.4, blue: 1.0),   // Purple
+        Color(red: 1.0, green: 0.4, blue: 0.8),   // Pink
+        Color(red: 1.0, green: 0.3, blue: 0.3),   // Red (loop)
+    ]
+    
+    // Shift gradient based on time for animation effect
+    private var gradientRotation: Double {
+        let seconds = Calendar.current.component(.second, from: entry.date)
+        return Double(seconds) * 6 // 360 degrees per minute
+    }
+    
     var body: some View {
         ZStack {
-            // Ultra thin white border
+            // Rainbow gradient border
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(Color.white.opacity(0.9))
+                .fill(
+                    AngularGradient(
+                        colors: rainbowColors,
+                        center: .center,
+                        startAngle: .degrees(gradientRotation),
+                        endAngle: .degrees(gradientRotation + 360)
+                    )
+                )
             
             // Dark content area
-            RoundedRectangle(cornerRadius: 21.5, style: .continuous)
+            RoundedRectangle(cornerRadius: 21, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
@@ -132,7 +157,7 @@ struct QuoteWidgetEntryView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .padding(0.5) // Ultra thin 0.5pt border
+                .padding(1.5) // Slightly thicker to show rainbow
             
             if let quote = entry.quote {
                 VStack(spacing: 6) {
@@ -230,14 +255,39 @@ struct AffirmationWidgetEntryView: View {
     var entry: AffirmationProvider.Entry
     @Environment(\.widgetFamily) var family
     
+    // Rainbow colors
+    private let rainbowColors: [Color] = [
+        Color(red: 1.0, green: 0.3, blue: 0.3),   // Red
+        Color(red: 1.0, green: 0.6, blue: 0.2),   // Orange
+        Color(red: 1.0, green: 0.9, blue: 0.3),   // Yellow
+        Color(red: 0.3, green: 0.9, blue: 0.4),   // Green
+        Color(red: 0.3, green: 0.7, blue: 1.0),   // Blue
+        Color(red: 0.6, green: 0.4, blue: 1.0),   // Purple
+        Color(red: 1.0, green: 0.4, blue: 0.8),   // Pink
+        Color(red: 1.0, green: 0.3, blue: 0.3),   // Red (loop)
+    ]
+    
+    // Shift gradient based on time for animation effect
+    private var gradientRotation: Double {
+        let seconds = Calendar.current.component(.second, from: entry.date)
+        return Double(seconds) * 6 // 360 degrees per minute
+    }
+    
     var body: some View {
         ZStack {
-            // Ultra thin white border
+            // Rainbow gradient border
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(Color.white.opacity(0.9))
+                .fill(
+                    AngularGradient(
+                        colors: rainbowColors,
+                        center: .center,
+                        startAngle: .degrees(gradientRotation),
+                        endAngle: .degrees(gradientRotation + 360)
+                    )
+                )
             
             // Dark content area
-            RoundedRectangle(cornerRadius: 21.5, style: .continuous)
+            RoundedRectangle(cornerRadius: 21, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
@@ -245,7 +295,7 @@ struct AffirmationWidgetEntryView: View {
                         endPoint: .bottomTrailing
                     )
                 )
-                .padding(0.5) // Ultra thin 0.5pt border
+                .padding(1.5) // Slightly thicker to show rainbow
             
             if let affirmation = entry.affirmation {
                 VStack(spacing: 6) {
