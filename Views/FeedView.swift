@@ -93,6 +93,8 @@ struct FeedView: View {
                         get: { currentIndex },
                         set: { if let newValue = $0 { currentIndex = newValue } }
                     ))
+                    // Force ScrollView to recreate when category changes
+                    .id(selectedCategory)
                 }
                 .ignoresSafeArea()
                 .onChange(of: selectedCategory) { _, _ in
