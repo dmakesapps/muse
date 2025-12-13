@@ -76,6 +76,17 @@ struct FeedView: View {
                         // Page content - centered using GeometryReader
                         GeometryReader { geo in
                             VStack(spacing: 16) {
+                                // Category tag
+                                Text(item.category.uppercased())
+                                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                    .foregroundColor(.museAccentBlue)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        Capsule()
+                                            .fill(Color.museAccentBlue.opacity(0.15))
+                                    )
+                                
                                 Text(item.text)
                                     .font(.system(size: fontSizeFor(text: item.text), weight: .medium, design: .serif))
                                     .foregroundColor(.museSoftWhite)
@@ -306,6 +317,7 @@ struct AnyContentItem: Identifiable {
     let id: UUID
     let text: String
     let author: String?
+    let category: String
     let affirmation: Affirmation?
     let quote: Quote?
     
@@ -313,6 +325,7 @@ struct AnyContentItem: Identifiable {
         self.id = affirmation.id
         self.text = affirmation.text
         self.author = nil
+        self.category = affirmation.category
         self.affirmation = affirmation
         self.quote = nil
     }
@@ -321,6 +334,7 @@ struct AnyContentItem: Identifiable {
         self.id = quote.id
         self.text = quote.text
         self.author = quote.author
+        self.category = quote.category
         self.affirmation = nil
         self.quote = quote
     }
@@ -786,6 +800,7 @@ struct FavoritesView: View {
                                         FavoriteCard(
                                             text: affirmation.text,
                                             author: nil,
+                                            category: affirmation.category,
                                             onDelete: {
                                                 storage.removeAffirmation(affirmation)
                                             }
@@ -819,6 +834,7 @@ struct FavoritesView: View {
                                         FavoriteCard(
                                             text: quote.text,
                                             author: quote.author,
+                                            category: quote.category,
                                             onDelete: {
                                                 storage.removeQuote(quote)
                                             }
@@ -885,6 +901,17 @@ struct FavoritesFeedView: View {
                     ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                         GeometryReader { geo in
                             VStack(spacing: 16) {
+                                // Category tag
+                                Text(item.category.uppercased())
+                                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                    .foregroundColor(.museAccentBlue)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        Capsule()
+                                            .fill(Color.museAccentBlue.opacity(0.15))
+                                    )
+                                
                                 Text(item.text)
                                     .font(.system(size: fontSizeFor(text: item.text), weight: .medium, design: .serif))
                                     .foregroundColor(.museSoftWhite)
@@ -952,10 +979,22 @@ struct FavoritesFeedView: View {
 struct FavoriteCard: View {
     let text: String
     let author: String?
+    let category: String
     let onDelete: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            // Category tag
+            Text(category.uppercased())
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .foregroundColor(.museAccentBlue)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(
+                    Capsule()
+                        .fill(Color.museAccentBlue.opacity(0.15))
+                )
+            
             Text(text)
                 .font(.system(size: 16, weight: .medium, design: .serif))
                 .foregroundColor(.museSoftWhite)
