@@ -1,43 +1,2002 @@
 [
   {
-    "text": "I am capable of achieving my goals",
-    "category": "Confidence"
+    "text": "I am worthy of love and respect",
+    "category": "Self-Love"
   },
   {
-    "text": "I choose to focus on what I can control",
-    "category": "Peace"
-  },
-  {
-    "text": "I am worthy of success and happiness",
+    "text": "I am enough exactly as I am",
     "category": "Self-Worth"
   },
   {
-    "text": "I trust in my ability to overcome challenges",
-    "category": "Strength"
+    "text": "I am capable of achieving anything I set my mind to",
+    "category": "Confidence"
   },
   {
-    "text": "I am grateful for the opportunities in my life",
+    "text": "I am deserving of happiness and success",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am at peace with my past and excited for my future",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am grateful for this moment and all it contains",
     "category": "Gratitude"
   },
   {
-    "text": "I refuse to let anyone make me doubt myself",
-    "category": "Confidence"
+    "text": "I am strong, resilient, and capable of handling anything",
+    "category": "Strength"
   },
   {
-    "text": "I am becoming the person I want to be",
+    "text": "I am surrounded by love and support",
+    "category": "Love"
+  },
+  {
+    "text": "I am becoming the best version of myself every day",
     "category": "Growth"
   },
   {
-    "text": "I deserve to take care of myself",
-    "category": "Self-Care"
+    "text": "I am in control of my thoughts and emotions",
+    "category": "Mental Health"
   },
   {
-    "text": "I am confident, capable, and ready to embrace all the opportunities that come my way",
+    "text": "I am attracting abundance into my life",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am confident in my abilities and talents",
     "category": "Confidence"
   },
   {
-    "text": "I am worthy of love, respect, and all the good things life has to offer",
+    "text": "I am free from worry and filled with peace",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am choosing to focus on what I can control",
+    "category": "Mental Health"
+  },
+  {
+    "text": "I am worthy of all the good things coming my way",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am letting go of what no longer serves me",
+    "category": "Healing"
+  },
+  {
+    "text": "I am creating the life of my dreams",
+    "category": "Manifestation"
+  },
+  {
+    "text": "I am grateful for my body and all it does for me",
+    "category": "Health"
+  },
+  {
+    "text": "I am open to receiving love and giving love freely",
+    "category": "Love"
+  },
+  {
+    "text": "I am calm, centered, and grounded",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am worthy of taking up space in this world",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am releasing all fear and embracing courage",
+    "category": "Courage"
+  },
+  {
+    "text": "I am trusting the journey of my life",
+    "category": "Trust"
+  },
+  {
+    "text": "I am forgiving myself for past mistakes",
+    "category": "Forgiveness"
+  },
+  {
+    "text": "I am exactly where I need to be right now",
+    "category": "Acceptance"
+  },
+  {
+    "text": "I am filled with positive energy and light",
+    "category": "Positivity"
+  },
+  {
+    "text": "I am worthy of rest and relaxation",
+    "category": "Self-Care"
+  },
+  {
+    "text": "I am confident in my decisions",
+    "category": "Confidence"
+  },
+  {
+    "text": "I am attracting positive people into my life",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am grateful for the lessons life teaches me",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am releasing anxiety and welcoming calm",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am worthy of success in all areas of my life",
+    "category": "Success"
+  },
+  {
+    "text": "I am honoring my needs and boundaries",
+    "category": "Boundaries"
+  },
+  {
+    "text": "I am open to new possibilities and opportunities",
+    "category": "Growth"
+  },
+  {
+    "text": "I am stronger than my challenges",
+    "category": "Strength"
+  },
+  {
+    "text": "I am choosing peace over worry",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am worthy of healthy, loving relationships",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am embracing change with an open heart",
+    "category": "Growth"
+  },
+  {
+    "text": "I am letting go of the need for perfection",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am creating positive change in my life",
+    "category": "Transformation"
+  },
+  {
+    "text": "I am grateful for my unique gifts and talents",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am at peace with who I am",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am worthy of achieving my goals",
+    "category": "Success"
+  },
+  {
+    "text": "I am releasing negative thoughts and embracing positivity",
+    "category": "Mental Health"
+  },
+  {
+    "text": "I am capable of overcoming any obstacle",
+    "category": "Resilience"
+  },
+  {
+    "text": "I am choosing to see the good in every situation",
+    "category": "Positivity"
+  },
+  {
+    "text": "I am deserving of financial abundance",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am healing more and more each day",
+    "category": "Healing"
+  },
+  {
+    "text": "I am proud of how far I have come",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am open to giving and receiving kindness",
+    "category": "Compassion"
+  },
+  {
+    "text": "I am in harmony with the universe",
+    "category": "Spirituality"
+  },
+  {
+    "text": "I am worthy of my dreams coming true",
+    "category": "Manifestation"
+  },
+  {
+    "text": "I am embracing my authentic self",
+    "category": "Authenticity"
+  },
+  {
+    "text": "I am filled with inner strength and courage",
+    "category": "Courage"
+  },
+  {
+    "text": "I am grateful for the abundance in my life",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am releasing stress and inviting relaxation",
+    "category": "Stress Relief"
+  },
+  {
+    "text": "I am worthy of being heard and understood",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am creating space for joy in my life",
+    "category": "Joy"
+  },
+  {
+    "text": "I am confident in expressing my true self",
+    "category": "Authenticity"
+  },
+  {
+    "text": "I am attracting wealth and prosperity",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am worthy of peace and tranquility",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am embracing my journey with patience",
+    "category": "Patience"
+  },
+  {
+    "text": "I am surrounded by positive energy",
+    "category": "Positivity"
+  },
+  {
+    "text": "I am worthy of taking care of myself first",
+    "category": "Self-Care"
+  },
+  {
+    "text": "I am releasing the need to please everyone",
+    "category": "Boundaries"
+  },
+  {
+    "text": "I am trusting my intuition to guide me",
+    "category": "Trust"
+  },
+  {
+    "text": "I am grateful for my health and vitality",
+    "category": "Health"
+  },
+  {
+    "text": "I am worthy of unconditional love",
+    "category": "Love"
+  },
+  {
+    "text": "I am choosing happiness in this moment",
+    "category": "Joy"
+  },
+  {
+    "text": "I am capable of creating positive habits",
+    "category": "Growth"
+  },
+  {
+    "text": "I am at peace with uncertainty",
+    "category": "Acceptance"
+  },
+  {
+    "text": "I am worthy of respect from others and myself",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am releasing fear and stepping into my power",
+    "category": "Courage"
+  },
+  {
+    "text": "I am grateful for this new day and its possibilities",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of living a life I love",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am calm in the face of challenges",
+    "category": "Resilience"
+  },
+  {
+    "text": "I am open to learning and growing",
+    "category": "Growth"
+  },
+  {
+    "text": "I am worthy of celebrating my achievements",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am releasing all that weighs me down",
+    "category": "Healing"
+  },
+  {
+    "text": "I am attracting success and opportunities",
+    "category": "Success"
+  },
+  {
+    "text": "I am worthy of setting healthy boundaries",
+    "category": "Boundaries"
+  },
+  {
+    "text": "I am embracing self-compassion",
     "category": "Self-Love"
+  },
+  {
+    "text": "I am grateful for the people who love me",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of speaking my truth",
+    "category": "Authenticity"
+  },
+  {
+    "text": "I am choosing to believe in myself",
+    "category": "Confidence"
+  },
+  {
+    "text": "I am releasing comparison and embracing my uniqueness",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am worthy of a peaceful mind",
+    "category": "Mental Health"
+  },
+  {
+    "text": "I am creating a life filled with purpose",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am grateful for every breath I take",
+    "category": "Mindfulness"
+  },
+  {
+    "text": "I am worthy of forgiveness",
+    "category": "Forgiveness"
+  },
+  {
+    "text": "I am embracing the present moment fully",
+    "category": "Mindfulness"
+  },
+  {
+    "text": "I am confident in my path forward",
+    "category": "Confidence"
+  },
+  {
+    "text": "I am worthy of expressing my creativity",
+    "category": "Creativity"
+  },
+  {
+    "text": "I am releasing self-doubt and embracing self-belief",
+    "category": "Confidence"
+  },
+  {
+    "text": "I am grateful for the strength within me",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of experiencing joy every day",
+    "category": "Joy"
+  },
+  {
+    "text": "I am choosing to focus on solutions, not problems",
+    "category": "Positivity"
+  },
+  {
+    "text": "I am at peace with my body",
+    "category": "Body Positivity"
+  },
+  {
+    "text": "I am worthy of deep, meaningful connections",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am releasing old patterns that no longer serve me",
+    "category": "Transformation"
+  },
+  {
+    "text": "I am grateful for the wisdom I have gained",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of feeling confident in my skin",
+    "category": "Body Positivity"
+  },
+  {
+    "text": "I am choosing love over fear",
+    "category": "Love"
+  },
+  {
+    "text": "I am capable of handling whatever comes my way",
+    "category": "Resilience"
+  },
+  {
+    "text": "I am worthy of abundance in all forms",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am embracing my imperfections as part of my beauty",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am grateful for the opportunity to grow",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of pursuing my passions",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am releasing anxiety about the future",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am confident in my ability to succeed",
+    "category": "Success"
+  },
+  {
+    "text": "I am worthy of loving myself unconditionally",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am creating boundaries that protect my peace",
+    "category": "Boundaries"
+  },
+  {
+    "text": "I am grateful for the love that surrounds me",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of taking time for myself",
+    "category": "Self-Care"
+  },
+  {
+    "text": "I am embracing change as an opportunity for growth",
+    "category": "Growth"
+  },
+  {
+    "text": "I am at peace with letting go",
+    "category": "Acceptance"
+  },
+  {
+    "text": "I am worthy of my own kindness",
+    "category": "Self-Compassion"
+  },
+  {
+    "text": "I am choosing to see my worth",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am releasing the need for external validation",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am grateful for my journey, including the hard parts",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of a life free from stress",
+    "category": "Stress Relief"
+  },
+  {
+    "text": "I am confident in sharing my ideas with the world",
+    "category": "Confidence"
+  },
+  {
+    "text": "I am attracting love and positivity",
+    "category": "Love"
+  },
+  {
+    "text": "I am worthy of being prioritized",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am embracing stillness and silence",
+    "category": "Mindfulness"
+  },
+  {
+    "text": "I am releasing guilt and shame from my past",
+    "category": "Forgiveness"
+  },
+  {
+    "text": "I am grateful for my resilience",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of achieving my highest potential",
+    "category": "Growth"
+  },
+  {
+    "text": "I am choosing to trust the process of life",
+    "category": "Trust"
+  },
+  {
+    "text": "I am at peace with where I am in life",
+    "category": "Acceptance"
+  },
+  {
+    "text": "I am worthy of feeling safe and secure",
+    "category": "Security"
+  },
+  {
+    "text": "I am embracing my power to create change",
+    "category": "Empowerment"
+  },
+  {
+    "text": "I am grateful for the beauty around me",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of feeling proud of myself",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am releasing perfectionism and embracing progress",
+    "category": "Growth"
+  },
+  {
+    "text": "I am confident in my unique perspective",
+    "category": "Authenticity"
+  },
+  {
+    "text": "I am worthy of rest without guilt",
+    "category": "Self-Care"
+  },
+  {
+    "text": "I am attracting meaningful experiences",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am grateful for my ability to heal",
+    "category": "Healing"
+  },
+  {
+    "text": "I am worthy of living authentically",
+    "category": "Authenticity"
+  },
+  {
+    "text": "I am choosing to release what I cannot control",
+    "category": "Acceptance"
+  },
+  {
+    "text": "I am at peace with my emotions",
+    "category": "Emotional Health"
+  },
+  {
+    "text": "I am worthy of having my needs met",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am embracing gratitude as a way of life",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am releasing negative self-talk",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am confident in my ability to learn new things",
+    "category": "Growth"
+  },
+  {
+    "text": "I am worthy of compassion from myself and others",
+    "category": "Compassion"
+  },
+  {
+    "text": "I am creating a life aligned with my values",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am grateful for this present moment",
+    "category": "Mindfulness"
+  },
+  {
+    "text": "I am worthy of feeling content",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am embracing vulnerability as strength",
+    "category": "Courage"
+  },
+  {
+    "text": "I am releasing the weight of others' expectations",
+    "category": "Freedom"
+  },
+  {
+    "text": "I am confident in setting my own pace",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am worthy of experiencing deep peace",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am attracting clarity and focus",
+    "category": "Focus"
+  },
+  {
+    "text": "I am grateful for my ability to feel deeply",
+    "category": "Emotional Health"
+  },
+  {
+    "text": "I am worthy of chasing my dreams",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am choosing to be patient with myself",
+    "category": "Self-Compassion"
+  },
+  {
+    "text": "I am at peace with not having all the answers",
+    "category": "Acceptance"
+  },
+  {
+    "text": "I am worthy of celebration",
+    "category": "Joy"
+  },
+  {
+    "text": "I am embracing each day as a fresh start",
+    "category": "Hope"
+  },
+  {
+    "text": "I am releasing resentment and choosing peace",
+    "category": "Forgiveness"
+  },
+  {
+    "text": "I am confident in my capacity for love",
+    "category": "Love"
+  },
+  {
+    "text": "I am worthy of trusting myself",
+    "category": "Trust"
+  },
+  {
+    "text": "I am creating space for what matters most",
+    "category": "Priorities"
+  },
+  {
+    "text": "I am grateful for my ability to start over",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of investing in myself",
+    "category": "Self-Care"
+  },
+  {
+    "text": "I am choosing courage over comfort",
+    "category": "Courage"
+  },
+  {
+    "text": "I am at peace with my decisions",
+    "category": "Confidence"
+  },
+  {
+    "text": "I am worthy of being seen and valued",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am embracing my journey without comparison",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am releasing the fear of failure",
+    "category": "Courage"
+  },
+  {
+    "text": "I am confident in my right to take up space",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am worthy of experiencing wonder",
+    "category": "Joy"
+  },
+  {
+    "text": "I am attracting opportunities aligned with my purpose",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am grateful for my capacity to grow",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of asking for help",
+    "category": "Self-Care"
+  },
+  {
+    "text": "I am choosing to believe good things are coming",
+    "category": "Hope"
+  },
+  {
+    "text": "I am at peace with being a work in progress",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am worthy of saying no without guilt",
+    "category": "Boundaries"
+  },
+  {
+    "text": "I am embracing self-love as my foundation",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am releasing the need to be perfect",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am confident in my ability to adapt",
+    "category": "Resilience"
+  },
+  {
+    "text": "I am worthy of a calm and peaceful mind",
+    "category": "Mental Health"
+  },
+  {
+    "text": "I am creating joy in my daily life",
+    "category": "Joy"
+  },
+  {
+    "text": "I am grateful for my courage to keep going",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of feeling at home in my body",
+    "category": "Body Positivity"
+  },
+  {
+    "text": "I am choosing to honor my feelings",
+    "category": "Emotional Health"
+  },
+  {
+    "text": "I am at peace with my story",
+    "category": "Acceptance"
+  },
+  {
+    "text": "I am worthy of genuine connections",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am embracing my sensitivity as a gift",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am releasing toxic thoughts and patterns",
+    "category": "Mental Health"
+  },
+  {
+    "text": "I am confident in my inner wisdom",
+    "category": "Trust"
+  },
+  {
+    "text": "I am worthy of making myself a priority",
+    "category": "Self-Care"
+  },
+  {
+    "text": "I am attracting peace into my life",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am grateful for the love I have to give",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of experiencing gratitude",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am choosing to focus on my blessings",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am at peace with my pace of progress",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am worthy of feeling hopeful",
+    "category": "Hope"
+  },
+  {
+    "text": "I am embracing my worth without conditions",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am releasing self-criticism",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am confident in my resilience",
+    "category": "Resilience"
+  },
+  {
+    "text": "I am worthy of having dreams",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am creating a mindset of abundance",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am grateful for every experience that shaped me",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of kindness from myself",
+    "category": "Self-Compassion"
+  },
+  {
+    "text": "I am choosing peace in every moment",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am at peace with impermanence",
+    "category": "Acceptance"
+  },
+  {
+    "text": "I am worthy of thriving, not just surviving",
+    "category": "Growth"
+  },
+  {
+    "text": "I am embracing the power of now",
+    "category": "Mindfulness"
+  },
+  {
+    "text": "I am releasing the burden of overthinking",
+    "category": "Mental Health"
+  },
+  {
+    "text": "I am confident in my worth",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am worthy of feeling grounded",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am attracting healing energy",
+    "category": "Healing"
+  },
+  {
+    "text": "I am grateful for my ability to love",
+    "category": "Love"
+  },
+  {
+    "text": "I am worthy of feeling alive",
+    "category": "Joy"
+  },
+  {
+    "text": "I am choosing to be gentle with myself",
+    "category": "Self-Compassion"
+  },
+  {
+    "text": "I am at peace with my unique path",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am worthy of my own approval",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am embracing the unknown with curiosity",
+    "category": "Courage"
+  },
+  {
+    "text": "I am releasing limiting beliefs about myself",
+    "category": "Growth"
+  },
+  {
+    "text": "I am confident in my creative abilities",
+    "category": "Creativity"
+  },
+  {
+    "text": "I am worthy of fulfillment",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am creating healthy patterns for my life",
+    "category": "Health"
+  },
+  {
+    "text": "I am grateful for my mind's ability to heal",
+    "category": "Mental Health"
+  },
+  {
+    "text": "I am worthy of balanced relationships",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am choosing growth over fear",
+    "category": "Growth"
+  },
+  {
+    "text": "I am at peace with saying no",
+    "category": "Boundaries"
+  },
+  {
+    "text": "I am worthy of deep inner peace",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am embracing self-acceptance fully",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am releasing the need for certainty",
+    "category": "Trust"
+  },
+  {
+    "text": "I am confident in facing my fears",
+    "category": "Courage"
+  },
+  {
+    "text": "I am worthy of patience from myself",
+    "category": "Self-Compassion"
+  },
+  {
+    "text": "I am attracting supportive relationships",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am grateful for my emotional strength",
+    "category": "Emotional Health"
+  },
+  {
+    "text": "I am worthy of expressing myself freely",
+    "category": "Authenticity"
+  },
+  {
+    "text": "I am choosing to trust my journey",
+    "category": "Trust"
+  },
+  {
+    "text": "I am at peace with my boundaries",
+    "category": "Boundaries"
+  },
+  {
+    "text": "I am worthy of safety and protection",
+    "category": "Security"
+  },
+  {
+    "text": "I am embracing my full potential",
+    "category": "Growth"
+  },
+  {
+    "text": "I am releasing anxiety about tomorrow",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am confident in my ability to heal",
+    "category": "Healing"
+  },
+  {
+    "text": "I am worthy of inner harmony",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am creating positive momentum in my life",
+    "category": "Growth"
+  },
+  {
+    "text": "I am grateful for my perseverance",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of feeling empowered",
+    "category": "Empowerment"
+  },
+  {
+    "text": "I am choosing self-love every day",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am at peace with my emotions",
+    "category": "Emotional Health"
+  },
+  {
+    "text": "I am worthy of experiencing magic in life",
+    "category": "Joy"
+  },
+  {
+    "text": "I am embracing my power to choose",
+    "category": "Empowerment"
+  },
+  {
+    "text": "I am releasing shame from my past",
+    "category": "Healing"
+  },
+  {
+    "text": "I am confident in being myself",
+    "category": "Authenticity"
+  },
+  {
+    "text": "I am worthy of making mistakes and learning",
+    "category": "Growth"
+  },
+  {
+    "text": "I am attracting wisdom and clarity",
+    "category": "Wisdom"
+  },
+  {
+    "text": "I am grateful for my unique journey",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of releasing control",
+    "category": "Trust"
+  },
+  {
+    "text": "I am choosing to see myself with love",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am at peace with not being liked by everyone",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am worthy of stillness",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am embracing life's uncertainties",
+    "category": "Trust"
+  },
+  {
+    "text": "I am releasing fear of judgment",
+    "category": "Confidence"
+  },
+  {
+    "text": "I am confident in my ability to thrive",
+    "category": "Success"
+  },
+  {
+    "text": "I am worthy of contentment",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am creating space for healing",
+    "category": "Healing"
+  },
+  {
+    "text": "I am grateful for my ability to choose",
+    "category": "Empowerment"
+  },
+  {
+    "text": "I am worthy of feeling motivated",
+    "category": "Motivation"
+  },
+  {
+    "text": "I am choosing to live with intention",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am at peace with my flaws",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am worthy of self-forgiveness",
+    "category": "Forgiveness"
+  },
+  {
+    "text": "I am embracing my worthiness",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am releasing stress from my body",
+    "category": "Stress Relief"
+  },
+  {
+    "text": "I am confident in my choices",
+    "category": "Confidence"
+  },
+  {
+    "text": "I am worthy of being understood",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am attracting positive change",
+    "category": "Transformation"
+  },
+  {
+    "text": "I am grateful for my imagination",
+    "category": "Creativity"
+  },
+  {
+    "text": "I am worthy of calm in chaos",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am choosing to embrace today fully",
+    "category": "Mindfulness"
+  },
+  {
+    "text": "I am at peace with being vulnerable",
+    "category": "Courage"
+  },
+  {
+    "text": "I am worthy of dreaming big",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am embracing my emotions as information",
+    "category": "Emotional Health"
+  },
+  {
+    "text": "I am releasing the weight of worry",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am confident in asking for what I need",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am worthy of abundance flowing to me",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am creating a life of meaning",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am grateful for second chances",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of slowing down",
+    "category": "Self-Care"
+  },
+  {
+    "text": "I am choosing to honor my energy",
+    "category": "Self-Care"
+  },
+  {
+    "text": "I am at peace with growing slowly",
+    "category": "Patience"
+  },
+  {
+    "text": "I am worthy of speaking up for myself",
+    "category": "Empowerment"
+  },
+  {
+    "text": "I am embracing the beauty of simplicity",
+    "category": "Mindfulness"
+  },
+  {
+    "text": "I am releasing negative energy from my life",
+    "category": "Healing"
+  },
+  {
+    "text": "I am confident in my ability to be happy",
+    "category": "Joy"
+  },
+  {
+    "text": "I am worthy of enjoying life",
+    "category": "Joy"
+  },
+  {
+    "text": "I am attracting inner peace",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am grateful for my determination",
+    "category": "Strength"
+  },
+  {
+    "text": "I am worthy of a fresh start",
+    "category": "Hope"
+  },
+  {
+    "text": "I am choosing to be present",
+    "category": "Mindfulness"
+  },
+  {
+    "text": "I am at peace with being human",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am worthy of standing in my truth",
+    "category": "Authenticity"
+  },
+  {
+    "text": "I am embracing the gift of today",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am releasing doubt and embracing faith",
+    "category": "Trust"
+  },
+  {
+    "text": "I am confident in my intuition",
+    "category": "Trust"
+  },
+  {
+    "text": "I am worthy of respect in all relationships",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am creating a peaceful inner world",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am grateful for the lessons in challenges",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of feeling secure",
+    "category": "Security"
+  },
+  {
+    "text": "I am choosing to appreciate my body",
+    "category": "Body Positivity"
+  },
+  {
+    "text": "I am at peace with my needs",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am worthy of being loved as I am",
+    "category": "Love"
+  },
+  {
+    "text": "I am embracing uncertainty with grace",
+    "category": "Trust"
+  },
+  {
+    "text": "I am releasing the need to rush",
+    "category": "Patience"
+  },
+  {
+    "text": "I am confident in my emotional intelligence",
+    "category": "Emotional Health"
+  },
+  {
+    "text": "I am worthy of following my heart",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am attracting alignment and flow",
+    "category": "Manifestation"
+  },
+  {
+    "text": "I am grateful for my open heart",
+    "category": "Love"
+  },
+  {
+    "text": "I am worthy of having fun",
+    "category": "Joy"
+  },
+  {
+    "text": "I am choosing optimism",
+    "category": "Positivity"
+  },
+  {
+    "text": "I am at peace with letting things unfold",
+    "category": "Trust"
+  },
+  {
+    "text": "I am worthy of my time and energy",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am embracing new beginnings",
+    "category": "Hope"
+  },
+  {
+    "text": "I am releasing old stories about myself",
+    "category": "Transformation"
+  },
+  {
+    "text": "I am confident in navigating life's challenges",
+    "category": "Resilience"
+  },
+  {
+    "text": "I am worthy of all forms of abundance",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am creating memories worth cherishing",
+    "category": "Joy"
+  },
+  {
+    "text": "I am grateful for my growth mindset",
+    "category": "Growth"
+  },
+  {
+    "text": "I am worthy of connection",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am choosing to believe in possibility",
+    "category": "Hope"
+  },
+  {
+    "text": "I am at peace with my sensitivity",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am worthy of grace and ease",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am embracing self-discovery",
+    "category": "Growth"
+  },
+  {
+    "text": "I am releasing resentment toward myself",
+    "category": "Forgiveness"
+  },
+  {
+    "text": "I am confident in my ability to change",
+    "category": "Transformation"
+  },
+  {
+    "text": "I am worthy of waking up excited for life",
+    "category": "Joy"
+  },
+  {
+    "text": "I am attracting beautiful experiences",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am grateful for the present moment",
+    "category": "Mindfulness"
+  },
+  {
+    "text": "I am worthy of feeling light and free",
+    "category": "Freedom"
+  },
+  {
+    "text": "I am choosing to lead with love",
+    "category": "Love"
+  },
+  {
+    "text": "I am at peace with my worth",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am worthy of my own time",
+    "category": "Self-Care"
+  },
+  {
+    "text": "I am embracing life's flow",
+    "category": "Trust"
+  },
+  {
+    "text": "I am releasing the need to control outcomes",
+    "category": "Acceptance"
+  },
+  {
+    "text": "I am confident in my voice",
+    "category": "Empowerment"
+  },
+  {
+    "text": "I am worthy of my highest good",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am creating a life of balance",
+    "category": "Balance"
+  },
+  {
+    "text": "I am grateful for my spirit",
+    "category": "Spirituality"
+  },
+  {
+    "text": "I am worthy of miracles",
+    "category": "Manifestation"
+  },
+  {
+    "text": "I am choosing self-trust",
+    "category": "Trust"
+  },
+  {
+    "text": "I am at peace with the unknown",
+    "category": "Trust"
+  },
+  {
+    "text": "I am worthy of vibrant health",
+    "category": "Health"
+  },
+  {
+    "text": "I am embracing my inner light",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am releasing fear of success",
+    "category": "Success"
+  },
+  {
+    "text": "I am confident in my worthiness",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am worthy of receiving as much as I give",
+    "category": "Balance"
+  },
+  {
+    "text": "I am attracting my soul's desires",
+    "category": "Manifestation"
+  },
+  {
+    "text": "I am grateful for my ability to persevere",
+    "category": "Resilience"
+  },
+  {
+    "text": "I am worthy of feeling inspired",
+    "category": "Creativity"
+  },
+  {
+    "text": "I am choosing to release worry",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am at peace with taking breaks",
+    "category": "Self-Care"
+  },
+  {
+    "text": "I am worthy of deep fulfillment",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am embracing every part of myself",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am releasing fear of being seen",
+    "category": "Courage"
+  },
+  {
+    "text": "I am confident in my life's purpose",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am worthy of lasting happiness",
+    "category": "Joy"
+  },
+  {
+    "text": "I am creating ripples of positive change",
+    "category": "Impact"
+  },
+  {
+    "text": "I am grateful for my open mind",
+    "category": "Growth"
+  },
+  {
+    "text": "I am worthy of showing up as myself",
+    "category": "Authenticity"
+  },
+  {
+    "text": "I am choosing to embrace imperfection",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am at peace with my journey so far",
+    "category": "Acceptance"
+  },
+  {
+    "text": "I am worthy of radical self-acceptance",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am embracing the power of positive thinking",
+    "category": "Positivity"
+  },
+  {
+    "text": "I am releasing attachment to outcomes",
+    "category": "Trust"
+  },
+  {
+    "text": "I am confident in my contribution to the world",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am worthy of manifesting my desires",
+    "category": "Manifestation"
+  },
+  {
+    "text": "I am attracting wisdom and growth",
+    "category": "Growth"
+  },
+  {
+    "text": "I am grateful for the gift of life",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of feeling whole",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am choosing to embrace my light",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am at peace with receiving help",
+    "category": "Acceptance"
+  },
+  {
+    "text": "I am worthy of unconditional self-love",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am embracing each moment with gratitude",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am releasing the need to prove myself",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am confident in my ability to find peace",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am worthy of living fully",
+    "category": "Joy"
+  },
+  {
+    "text": "I am creating the future I desire",
+    "category": "Manifestation"
+  },
+  {
+    "text": "I am grateful for my intuitive wisdom",
+    "category": "Trust"
+  },
+  {
+    "text": "I am worthy of speaking my needs",
+    "category": "Boundaries"
+  },
+  {
+    "text": "I am choosing to trust myself deeply",
+    "category": "Trust"
+  },
+  {
+    "text": "I am at peace with all that I am",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am worthy of embracing joy",
+    "category": "Joy"
+  },
+  {
+    "text": "I am embracing the adventure of life",
+    "category": "Joy"
+  },
+  {
+    "text": "I am releasing fear of the unknown",
+    "category": "Courage"
+  },
+  {
+    "text": "I am confident in my inner peace",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am worthy of peaceful sleep",
+    "category": "Rest"
+  },
+  {
+    "text": "I am attracting positivity and light",
+    "category": "Positivity"
+  },
+  {
+    "text": "I am grateful for my ability to bounce back",
+    "category": "Resilience"
+  },
+  {
+    "text": "I am worthy of feeling energized",
+    "category": "Health"
+  },
+  {
+    "text": "I am choosing to nurture my soul",
+    "category": "Self-Care"
+  },
+  {
+    "text": "I am at peace with where I am going",
+    "category": "Trust"
+  },
+  {
+    "text": "I am worthy of being my own best friend",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am embracing the power within me",
+    "category": "Empowerment"
+  },
+  {
+    "text": "I am releasing what is beyond my control",
+    "category": "Acceptance"
+  },
+  {
+    "text": "I am confident in my path",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am worthy of believing in myself",
+    "category": "Confidence"
+  },
+  {
+    "text": "I am creating a sanctuary within my mind",
+    "category": "Mental Health"
+  },
+  {
+    "text": "I am grateful for every step forward",
+    "category": "Gratitude"
+  },
+  {
+    "text": "I am worthy of feeling truly alive",
+    "category": "Joy"
+  },
+  {
+    "text": "I am choosing to radiate love",
+    "category": "Love"
+  },
+  {
+    "text": "I am at peace with my truth",
+    "category": "Authenticity"
+  },
+  {
+    "text": "I am worthy of infinite possibilities",
+    "category": "Manifestation"
+  },
+  {
+    "text": "I am embracing the fullness of life",
+    "category": "Joy"
+  },
+  {
+    "text": "I am releasing fear and welcoming faith",
+    "category": "Trust"
+  },
+  {
+    "text": "I am confident in my ability to love",
+    "category": "Love"
+  },
+  {
+    "text": "I am worthy of an abundant life",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am attracting serenity and calm",
+    "category": "Inner Peace"
+  },
+  {
+    "text": "I am grateful for my fighting spirit",
+    "category": "Strength"
+  },
+  {
+    "text": "I am worthy of feeling grounded and stable",
+    "category": "Security"
+  },
+  {
+    "text": "I am choosing to live without regret",
+    "category": "Freedom"
+  },
+  {
+    "text": "I am at peace with my healing process",
+    "category": "Healing"
+  },
+  {
+    "text": "I am worthy of daily joy",
+    "category": "Joy"
+  },
+  {
+    "text": "I am embracing growth with open arms",
+    "category": "Growth"
+  },
+  {
+    "text": "I am releasing all that dims my light",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am confident in creating my reality",
+    "category": "Manifestation"
+  },
+  {
+    "text": "I am worthy of every good thing",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am creating a legacy of love",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am grateful for my ability to adapt",
+    "category": "Resilience"
+  },
+  {
+    "text": "I am worthy of divine love",
+    "category": "Spirituality"
+  },
+  {
+    "text": "I am choosing to honor my boundaries",
+    "category": "Boundaries"
+  },
+  {
+    "text": "I am at peace with being enough",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am worthy of my own love story",
+    "category": "Love"
+  },
+  {
+    "text": "I am embracing every emotion",
+    "category": "Emotional Health"
+  },
+  {
+    "text": "I am releasing self-judgment",
+    "category": "Self-Acceptance"
+  },
+  {
+    "text": "I am confident in my inner beauty",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am worthy of a life I love",
+    "category": "Joy"
+  },
+  {
+    "text": "I am attracting my tribe",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am grateful for my beating heart",
+    "category": "Health"
+  },
+  {
+    "text": "I am worthy of peace of mind",
+    "category": "Mental Health"
+  },
+  {
+    "text": "I am choosing to live with purpose",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am at peace with my authentic self",
+    "category": "Authenticity"
+  },
+  {
+    "text": "I am worthy of being celebrated",
+    "category": "Self-Worth"
+  },
+  {
+    "text": "I am embracing the light within me",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am releasing everything that no longer grows me",
+    "category": "Growth"
+  },
+  {
+    "text": "I am confident in my unique brilliance",
+    "category": "Confidence"
+  },
+  {
+    "text": "I am worthy of infinite love",
+    "category": "Love"
+  },
+  {
+    "text": "I am releasing tension from my body",
+    "category": "Stress Relief"
+  },
+  {
+    "text": "I am safe in this present moment",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am breathing in calm and breathing out stress",
+    "category": "Stress Relief"
+  },
+  {
+    "text": "I am worthy of a peaceful and calm mind",
+    "category": "Mental Health"
+  },
+  {
+    "text": "I am letting go of thoughts that don't serve me",
+    "category": "Mental Health"
+  },
+  {
+    "text": "I am grounded in the present moment",
+    "category": "Mindfulness"
+  },
+  {
+    "text": "I am allowed to feel my feelings fully",
+    "category": "Emotional Health"
+  },
+  {
+    "text": "I am building a life that feels good on the inside",
+    "category": "Purpose"
+  },
+  {
+    "text": "I am worthy of success in my career",
+    "category": "Success"
+  },
+  {
+    "text": "I am capable of building wealth",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am a magnet for opportunities",
+    "category": "Success"
+  },
+  {
+    "text": "I am creating financial freedom for myself",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am worthy of professional recognition",
+    "category": "Success"
+  },
+  {
+    "text": "I am capable of achieving work-life balance",
+    "category": "Balance"
+  },
+  {
+    "text": "I am attracting clients who value my work",
+    "category": "Business"
+  },
+  {
+    "text": "I am confident in my professional abilities",
+    "category": "Business"
+  },
+  {
+    "text": "I am building meaningful business relationships",
+    "category": "Business"
+  },
+  {
+    "text": "I am worthy of charging what I'm worth",
+    "category": "Business"
+  },
+  {
+    "text": "I am creating value in everything I do",
+    "category": "Business"
+  },
+  {
+    "text": "I am a leader in my field",
+    "category": "Success"
+  },
+  {
+    "text": "I am attracting abundance through my talents",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am open to multiple streams of income",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am worthy of financial security",
+    "category": "Security"
+  },
+  {
+    "text": "I am making smart decisions with money",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am building generational wealth",
+    "category": "Abundance"
+  },
+  {
+    "text": "I am deserving of promotions and raises",
+    "category": "Success"
+  },
+  {
+    "text": "I am calm during stressful situations",
+    "category": "Stress Relief"
+  },
+  {
+    "text": "I am releasing the pressure I put on myself",
+    "category": "Stress Relief"
+  },
+  {
+    "text": "I am capable of handling today's challenges",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am not my anxious thoughts",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am safe and all is well",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am releasing the need to worry about tomorrow",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am stronger than my anxiety",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am finding peace within the storm",
+    "category": "Stress Relief"
+  },
+  {
+    "text": "I am worthy of moments of stillness",
+    "category": "Stress Relief"
+  },
+  {
+    "text": "I am gentle with myself during hard times",
+    "category": "Self-Compassion"
+  },
+  {
+    "text": "I am capable of finding calm in chaos",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am releasing panic and inviting peace",
+    "category": "Anxiety Relief"
+  },
+  {
+    "text": "I am learning to respond instead of react",
+    "category": "Mental Health"
+  },
+  {
+    "text": "I am worthy of relationships that feel safe",
+    "category": "Love"
+  },
+  {
+    "text": "I am attracting a partner who respects me",
+    "category": "Love"
+  },
+  {
+    "text": "I am worthy of romantic love",
+    "category": "Love"
+  },
+  {
+    "text": "I am open to giving and receiving deep love",
+    "category": "Love"
+  },
+  {
+    "text": "I am creating space for love in my life",
+    "category": "Love"
+  },
+  {
+    "text": "I am worthy of a love that feels easy",
+    "category": "Love"
+  },
+  {
+    "text": "I am attracting love that matches my energy",
+    "category": "Love"
+  },
+  {
+    "text": "I am healing my relationship with myself first",
+    "category": "Self-Love"
+  },
+  {
+    "text": "I am deserving of a healthy relationship",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am worthy of loyalty and commitment",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am attracting friendships that nourish me",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am surrounded by people who lift me up",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am creating healthy patterns in relationships",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am worthy of honest communication",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am attracting my soul family",
+    "category": "Relationships"
+  },
+  {
+    "text": "I am healing old relationship wounds",
+    "category": "Healing"
+  },
+  {
+    "text": "I am becoming more confident every day",
+    "category": "Confidence"
   }
 ]
-
