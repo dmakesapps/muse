@@ -811,10 +811,10 @@ struct AffirmationDisplayView: View {
                     Spacer()
                     
                     Text(randomizedAffirmations[currentIndex].text)
-                        .font(.system(size: 42, weight: .medium, design: .rounded))
+                        .font(.system(size: 36, weight: .medium, design: .serif))
                         .foregroundColor(.museSoftWhite)
                         .multilineTextAlignment(.center)
-                        .lineSpacing(16)
+                        .lineSpacing(12)
                         .padding(.horizontal, 40)
                         .frame(maxWidth: .infinity)
                         .opacity(opacity)
@@ -846,7 +846,7 @@ struct AffirmationDisplayView: View {
                             )
                     }
                     .padding(.leading, 30)
-                    .padding(.top, 60)
+                    .padding(.top, 80)
                     
                     Spacer()
                     
@@ -866,7 +866,7 @@ struct AffirmationDisplayView: View {
                             )
                     }
                     .padding(.trailing, 30)
-                    .padding(.top, 60)
+                    .padding(.top, 80)
                 }
                 Spacer()
             }
