@@ -47,6 +47,7 @@
 		72EFBAC02EEE1BD500C40084 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72EFBABF2EEE1BD500C40084 /* WidgetKit.framework */; };
 		72EFBAC22EEE1BD500C40084 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72EFBAC12EEE1BD500C40084 /* SwiftUI.framework */; };
 		72EFBAD32EEE1BD600C40084 /* MuseWidgetsExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 72EFBABD2EEE1BD500C40084 /* MuseWidgetsExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		72EFBAEA2EEE27F100C40084 /* DJTAYEbackground.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72EFBAE92EEE27F100C40084 /* DJTAYEbackground.mp3 */; };
 		AAAA00012EC6F00000000001 /* ContentLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00002EC6F00000000001 /* ContentLoader.swift */; };
 		AAAA00032EC6F00000000002 /* quotes.json in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00022EC6F00000000002 /* quotes.json */; };
 		AAAA00052EC6F00000000003 /* affirmations.json in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00042EC6F00000000003 /* affirmations.json */; };
@@ -136,6 +137,7 @@
 		72EFBAC12EEE1BD500C40084 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		72EFBAD92EEE1BF100C40084 /* MuseWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MuseWidgetsExtension.entitlements; sourceTree = "<group>"; };
 		72EFBADA2EEE1C0C00C40084 /* Muse.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Muse.entitlements; path = Muse/Muse.entitlements; sourceTree = "<group>"; };
+		72EFBAE92EEE27F100C40084 /* DJTAYEbackground.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = DJTAYEbackground.mp3; sourceTree = "<group>"; };
 		AAAA00002EC6F00000000001 /* ContentLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLoader.swift; sourceTree = "<group>"; };
 		AAAA00022EC6F00000000002 /* quotes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = quotes.json; sourceTree = "<group>"; };
 		AAAA00042EC6F00000000003 /* affirmations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = affirmations.json; sourceTree = "<group>"; };
@@ -301,6 +303,7 @@
 		AAAA00062EC6F00000000004 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				72EFBAE92EEE27F100C40084 /* DJTAYEbackground.mp3 */,
 				AAAA00022EC6F00000000002 /* quotes.json */,
 				AAAA00042EC6F00000000003 /* affirmations.json */,
 			);
@@ -448,6 +451,7 @@
 			files = (
 				72E262A82EC68E040080CF29 /* NotiAgentAppLogoWhite.png in Resources */,
 				72E262AA2EC68E040080CF29 /* Assets.xcassets in Resources */,
+				72EFBAEA2EEE27F100C40084 /* DJTAYEbackground.mp3 in Resources */,
 				AAAA00032EC6F00000000002 /* quotes.json in Resources */,
 				AAAA00052EC6F00000000003 /* affirmations.json in Resources */,
 			);

@@ -669,12 +669,97 @@ struct CountdownView: View {
     }
 }
 
+// MARK: - Background Music Manager
+import AVFoundation
+
+class BackgroundMusicManager: ObservableObject {
+    static let shared = BackgroundMusicManager()
+    
+    private var audioPlayer: AVAudioPlayer?
+    @Published var volume: Float = 0.5
+    @Published var isPlaying = false
+    
+    private init() {
+        setupAudioSession()
+    }
+    
+    private func setupAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Failed to setup audio session: \(error)")
+        }
+    }
+    
+    func play(fadeInDuration: TimeInterval = 2.0) {
+        guard let url = Bundle.main.url(forResource: "DJTAYEbackground", withExtension: "mp3") else {
+            print("Could not find DJTAYEbackground.mp3")
+            return
+        }
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.numberOfLoops = -1 // Loop indefinitely
+            audioPlayer?.volume = 0 // Start at 0 for fade in
+            audioPlayer?.prepareToPlay()
+            audioPlayer?.play()
+            isPlaying = true
+            
+            // Fade in
+            fadeToVolume(volume, duration: fadeInDuration)
+        } catch {
+            print("Failed to play audio: \(error)")
+        }
+    }
+    
+    func stop(fadeOutDuration: TimeInterval = 1.5) {
+        guard isPlaying else { return }
+        
+        // Fade out then stop
+        fadeToVolume(0, duration: fadeOutDuration) {
+            self.audioPlayer?.stop()
+            self.audioPlayer = nil
+            self.isPlaying = false
+        }
+    }
+    
+    func setVolume(_ newVolume: Float) {
+        volume = newVolume
+        audioPlayer?.volume = newVolume
+    }
+    
+    private func fadeToVolume(_ targetVolume: Float, duration: TimeInterval, completion: (() -> Void)? = nil) {
+        guard let player = audioPlayer else {
+            completion?()
+            return
+        }
+        
+        let startVolume = player.volume
+        let volumeDiff = targetVolume - startVolume
+        let steps = 20
+        let stepDuration = duration / Double(steps)
+        
+        for i in 0...steps {
+            DispatchQueue.main.asyncAfter(deadline: .now() + stepDuration * Double(i)) {
+                let progress = Float(i) / Float(steps)
+                player.volume = startVolume + (volumeDiff * progress)
+                
+                if i == steps {
+                    completion?()
+                }
+            }
+        }
+    }
+}
+
 // MARK: - Affirmation Display View
 struct AffirmationDisplayView: View {
     let affirmations: [Affirmation]
     let duration: StartAffirmationsView.AffirmationDuration
     let onComplete: () -> Void
     
+    @StateObject private var musicManager = BackgroundMusicManager.shared
     @State private var randomizedAffirmations: [Affirmation] = []
     @State private var currentIndex = 0
     @State private var elapsedTime = 0
@@ -684,6 +769,7 @@ struct AffirmationDisplayView: View {
     @State private var sessionStartTime: Date = Date()
     @State private var completedAffirmations: [String] = []
     @State private var lastShownAffirmationId: UUID? = nil
+    @State private var showVolumeSlider = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
@@ -737,10 +823,34 @@ struct AffirmationDisplayView: View {
                 }
             }
             
-            // Close button
+            // Top controls - Close button and Volume
             VStack {
                 HStack {
+                    // Volume button
+                    Button(action: { 
+                        withAnimation(.spring(response: 0.3)) {
+                            showVolumeSlider.toggle()
+                        }
+                    }) {
+                        Image(systemName: musicManager.volume > 0 ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.museSoftWhite)
+                            .padding(14)
+                            .background(
+                                Circle()
+                                    .fill(Color.museDarkGray.opacity(0.8))
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Color.museMediumGray.opacity(0.6), lineWidth: 1)
+                                    )
+                            )
+                    }
+                    .padding(.leading, 30)
+                    .padding(.top, 60)
+                    
                     Spacer()
+                    
+                    // Close button
                     Button(action: { stop() }) {
                         Image(systemName: "xmark")
                             .font(.system(size: 20, weight: .semibold))
@@ -760,11 +870,55 @@ struct AffirmationDisplayView: View {
                 }
                 Spacer()
             }
+            
+            // Volume slider overlay
+            if showVolumeSlider {
+                VStack {
+                    Spacer()
+                    
+                    HStack(spacing: 16) {
+                        Image(systemName: "speaker.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(.museLightGray)
+                        
+                        Slider(value: Binding(
+                            get: { Double(musicManager.volume) },
+                            set: { musicManager.setVolume(Float($0)) }
+                        ), in: 0...1)
+                        .accentColor(.museGradientStart)
+                        
+                        Image(systemName: "speaker.wave.3.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(.museLightGray)
+                    }
+                    .padding(.horizontal, 30)
+                    .padding(.vertical, 20)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.museDarkGray.opacity(0.95))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(Color.museMediumGray.opacity(0.5), lineWidth: 1)
+                            )
+                    )
+                    .padding(.horizontal, 40)
+                    .padding(.bottom, 100)
+                }
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
+            }
         }
         .ignoresSafeArea(.all)
         .statusBar(hidden: true)
         .onAppear { start() }
         .onDisappear { stop() }
+        .onTapGesture {
+            // Hide volume slider when tapping elsewhere
+            if showVolumeSlider {
+                withAnimation(.spring(response: 0.3)) {
+                    showVolumeSlider = false
+                }
+            }
+        }
     }
     
     private func start() {
@@ -777,6 +931,9 @@ struct AffirmationDisplayView: View {
         completedAffirmations = []
         randomizedAffirmations = affirmations.shuffled()
         currentIndex = 0
+        
+        // Start background music with fade in
+        musicManager.play(fadeInDuration: 2.0)
         
         // Start the affirmation cycle timer
         scheduleNextAffirmation()
@@ -849,6 +1006,9 @@ struct AffirmationDisplayView: View {
     }
     
     private func stop() {
+        // Stop background music with fade out
+        musicManager.stop(fadeOutDuration: 1.5)
+        
         let sessionDuration = Date().timeIntervalSince(sessionStartTime)
         let affirmationCount = completedAffirmations.count
         
