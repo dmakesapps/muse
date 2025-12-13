@@ -118,46 +118,50 @@ struct QuoteWidgetEntryView: View {
     @Environment(\.widgetFamily) var family
     
     var body: some View {
-        ZStack {
-            // Dark gradient background with rounded corners
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
-                )
-            
-            if let quote = entry.quote {
-                VStack(spacing: 8) {
-                    // Category tag
-                    Text(quote.category.uppercased())
-                        .font(.system(size: 9, weight: .semibold, design: .rounded))
-                        .foregroundColor(Color(red: 0.4, green: 0.8, blue: 0.8)) // Teal
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(
-                            Capsule()
-                                .fill(Color(red: 0.4, green: 0.8, blue: 0.8).opacity(0.15))
+        GeometryReader { geometry in
+            ZStack {
+                // Thin white border
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(Color.white)
+                
+                // Dark content area (inset to show border)
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
                         )
-                    
-                    Text(quote.text)
-                        .font(.system(size: fontSize, weight: .medium, design: .serif))
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(family == .systemSmall ? 4 : 6)
-                        .minimumScaleFactor(0.7)
-                    
-                    Text("— \(quote.author)")
-                        .font(.system(size: fontSize * 0.6, weight: .regular, design: .serif))
-                        .foregroundColor(.white.opacity(0.7))
+                    )
+                    .padding(2) // Creates thin white border
+                
+                if let quote = entry.quote {
+                    VStack(spacing: 6) {
+                        // Category tag
+                        Text(quote.category.uppercased())
+                            .font(.system(size: 9, weight: .semibold, design: .rounded))
+                            .foregroundColor(Color(red: 0.4, green: 0.8, blue: 0.8)) // Teal
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(
+                                Capsule()
+                                    .fill(Color(red: 0.4, green: 0.8, blue: 0.8).opacity(0.15))
+                            )
+                        
+                        Text(quote.text)
+                            .font(.system(size: fontSize, weight: .medium, design: .serif))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(family == .systemSmall ? 5 : 7)
+                            .minimumScaleFactor(0.6)
+                        
+                        Text("— \(quote.author)")
+                            .font(.system(size: fontSize * 0.55, weight: .regular, design: .serif))
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
                 }
-                .padding()
             }
         }
     }
@@ -230,42 +234,46 @@ struct AffirmationWidgetEntryView: View {
     @Environment(\.widgetFamily) var family
     
     var body: some View {
-        ZStack {
-            // Dark gradient background with rounded corners
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
-                )
-            
-            if let affirmation = entry.affirmation {
-                VStack(spacing: 8) {
-                    // Category tag - purple for affirmations
-                    Text(affirmation.category.uppercased())
-                        .font(.system(size: 9, weight: .semibold, design: .rounded))
-                        .foregroundColor(Color(red: 0.6, green: 0.4, blue: 0.9)) // Purple
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(
-                            Capsule()
-                                .fill(Color(red: 0.6, green: 0.4, blue: 0.9).opacity(0.15))
+        GeometryReader { geometry in
+            ZStack {
+                // Thin white border
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(Color.white)
+                
+                // Dark content area (inset to show border)
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
                         )
-                    
-                    Text(affirmation.text)
-                        .font(.system(size: fontSize, weight: .medium, design: .serif))
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(family == .systemSmall ? 4 : 6)
-                        .minimumScaleFactor(0.7)
+                    )
+                    .padding(2) // Creates thin white border
+                
+                if let affirmation = entry.affirmation {
+                    VStack(spacing: 6) {
+                        // Category tag - purple for affirmations
+                        Text(affirmation.category.uppercased())
+                            .font(.system(size: 9, weight: .semibold, design: .rounded))
+                            .foregroundColor(Color(red: 0.6, green: 0.4, blue: 0.9)) // Purple
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(
+                                Capsule()
+                                    .fill(Color(red: 0.6, green: 0.4, blue: 0.9).opacity(0.15))
+                            )
+                        
+                        Text(affirmation.text)
+                            .font(.system(size: fontSize, weight: .medium, design: .serif))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(family == .systemSmall ? 5 : 7)
+                            .minimumScaleFactor(0.6)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
                 }
-                .padding()
             }
         }
     }
