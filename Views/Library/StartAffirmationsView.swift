@@ -683,6 +683,7 @@ struct AffirmationDisplayView: View {
     @State private var opacity: Double = 1.0
     @State private var sessionStartTime: Date = Date()
     @State private var completedAffirmations: [String] = []
+    @State private var lastShownAffirmationId: UUID? = nil
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
@@ -799,6 +800,7 @@ struct AffirmationDisplayView: View {
     private func transitionToNext() {
         if currentIndex < randomizedAffirmations.count {
             completedAffirmations.append(randomizedAffirmations[currentIndex].text)
+            lastShownAffirmationId = randomizedAffirmations[currentIndex].id
         }
         
         // Fade out
@@ -812,7 +814,7 @@ struct AffirmationDisplayView: View {
             
             // Reshuffle if we've gone through all
             if currentIndex == 0 {
-                randomizedAffirmations = affirmations.shuffled()
+                reshuffleWithoutRepeat()
             }
             
             // Fade in
@@ -823,6 +825,27 @@ struct AffirmationDisplayView: View {
             // Schedule next transition
             scheduleNextAffirmation()
         }
+    }
+    
+    // Reshuffle ensuring the last shown affirmation isn't first
+    private func reshuffleWithoutRepeat() {
+        guard affirmations.count > 1 else {
+            randomizedAffirmations = affirmations
+            return
+        }
+        
+        var shuffled = affirmations.shuffled()
+        
+        // If the first item is the same as the last shown, move it elsewhere
+        if let lastId = lastShownAffirmationId, shuffled.first?.id == lastId {
+            if let firstItem = shuffled.first {
+                shuffled.removeFirst()
+                let insertIndex = Int.random(in: 1..<shuffled.count)
+                shuffled.insert(firstItem, at: insertIndex)
+            }
+        }
+        
+        randomizedAffirmations = shuffled
     }
     
     private func stop() {
