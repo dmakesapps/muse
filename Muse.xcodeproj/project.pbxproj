@@ -28,25 +28,25 @@
 		72E262AD2EC68E040080CF29 /* Components/SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262AE2EC68E040080CF29 /* Components/SidebarView.swift */; };
 		72E262B32EC68E040080CF29 /* ScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262B42EC68E040080CF29 /* ScheduleView.swift */; };
 		72E262B62EC68E040080CF29 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262B52EC68E040080CF29 /* HelpView.swift */; };
-		72E262C12EC68E040080CF29 /* Library/LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C02EC68E040080CF29 /* Library/LibraryView.swift */; };
-		72E262C32EC68E040080CF29 /* Discover/DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C22EC68E040080CF29 /* Discover/DiscoverView.swift */; };
-		72E262C52EC68E040080CF29 /* Muse/MuseChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C42EC68E040080CF29 /* Muse/MuseChatView.swift */; };
-		72E262C72EC68E040080CF29 /* Progress/ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C62EC68E040080CF29 /* Progress/ProgressView.swift */; };
+		72E262C12EC68E040080CF29 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C02EC68E040080CF29 /* LibraryView.swift */; };
+		72E262C32EC68E040080CF29 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C22EC68E040080CF29 /* DiscoverView.swift */; };
+		72E262C52EC68E040080CF29 /* MuseChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C42EC68E040080CF29 /* MuseChatView.swift */; };
+		72E262C72EC68E040080CF29 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C62EC68E040080CF29 /* ProgressView.swift */; };
 		72E262C92EC68E040080CF29 /* Quote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C82EC68E040080CF29 /* Quote.swift */; };
 		72E262CB2EC68E040080CF29 /* Affirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262CA2EC68E040080CF29 /* Affirmation.swift */; };
-		72E262CD2EC68E040080CF29 /* Discover/QuoteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262CC2EC68E040080CF29 /* Discover/QuoteCard.swift */; };
-		72E262CF2EC68E040080CF29 /* Discover/AffirmationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262CE2EC68E040080CF29 /* Discover/AffirmationCard.swift */; };
+		72E262CD2EC68E040080CF29 /* QuoteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262CC2EC68E040080CF29 /* QuoteCard.swift */; };
+		72E262CF2EC68E040080CF29 /* AffirmationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262CE2EC68E040080CF29 /* AffirmationCard.swift */; };
 		72E262D12EC68E040080CF29 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D02EC68E040080CF29 /* StorageService.swift */; };
-		72E262D32EC68E040080CF29 /* Library/StartAffirmationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D22EC68E040080CF29 /* Library/StartAffirmationsView.swift */; };
-		72E262D52EC68E040080CF29 /* Library/ImmersiveAffirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D42EC68E040080CF29 /* Library/ImmersiveAffirmationView.swift */; };
-		72E262D72EC68E040080CF29 /* Muse/ChatBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D62EC68E040080CF29 /* Muse/ChatBoxView.swift */; };
 		72E262D82EC68E040080CF29 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D92EC68E040080CF29 /* SpeechService.swift */; };
+		72E262D32EC68E040080CF29 /* StartAffirmationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D22EC68E040080CF29 /* StartAffirmationsView.swift */; };
+		72E262D52EC68E040080CF29 /* ImmersiveAffirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D42EC68E040080CF29 /* ImmersiveAffirmationView.swift */; };
+		72E262D72EC68E040080CF29 /* ChatBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D62EC68E040080CF29 /* ChatBoxView.swift */; };
 		72E262DA2EC68E040080CF29 /* AffirmationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262DB2EC68E040080CF29 /* AffirmationSession.swift */; };
 		72E262DC2EC68E040080CF29 /* ProgressService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262DD2EC68E040080CF29 /* ProgressService.swift */; };
 		72E262DF2EC68E040080CF29 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262DE2EC68E040080CF29 /* FeedView.swift */; };
-		72EFBA942EEDEFBB00C40084 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72EFBA932EEDEFBB00C40084 /* WidgetKit.framework */; };
-		72EFBA962EEDEFBB00C40084 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72EFBA952EEDEFBB00C40084 /* SwiftUI.framework */; };
-		72EFBAA72EEDEFBC00C40084 /* MuseWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 72EFBA912EEDEFBB00C40084 /* MuseWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AAAA00012EC6F00000000001 /* ContentLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00002EC6F00000000001 /* ContentLoader.swift */; };
+		AAAA00032EC6F00000000002 /* quotes.json in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00022EC6F00000000002 /* quotes.json */; };
+		AAAA00052EC6F00000000003 /* affirmations.json in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00042EC6F00000000003 /* affirmations.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,28 +64,7 @@
 			remoteGlobalIDString = 72E262562EC68CF40080CF29;
 			remoteInfo = Muse;
 		};
-		72EFBAA52EEDEFBC00C40084 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 72E2624F2EC68CF40080CF29 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 72EFBA902EEDEFBB00C40084;
-			remoteInfo = MuseWidgetsExtension;
-		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		72EFBAA82EEDEFBC00C40084 /* Embed Foundation Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				72EFBAA72EEDEFBC00C40084 /* MuseWidgetsExtension.appex in Embed Foundation Extensions */,
-			);
-			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		726462232EC6C35100526FCE /* PromiseEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseEditSheet.swift; sourceTree = "<group>"; };
@@ -112,49 +91,26 @@
 		72E262AE2EC68E040080CF29 /* Components/SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/SidebarView.swift; sourceTree = "<group>"; };
 		72E262B42EC68E040080CF29 /* ScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleView.swift; sourceTree = "<group>"; };
 		72E262B52EC68E040080CF29 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
-		72E262C02EC68E040080CF29 /* Library/LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library/LibraryView.swift; sourceTree = "<group>"; };
-		72E262C22EC68E040080CF29 /* Discover/DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discover/DiscoverView.swift; sourceTree = "<group>"; };
-		72E262C42EC68E040080CF29 /* Muse/MuseChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Muse/MuseChatView.swift; sourceTree = "<group>"; };
-		72E262C62EC68E040080CF29 /* Progress/ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress/ProgressView.swift; sourceTree = "<group>"; };
+		72E262C02EC68E040080CF29 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library/LibraryView.swift; sourceTree = "<group>"; };
+		72E262C22EC68E040080CF29 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discover/DiscoverView.swift; sourceTree = "<group>"; };
+		72E262C42EC68E040080CF29 /* MuseChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Muse/MuseChatView.swift; sourceTree = "<group>"; };
+		72E262C62EC68E040080CF29 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress/ProgressView.swift; sourceTree = "<group>"; };
 		72E262C82EC68E040080CF29 /* Quote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quote.swift; sourceTree = "<group>"; };
 		72E262CA2EC68E040080CF29 /* Affirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Affirmation.swift; sourceTree = "<group>"; };
-		72E262CC2EC68E040080CF29 /* Discover/QuoteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discover/QuoteCard.swift; sourceTree = "<group>"; };
-		72E262CE2EC68E040080CF29 /* Discover/AffirmationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discover/AffirmationCard.swift; sourceTree = "<group>"; };
+		72E262CC2EC68E040080CF29 /* QuoteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discover/QuoteCard.swift; sourceTree = "<group>"; };
+		72E262CE2EC68E040080CF29 /* AffirmationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discover/AffirmationCard.swift; sourceTree = "<group>"; };
 		72E262D02EC68E040080CF29 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
-		72E262D22EC68E040080CF29 /* Library/StartAffirmationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library/StartAffirmationsView.swift; sourceTree = "<group>"; };
-		72E262D42EC68E040080CF29 /* Library/ImmersiveAffirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library/ImmersiveAffirmationView.swift; sourceTree = "<group>"; };
-		72E262D62EC68E040080CF29 /* Muse/ChatBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Muse/ChatBoxView.swift; sourceTree = "<group>"; };
 		72E262D92EC68E040080CF29 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
+		AAAA00002EC6F00000000001 /* ContentLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLoader.swift; sourceTree = "<group>"; };
+		AAAA00022EC6F00000000002 /* quotes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = quotes.json; sourceTree = "<group>"; };
+		AAAA00042EC6F00000000003 /* affirmations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = affirmations.json; sourceTree = "<group>"; };
+		72E262D22EC68E040080CF29 /* StartAffirmationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library/StartAffirmationsView.swift; sourceTree = "<group>"; };
+		72E262D42EC68E040080CF29 /* ImmersiveAffirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library/ImmersiveAffirmationView.swift; sourceTree = "<group>"; };
+		72E262D62EC68E040080CF29 /* ChatBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Muse/ChatBoxView.swift; sourceTree = "<group>"; };
 		72E262DB2EC68E040080CF29 /* AffirmationSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AffirmationSession.swift; sourceTree = "<group>"; };
 		72E262DD2EC68E040080CF29 /* ProgressService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressService.swift; sourceTree = "<group>"; };
 		72E262DE2EC68E040080CF29 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
-		72EFBA912EEDEFBB00C40084 /* MuseWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MuseWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		72EFBA932EEDEFBB00C40084 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
-		72EFBA952EEDEFBB00C40084 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		72EFBAB72EEDF03800C40084 /* MuseWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MuseWidgetsExtension.entitlements; sourceTree = "<group>"; };
-		72EFBAB82EEDF2B000C40084 /* Muse.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Muse.entitlements; path = Muse/Muse.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		72EFBAAB2EEDEFBC00C40084 /* Exceptions for "MuseWidgets" folder in "MuseWidgetsExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 72EFBA902EEDEFBB00C40084 /* MuseWidgetsExtension */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		72EFBA972EEDEFBB00C40084 /* MuseWidgets */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				72EFBAAB2EEDEFBC00C40084 /* Exceptions for "MuseWidgets" folder in "MuseWidgetsExtension" target */,
-			);
-			path = MuseWidgets;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		72E262542EC68CF40080CF29 /* Frameworks */ = {
@@ -178,33 +134,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		72EFBA8E2EEDEFBB00C40084 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				72EFBA962EEDEFBB00C40084 /* SwiftUI.framework in Frameworks */,
-				72EFBA942EEDEFBB00C40084 /* WidgetKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		72E2624E2EC68CF40080CF29 = {
 			isa = PBXGroup;
 			children = (
-				72EFBAB82EEDF2B000C40084 /* Muse.entitlements */,
-				72EFBAB72EEDF03800C40084 /* MuseWidgetsExtension.entitlements */,
 				72E262832EC68E040080CF29 /* Config.swift */,
 				72E262872EC68E040080CF29 /* Models */,
 				72E262882EC68E040080CF29 /* PromiseKeeperApp.swift */,
 				72E262A72EC68E040080CF29 /* NotiAgentAppLogoWhite.png */,
 				72E262A92EC68E040080CF29 /* Assets.xcassets */,
+				AAAA00062EC6F00000000004 /* Resources */,
 				72E2628C2EC68E040080CF29 /* Services */,
 				72E2628E2EC68E040080CF29 /* ViewModels */,
 				72E262932EC68E040080CF29 /* Views */,
-				72EFBA972EEDEFBB00C40084 /* MuseWidgets */,
-				72EFBA922EEDEFBB00C40084 /* Frameworks */,
 				72E262582EC68CF40080CF29 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -215,7 +159,6 @@
 				72E262572EC68CF40080CF29 /* Muse.app */,
 				72E262662EC68CF60080CF29 /* MuseTests.xctest */,
 				72E262702EC68CF60080CF29 /* MuseUITests.xctest */,
-				72EFBA912EEDEFBB00C40084 /* MuseWidgetsExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -242,8 +185,18 @@
 				72E262D02EC68E040080CF29 /* StorageService.swift */,
 				72E262D92EC68E040080CF29 /* SpeechService.swift */,
 				72E262DD2EC68E040080CF29 /* ProgressService.swift */,
+				AAAA00002EC6F00000000001 /* ContentLoader.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		AAAA00062EC6F00000000004 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA00022EC6F00000000002 /* quotes.json */,
+				AAAA00042EC6F00000000003 /* affirmations.json */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		72E2628E2EC68E040080CF29 /* ViewModels */ = {
@@ -257,15 +210,15 @@
 		72E262932EC68E040080CF29 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				72E262C02EC68E040080CF29 /* Library/LibraryView.swift */,
-				72E262D22EC68E040080CF29 /* Library/StartAffirmationsView.swift */,
-				72E262D42EC68E040080CF29 /* Library/ImmersiveAffirmationView.swift */,
-				72E262C22EC68E040080CF29 /* Discover/DiscoverView.swift */,
-				72E262CC2EC68E040080CF29 /* Discover/QuoteCard.swift */,
-				72E262CE2EC68E040080CF29 /* Discover/AffirmationCard.swift */,
-				72E262C42EC68E040080CF29 /* Muse/MuseChatView.swift */,
-				72E262D62EC68E040080CF29 /* Muse/ChatBoxView.swift */,
-				72E262C62EC68E040080CF29 /* Progress/ProgressView.swift */,
+				72E262C02EC68E040080CF29 /* LibraryView.swift */,
+				72E262D22EC68E040080CF29 /* StartAffirmationsView.swift */,
+				72E262D42EC68E040080CF29 /* ImmersiveAffirmationView.swift */,
+				72E262C22EC68E040080CF29 /* DiscoverView.swift */,
+				72E262CC2EC68E040080CF29 /* QuoteCard.swift */,
+				72E262CE2EC68E040080CF29 /* AffirmationCard.swift */,
+				72E262C42EC68E040080CF29 /* MuseChatView.swift */,
+				72E262D62EC68E040080CF29 /* ChatBoxView.swift */,
+				72E262C62EC68E040080CF29 /* ProgressView.swift */,
 				72E262902EC68E040080CF29 /* ContentView.swift */,
 				72E2628F2EC68E040080CF29 /* ChatView.swift */,
 				72E262DE2EC68E040080CF29 /* FeedView.swift */,
@@ -281,15 +234,6 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		72EFBA922EEDEFBB00C40084 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				72EFBA932EEDEFBB00C40084 /* WidgetKit.framework */,
-				72EFBA952EEDEFBB00C40084 /* SwiftUI.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -300,12 +244,10 @@
 				72E262532EC68CF40080CF29 /* Sources */,
 				72E262542EC68CF40080CF29 /* Frameworks */,
 				72E262552EC68CF40080CF29 /* Resources */,
-				72EFBAA82EEDEFBC00C40084 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				72EFBAA62EEDEFBC00C40084 /* PBXTargetDependency */,
 			);
 			name = Muse;
 			packageProductDependencies = (
@@ -354,28 +296,6 @@
 			productReference = 72E262702EC68CF60080CF29 /* MuseUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		72EFBA902EEDEFBB00C40084 /* MuseWidgetsExtension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 72EFBAAC2EEDEFBC00C40084 /* Build configuration list for PBXNativeTarget "MuseWidgetsExtension" */;
-			buildPhases = (
-				72EFBA8D2EEDEFBB00C40084 /* Sources */,
-				72EFBA8E2EEDEFBB00C40084 /* Frameworks */,
-				72EFBA8F2EEDEFBB00C40084 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				72EFBA972EEDEFBB00C40084 /* MuseWidgets */,
-			);
-			name = MuseWidgetsExtension;
-			packageProductDependencies = (
-			);
-			productName = MuseWidgetsExtension;
-			productReference = 72EFBA912EEDEFBB00C40084 /* MuseWidgetsExtension.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -397,9 +317,6 @@
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = 72E262562EC68CF40080CF29;
 					};
-					72EFBA902EEDEFBB00C40084 = {
-						CreatedOnToolsVersion = 16.4;
-					};
 				};
 			};
 			buildConfigurationList = 72E262522EC68CF40080CF29 /* Build configuration list for PBXProject "Muse" */;
@@ -419,7 +336,6 @@
 				72E262562EC68CF40080CF29 /* Muse */,
 				72E262652EC68CF60080CF29 /* MuseTests */,
 				72E2626F2EC68CF60080CF29 /* MuseUITests */,
-				72EFBA902EEDEFBB00C40084 /* MuseWidgetsExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -431,6 +347,8 @@
 			files = (
 				72E262A82EC68E040080CF29 /* NotiAgentAppLogoWhite.png in Resources */,
 				72E262AA2EC68E040080CF29 /* Assets.xcassets in Resources */,
+				AAAA00032EC6F00000000002 /* quotes.json in Resources */,
+				AAAA00052EC6F00000000003 /* affirmations.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -442,13 +360,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		72E2626E2EC68CF60080CF29 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		72EFBA8F2EEDEFBB00C40084 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -475,28 +386,29 @@
 				72E2629F2EC68E040080CF29 /* PromiseListView.swift in Sources */,
 				72E262B32EC68E040080CF29 /* ScheduleView.swift in Sources */,
 				72E262B62EC68E040080CF29 /* HelpView.swift in Sources */,
-				72E262C12EC68E040080CF29 /* Library/LibraryView.swift in Sources */,
-				72E262C32EC68E040080CF29 /* Discover/DiscoverView.swift in Sources */,
-				72E262C52EC68E040080CF29 /* Muse/MuseChatView.swift in Sources */,
-				72E262D72EC68E040080CF29 /* Muse/ChatBoxView.swift in Sources */,
-				72E262C72EC68E040080CF29 /* Progress/ProgressView.swift in Sources */,
+				72E262C12EC68E040080CF29 /* LibraryView.swift in Sources */,
+				72E262C32EC68E040080CF29 /* DiscoverView.swift in Sources */,
+				72E262C52EC68E040080CF29 /* MuseChatView.swift in Sources */,
+				72E262D72EC68E040080CF29 /* ChatBoxView.swift in Sources */,
+				72E262C72EC68E040080CF29 /* ProgressView.swift in Sources */,
 				72E262C92EC68E040080CF29 /* Quote.swift in Sources */,
 				72E262CB2EC68E040080CF29 /* Affirmation.swift in Sources */,
-				72E262CD2EC68E040080CF29 /* Discover/QuoteCard.swift in Sources */,
-				72E262CF2EC68E040080CF29 /* Discover/AffirmationCard.swift in Sources */,
+				72E262CD2EC68E040080CF29 /* QuoteCard.swift in Sources */,
+				72E262CF2EC68E040080CF29 /* AffirmationCard.swift in Sources */,
 				72E262D12EC68E040080CF29 /* StorageService.swift in Sources */,
 				72E262D82EC68E040080CF29 /* SpeechService.swift in Sources */,
 				72E262DA2EC68E040080CF29 /* AffirmationSession.swift in Sources */,
 				72E262DC2EC68E040080CF29 /* ProgressService.swift in Sources */,
 				72E262DF2EC68E040080CF29 /* FeedView.swift in Sources */,
-				72E262D32EC68E040080CF29 /* Library/StartAffirmationsView.swift in Sources */,
-				72E262D52EC68E040080CF29 /* Library/ImmersiveAffirmationView.swift in Sources */,
+				72E262D32EC68E040080CF29 /* StartAffirmationsView.swift in Sources */,
+				72E262D52EC68E040080CF29 /* ImmersiveAffirmationView.swift in Sources */,
 				72E262A02EC68E040080CF29 /* Promise.swift in Sources */,
 				72E262A12EC68E040080CF29 /* NotificationAgent.swift in Sources */,
 				72E262A32EC68E040080CF29 /* AgentCreationSheet.swift in Sources */,
 				72E262A52EC68E040080CF29 /* Theme.swift in Sources */,
 				72E262AB2EC68E040080CF29 /* Components/MultimodalInputView.swift in Sources */,
 				72E262AD2EC68E040080CF29 /* Components/SidebarView.swift in Sources */,
+				AAAA00012EC6F00000000001 /* ContentLoader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -508,13 +420,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		72E2626C2EC68CF60080CF29 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		72EFBA8D2EEDEFBB00C40084 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -533,11 +438,6 @@
 			isa = PBXTargetDependency;
 			target = 72E262562EC68CF40080CF29 /* Muse */;
 			targetProxy = 72E262712EC68CF60080CF29 /* PBXContainerItemProxy */;
-		};
-		72EFBAA62EEDEFBC00C40084 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 72EFBA902EEDEFBB00C40084 /* MuseWidgetsExtension */;
-			targetProxy = 72EFBAA52EEDEFBC00C40084 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -668,7 +568,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Muse/Muse.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 28D2M73B26;
@@ -688,7 +587,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.02;
-				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.Muse;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ephesian28LLC.Muse";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -701,7 +600,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Muse/Muse.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 28D2M73B26;
@@ -721,7 +619,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.02;
-				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.Muse;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ephesian28LLC.Muse";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -739,7 +637,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.MuseTests;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ephesian28LLC.MuseTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -758,7 +656,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.MuseTests;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ephesian28LLC.MuseTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -775,7 +673,7 @@
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.MuseUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ephesian28LLC.MuseUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -792,7 +690,7 @@
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.MuseUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = "Ephesian28LLC.MuseUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
@@ -801,66 +699,10 @@
 			};
 			name = Release;
 		};
-		72EFBAA92EEDEFBC00C40084 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_ENTITLEMENTS = MuseWidgetsExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 28D2M73B26;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MuseWidgets/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MuseWidgets;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.Muse.MuseWidgets;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		72EFBAAA2EEDEFBC00C40084 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_ENTITLEMENTS = MuseWidgetsExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 28D2M73B26;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MuseWidgets/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MuseWidgets;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.Muse.MuseWidgets;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		72E262522EC68CF40080CF29 /* Build configuration list for PBXProject "Muse" */ = {
+		72E262522EC68CF40080CF29 /* Build configuration list for PBXProject "oath.ai" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				72E262782EC68CF60080CF29 /* Debug */,
@@ -892,15 +734,6 @@
 			buildConfigurations = (
 				72E262812EC68CF60080CF29 /* Debug */,
 				72E262822EC68CF60080CF29 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		72EFBAAC2EEDEFBC00C40084 /* Build configuration list for PBXNativeTarget "MuseWidgetsExtension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				72EFBAA92EEDEFBC00C40084 /* Debug */,
-				72EFBAAA2EEDEFBC00C40084 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
