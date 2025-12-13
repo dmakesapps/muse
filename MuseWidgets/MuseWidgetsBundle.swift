@@ -11,8 +11,7 @@ import SwiftUI
 @main
 struct MuseWidgetsBundle: WidgetBundle {
     var body: some Widget {
-        MuseWidgets()
-        MuseWidgetsControl()
-        MuseWidgetsLiveActivity()
+        QuoteWidget()
+        AffirmationWidget()
     }
 }
