@@ -119,6 +119,21 @@ struct QuoteWidgetEntryView: View {
     
     var body: some View {
         ZStack {
+            // Very thin white border
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(Color.white.opacity(0.9))
+            
+            // Dark content area
+            RoundedRectangle(cornerRadius: 21, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .padding(1) // Very thin 1pt border
+            
             if let quote = entry.quote {
                 VStack(spacing: 6) {
                     // Category tag
@@ -143,25 +158,18 @@ struct QuoteWidgetEntryView: View {
                         .font(.system(size: fontSize * 0.55, weight: .regular, design: .serif))
                         .foregroundColor(.white.opacity(0.7))
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
             }
-        }
-        .containerBackground(for: .widget) {
-            LinearGradient(
-                colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
         }
     }
     
     private var fontSize: CGFloat {
         switch family {
-        case .systemSmall: return 13
-        case .systemMedium: return 15
-        case .systemLarge: return 18
-        default: return 14
+        case .systemSmall: return 15
+        case .systemMedium: return 18
+        case .systemLarge: return 22
+        default: return 16
         }
     }
 }
@@ -224,6 +232,21 @@ struct AffirmationWidgetEntryView: View {
     
     var body: some View {
         ZStack {
+            // Very thin white border
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(Color.white.opacity(0.9))
+            
+            // Dark content area
+            RoundedRectangle(cornerRadius: 21, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .padding(1) // Very thin 1pt border
+            
             if let affirmation = entry.affirmation {
                 VStack(spacing: 6) {
                     // Category tag - purple for affirmations
@@ -244,25 +267,18 @@ struct AffirmationWidgetEntryView: View {
                         .lineLimit(family == .systemSmall ? 5 : 7)
                         .minimumScaleFactor(0.6)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
             }
-        }
-        .containerBackground(for: .widget) {
-            LinearGradient(
-                colors: [Color(red: 0.08, green: 0.09, blue: 0.14), Color(red: 0.12, green: 0.13, blue: 0.18)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
         }
     }
     
     private var fontSize: CGFloat {
         switch family {
-        case .systemSmall: return 14
-        case .systemMedium: return 16
-        case .systemLarge: return 20
-        default: return 15
+        case .systemSmall: return 16
+        case .systemMedium: return 19
+        case .systemLarge: return 24
+        default: return 17
         }
     }
 }
