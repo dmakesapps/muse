@@ -580,6 +580,44 @@ struct AffirmationSelectRow: View {
     }
 }
 
+// MARK: - Affirmation Selection Card (for horizontal scroll)
+struct AffirmationSelectionCard: View {
+    let affirmation: Affirmation
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .font(.system(size: 20))
+                        .foregroundColor(isSelected ? .museSuccessGreen : .museLightGray)
+                    
+                    Spacer()
+                }
+                
+                Text(affirmation.text)
+                    .font(.museBodySmall())
+                    .foregroundColor(.museSoftWhite)
+                    .lineLimit(3)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(16)
+            .frame(width: 200)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(isSelected ? Color.museAccentBlue.opacity(0.2) : Color.museMediumGray.opacity(0.3))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(isSelected ? Color.museAccentBlue : Color.museMediumGray, lineWidth: isSelected ? 2 : 1)
+                    )
+            )
+        }
+    }
+}
+
 // MARK: - Countdown View
 struct CountdownView: View {
     @Binding var countdown: Int
