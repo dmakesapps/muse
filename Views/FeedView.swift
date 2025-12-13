@@ -900,44 +900,52 @@ struct FavoritesFeedView: View {
                         .foregroundColor(.museLightGray)
                 }
             } else {
-                // Vertical swipe feed
-                TabView(selection: $currentIndex) {
-                    ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                        GeometryReader { geo in
-                            VStack(spacing: 16) {
-                                // Category tag - purple for affirmations, teal for quotes
-                                Text(item.category.uppercased())
-                                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                                    .foregroundColor(item.tagColor)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(
-                                        Capsule()
-                                            .fill(item.tagColor.opacity(0.15))
-                                    )
-                                
-                                Text(item.text)
-                                    .font(.system(size: fontSizeFor(text: item.text), weight: .medium, design: .serif))
-                                    .foregroundColor(.museSoftWhite)
-                                    .multilineTextAlignment(.center)
-                                    .lineSpacing(8)
-                                
-                                if let author = item.author {
-                                    Text("— \(author)")
-                                        .font(.system(size: fontSizeFor(text: item.text) * 0.65, weight: .regular, design: .serif))
-                                        .foregroundColor(.museLightGray)
+                // Vertical swipe feed using native vertical paging
+                GeometryReader { geometry in
+                    ScrollView(.vertical, showsIndicators: false) {
+                        LazyVStack(spacing: 0) {
+                            ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                                ZStack {
+                                    Color.museDeepNavy
+                                    
+                                    VStack(spacing: 16) {
+                                        // Category tag
+                                        Text(item.category.uppercased())
+                                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                            .foregroundColor(item.tagColor)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 6)
+                                            .background(
+                                                Capsule()
+                                                    .fill(item.tagColor.opacity(0.15))
+                                            )
+                                        
+                                        Text(item.text)
+                                            .font(.system(size: fontSizeFor(text: item.text), weight: .medium, design: .serif))
+                                            .foregroundColor(.museSoftWhite)
+                                            .multilineTextAlignment(.center)
+                                            .lineSpacing(8)
+                                        
+                                        if let author = item.author {
+                                            Text("— \(author)")
+                                                .font(.system(size: fontSizeFor(text: item.text) * 0.65, weight: .regular, design: .serif))
+                                                .foregroundColor(.museLightGray)
+                                        }
+                                    }
+                                    .padding(.horizontal, 40)
                                 }
+                                .frame(width: geometry.size.width, height: geometry.size.height)
+                                .id(index)
                             }
-                            .padding(.horizontal, 40)
-                            .frame(width: geo.size.width, height: geo.size.height)
                         }
-                        .background(Color.museDeepNavy)
-                        .rotationEffect(.degrees(-90))
-                        .tag(index)
+                        .scrollTargetLayout()
                     }
+                    .scrollTargetBehavior(.paging)
+                    .scrollPosition(id: Binding(
+                        get: { currentIndex },
+                        set: { if let newValue = $0 { currentIndex = newValue } }
+                    ))
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .rotationEffect(.degrees(90))
                 .ignoresSafeArea()
             }
             
