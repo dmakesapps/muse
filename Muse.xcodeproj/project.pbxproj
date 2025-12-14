@@ -7,50 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		726462242EC6C35100526FCE /* PromiseEditSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 726462232EC6C35100526FCE /* PromiseEditSheet.swift */; };
-		72E262952EC68E040080CF29 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262832EC68E040080CF29 /* Config.swift */; };
-		72E262962EC68E040080CF29 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262862EC68E040080CF29 /* UserProfile.swift */; };
-		72E262972EC68E040080CF29 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E2628D2EC68E040080CF29 /* ChatViewModel.swift */; };
-		72E262982EC68E040080CF29 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E2628F2EC68E040080CF29 /* ChatView.swift */; };
-		72E262992EC68E040080CF29 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262842EC68E040080CF29 /* Message.swift */; };
-		72E2629A2EC68E040080CF29 /* AICoachService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E2628A2EC68E040080CF29 /* AICoachService.swift */; };
-		72E2629B2EC68E040080CF29 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E2628B2EC68E040080CF29 /* NotificationManager.swift */; };
-		72E2629D2EC68E040080CF29 /* PromiseKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262882EC68E040080CF29 /* PromiseKeeperApp.swift */; };
 		72E2629E2EC68E040080CF29 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262902EC68E040080CF29 /* ContentView.swift */; };
-		72E2629F2EC68E040080CF29 /* PromiseListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262912EC68E040080CF29 /* PromiseListView.swift */; };
-		72E262A02EC68E040080CF29 /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262852EC68E040080CF29 /* Promise.swift */; };
-		72E262A12EC68E040080CF29 /* NotificationAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262A22EC68E040080CF29 /* NotificationAgent.swift */; };
-		72E262A32EC68E040080CF29 /* AgentCreationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262A42EC68E040080CF29 /* AgentCreationSheet.swift */; };
 		72E262A52EC68E040080CF29 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262A62EC68E040080CF29 /* Theme.swift */; };
-		72E262A82EC68E040080CF29 /* NotiAgentAppLogoWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = 72E262A72EC68E040080CF29 /* NotiAgentAppLogoWhite.png */; };
 		72E262AA2EC68E040080CF29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72E262A92EC68E040080CF29 /* Assets.xcassets */; };
-		72E262AB2EC68E040080CF29 /* Components/MultimodalInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262AC2EC68E040080CF29 /* Components/MultimodalInputView.swift */; };
-		72E262AD2EC68E040080CF29 /* Components/SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262AE2EC68E040080CF29 /* Components/SidebarView.swift */; };
-		72E262B32EC68E040080CF29 /* ScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262B42EC68E040080CF29 /* ScheduleView.swift */; };
-		72E262B62EC68E040080CF29 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262B52EC68E040080CF29 /* HelpView.swift */; };
-		72E262C12EC68E040080CF29 /* Library/LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C02EC68E040080CF29 /* Library/LibraryView.swift */; };
-		72E262C32EC68E040080CF29 /* Discover/DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C22EC68E040080CF29 /* Discover/DiscoverView.swift */; };
-		72E262C52EC68E040080CF29 /* Muse/MuseChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C42EC68E040080CF29 /* Muse/MuseChatView.swift */; };
-		72E262C72EC68E040080CF29 /* Progress/ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C62EC68E040080CF29 /* Progress/ProgressView.swift */; };
+		72E262C52EC68E040080CF29 /* MuseChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C42EC68E040080CF29 /* MuseChatView.swift */; };
+		72E262C72EC68E040080CF29 /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C62EC68E040080CF29 /* ProgressView.swift */; };
 		72E262C92EC68E040080CF29 /* Quote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262C82EC68E040080CF29 /* Quote.swift */; };
 		72E262CB2EC68E040080CF29 /* Affirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262CA2EC68E040080CF29 /* Affirmation.swift */; };
-		72E262CD2EC68E040080CF29 /* Discover/QuoteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262CC2EC68E040080CF29 /* Discover/QuoteCard.swift */; };
-		72E262CF2EC68E040080CF29 /* Discover/AffirmationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262CE2EC68E040080CF29 /* Discover/AffirmationCard.swift */; };
 		72E262D12EC68E040080CF29 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D02EC68E040080CF29 /* StorageService.swift */; };
-		72E262D32EC68E040080CF29 /* Library/StartAffirmationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D22EC68E040080CF29 /* Library/StartAffirmationsView.swift */; };
-		72E262D52EC68E040080CF29 /* Library/ImmersiveAffirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D42EC68E040080CF29 /* Library/ImmersiveAffirmationView.swift */; };
-		72E262D72EC68E040080CF29 /* Muse/ChatBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D62EC68E040080CF29 /* Muse/ChatBoxView.swift */; };
-		72E262D82EC68E040080CF29 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D92EC68E040080CF29 /* SpeechService.swift */; };
+		72E262D32EC68E040080CF29 /* StartAffirmationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D22EC68E040080CF29 /* StartAffirmationsView.swift */; };
+		72E262D52EC68E040080CF29 /* ImmersiveAffirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D42EC68E040080CF29 /* ImmersiveAffirmationView.swift */; };
+		72E262D72EC68E040080CF29 /* ChatBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262D62EC68E040080CF29 /* ChatBoxView.swift */; };
 		72E262DA2EC68E040080CF29 /* AffirmationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262DB2EC68E040080CF29 /* AffirmationSession.swift */; };
 		72E262DC2EC68E040080CF29 /* ProgressService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262DD2EC68E040080CF29 /* ProgressService.swift */; };
 		72E262DF2EC68E040080CF29 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262DE2EC68E040080CF29 /* FeedView.swift */; };
-		72EFBAC02EEE1BD500C40084 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72EFBABF2EEE1BD500C40084 /* WidgetKit.framework */; };
-		72EFBAC22EEE1BD500C40084 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72EFBAC12EEE1BD500C40084 /* SwiftUI.framework */; };
-		72EFBAD32EEE1BD600C40084 /* MuseWidgetsExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 72EFBABD2EEE1BD500C40084 /* MuseWidgetsExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		72EFBAEA2EEE27F100C40084 /* DJTAYEbackground.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72EFBAE92EEE27F100C40084 /* DJTAYEbackground.mp3 */; };
+		72E262E12EC68E040080CF29 /* PromiseKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262E02EC68E040080CF29 /* PromiseKeeperApp.swift */; };
 		AAAA00012EC6F00000000001 /* ContentLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00002EC6F00000000001 /* ContentLoader.swift */; };
 		AAAA00032EC6F00000000002 /* quotes.json in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00022EC6F00000000002 /* quotes.json */; };
 		AAAA00052EC6F00000000003 /* affirmations.json in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00042EC6F00000000003 /* affirmations.json */; };
+		AAAA00072EC6F00000000005 /* DJTAYEbackground.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00062EC6F00000000005 /* DJTAYEbackground.mp3 */; };
+		BBBB00012EC7000000000001 /* MuseWidgetsExtensionBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00002EC7000000000001 /* MuseWidgetsExtensionBundle.swift */; };
+		BBBB00032EC7000000000002 /* MuseWidgetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00022EC7000000000002 /* MuseWidgetsExtension.swift */; };
+		BBBB00052EC7000000000003 /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00042EC7000000000003 /* AppIntent.swift */; };
+		BBBB00072EC7000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBBB00062EC7000000000004 /* Assets.xcassets */; };
+		BBBB00092EC7000000000005 /* MuseWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BBBB00082EC7000000000005 /* MuseWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,23 +48,23 @@
 			remoteGlobalIDString = 72E262562EC68CF40080CF29;
 			remoteInfo = Muse;
 		};
-		72EFBAD12EEE1BD600C40084 /* PBXContainerItemProxy */ = {
+		BBBB000A2EC7000000000006 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 72E2624F2EC68CF40080CF29 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 72EFBABC2EEE1BD500C40084;
-			remoteInfo = MuseWidgetsExtensionExtension;
+			remoteGlobalIDString = BBBB000B2EC7000000000007;
+			remoteInfo = MuseWidgetsExtension;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		72EFBAD42EEE1BD600C40084 /* Embed Foundation Extensions */ = {
+		BBBB000C2EC7000000000008 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				72EFBAD32EEE1BD600C40084 /* MuseWidgetsExtensionExtension.appex in Embed Foundation Extensions */,
+				BBBB00092EC7000000000005 /* MuseWidgetsExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -92,77 +72,37 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		726462232EC6C35100526FCE /* PromiseEditSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseEditSheet.swift; sourceTree = "<group>"; };
 		72E262572EC68CF40080CF29 /* Muse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Muse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		72E262662EC68CF60080CF29 /* MuseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		72E262702EC68CF60080CF29 /* MuseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		72E262832EC68E040080CF29 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
-		72E262842EC68E040080CF29 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
-		72E262852EC68E040080CF29 /* Promise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Promise.swift; sourceTree = "<group>"; };
-		72E262862EC68E040080CF29 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
-		72E262882EC68E040080CF29 /* PromiseKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseKeeperApp.swift; sourceTree = "<group>"; };
-		72E2628A2EC68E040080CF29 /* AICoachService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AICoachService.swift; sourceTree = "<group>"; };
-		72E2628B2EC68E040080CF29 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
-		72E2628D2EC68E040080CF29 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
-		72E2628F2EC68E040080CF29 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		72E262902EC68E040080CF29 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		72E262912EC68E040080CF29 /* PromiseListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseListView.swift; sourceTree = "<group>"; };
-		72E262A22EC68E040080CF29 /* NotificationAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationAgent.swift; sourceTree = "<group>"; };
-		72E262A42EC68E040080CF29 /* AgentCreationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentCreationSheet.swift; sourceTree = "<group>"; };
 		72E262A62EC68E040080CF29 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
-		72E262A72EC68E040080CF29 /* NotiAgentAppLogoWhite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NotiAgentAppLogoWhite.png; sourceTree = "<group>"; };
 		72E262A92EC68E040080CF29 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		72E262AC2EC68E040080CF29 /* Components/MultimodalInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/MultimodalInputView.swift; sourceTree = "<group>"; };
-		72E262AE2EC68E040080CF29 /* Components/SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components/SidebarView.swift; sourceTree = "<group>"; };
-		72E262B42EC68E040080CF29 /* ScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleView.swift; sourceTree = "<group>"; };
-		72E262B52EC68E040080CF29 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
-		72E262C02EC68E040080CF29 /* Library/LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library/LibraryView.swift; sourceTree = "<group>"; };
-		72E262C22EC68E040080CF29 /* Discover/DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discover/DiscoverView.swift; sourceTree = "<group>"; };
-		72E262C42EC68E040080CF29 /* Muse/MuseChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Muse/MuseChatView.swift; sourceTree = "<group>"; };
-		72E262C62EC68E040080CF29 /* Progress/ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Progress/ProgressView.swift; sourceTree = "<group>"; };
+		72E262C42EC68E040080CF29 /* MuseChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseChatView.swift; sourceTree = "<group>"; };
+		72E262C62EC68E040080CF29 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
 		72E262C82EC68E040080CF29 /* Quote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quote.swift; sourceTree = "<group>"; };
 		72E262CA2EC68E040080CF29 /* Affirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Affirmation.swift; sourceTree = "<group>"; };
-		72E262CC2EC68E040080CF29 /* Discover/QuoteCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discover/QuoteCard.swift; sourceTree = "<group>"; };
-		72E262CE2EC68E040080CF29 /* Discover/AffirmationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discover/AffirmationCard.swift; sourceTree = "<group>"; };
 		72E262D02EC68E040080CF29 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
-		72E262D22EC68E040080CF29 /* Library/StartAffirmationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library/StartAffirmationsView.swift; sourceTree = "<group>"; };
-		72E262D42EC68E040080CF29 /* Library/ImmersiveAffirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library/ImmersiveAffirmationView.swift; sourceTree = "<group>"; };
-		72E262D62EC68E040080CF29 /* Muse/ChatBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Muse/ChatBoxView.swift; sourceTree = "<group>"; };
-		72E262D92EC68E040080CF29 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
+		72E262D22EC68E040080CF29 /* StartAffirmationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartAffirmationsView.swift; sourceTree = "<group>"; };
+		72E262D42EC68E040080CF29 /* ImmersiveAffirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveAffirmationView.swift; sourceTree = "<group>"; };
+		72E262D62EC68E040080CF29 /* ChatBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBoxView.swift; sourceTree = "<group>"; };
 		72E262DB2EC68E040080CF29 /* AffirmationSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AffirmationSession.swift; sourceTree = "<group>"; };
 		72E262DD2EC68E040080CF29 /* ProgressService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressService.swift; sourceTree = "<group>"; };
 		72E262DE2EC68E040080CF29 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
-		72EFBABD2EEE1BD500C40084 /* MuseWidgetsExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MuseWidgetsExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		72EFBABF2EEE1BD500C40084 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
-		72EFBAC12EEE1BD500C40084 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		72EFBAD92EEE1BF100C40084 /* MuseWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MuseWidgetsExtension.entitlements; sourceTree = "<group>"; };
-		72EFBADA2EEE1C0C00C40084 /* Muse.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Muse.entitlements; path = Muse/Muse.entitlements; sourceTree = "<group>"; };
-		72EFBAE92EEE27F100C40084 /* DJTAYEbackground.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = DJTAYEbackground.mp3; sourceTree = "<group>"; };
+		72E262E02EC68E040080CF29 /* PromiseKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseKeeperApp.swift; sourceTree = "<group>"; };
+		72EFBB072EEE3DAE00C40084 /* Muse.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Muse.entitlements; sourceTree = "<group>"; };
 		AAAA00002EC6F00000000001 /* ContentLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLoader.swift; sourceTree = "<group>"; };
 		AAAA00022EC6F00000000002 /* quotes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = quotes.json; sourceTree = "<group>"; };
 		AAAA00042EC6F00000000003 /* affirmations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = affirmations.json; sourceTree = "<group>"; };
+		AAAA00062EC6F00000000005 /* DJTAYEbackground.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = DJTAYEbackground.mp3; sourceTree = "<group>"; };
+		BBBB00002EC7000000000001 /* MuseWidgetsExtensionBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseWidgetsExtensionBundle.swift; sourceTree = "<group>"; };
+		BBBB00022EC7000000000002 /* MuseWidgetsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseWidgetsExtension.swift; sourceTree = "<group>"; };
+		BBBB00042EC7000000000003 /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
+		BBBB00062EC7000000000004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BBBB00082EC7000000000005 /* MuseWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MuseWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBBB000D2EC7000000000009 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BBBB000E2EC700000000000A /* MuseWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MuseWidgetsExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		72EFBAD72EEE1BD600C40084 /* Exceptions for "MuseWidgetsExtension" folder in "MuseWidgetsExtensionExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 72EFBABC2EEE1BD500C40084 /* MuseWidgetsExtensionExtension */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		72EFBAC32EEE1BD500C40084 /* MuseWidgetsExtension */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				72EFBAD72EEE1BD600C40084 /* Exceptions for "MuseWidgetsExtension" folder in "MuseWidgetsExtensionExtension" target */,
-			);
-			path = MuseWidgetsExtension;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		72E262542EC68CF40080CF29 /* Frameworks */ = {
@@ -186,12 +126,10 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		72EFBABA2EEE1BD500C40084 /* Frameworks */ = {
+		BBBB000F2EC700000000000B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72EFBAC22EEE1BD500C40084 /* SwiftUI.framework in Frameworks */,
-				72EFBAC02EEE1BD500C40084 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,19 +139,14 @@
 		72E2624E2EC68CF40080CF29 = {
 			isa = PBXGroup;
 			children = (
-				72EFBADA2EEE1C0C00C40084 /* Muse.entitlements */,
-				72EFBAD92EEE1BF100C40084 /* MuseWidgetsExtension.entitlements */,
-				72E262832EC68E040080CF29 /* Config.swift */,
+				72E262592EC68CF40080CF29 /* Muse */,
 				72E262872EC68E040080CF29 /* Models */,
-				72E262882EC68E040080CF29 /* PromiseKeeperApp.swift */,
-				72E262A72EC68E040080CF29 /* NotiAgentAppLogoWhite.png */,
-				72E262A92EC68E040080CF29 /* Assets.xcassets */,
-				AAAA00062EC6F00000000004 /* Resources */,
 				72E2628C2EC68E040080CF29 /* Services */,
-				72E2628E2EC68E040080CF29 /* ViewModels */,
 				72E262932EC68E040080CF29 /* Views */,
-				72EFBAC32EEE1BD500C40084 /* MuseWidgetsExtension */,
-				72EFBABE2EEE1BD500C40084 /* Frameworks */,
+				AAAA00062EC6F00000000004 /* Resources */,
+				72E262A92EC68E040080CF29 /* Assets.xcassets */,
+				BBBB00102EC700000000000C /* MuseWidgetsExtension */,
+				BBBB000E2EC700000000000A /* MuseWidgetsExtension.entitlements */,
 				72E262582EC68CF40080CF29 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -224,18 +157,23 @@
 				72E262572EC68CF40080CF29 /* Muse.app */,
 				72E262662EC68CF60080CF29 /* MuseTests.xctest */,
 				72E262702EC68CF60080CF29 /* MuseUITests.xctest */,
-				72EFBABD2EEE1BD500C40084 /* MuseWidgetsExtensionExtension.appex */,
+				BBBB00082EC7000000000005 /* MuseWidgetsExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		72E262592EC68CF40080CF29 /* Muse */ = {
+			isa = PBXGroup;
+			children = (
+				72EFBB072EEE3DAE00C40084 /* Muse.entitlements */,
+				72E262E02EC68E040080CF29 /* PromiseKeeperApp.swift */,
+			);
+			path = Muse;
 			sourceTree = "<group>";
 		};
 		72E262872EC68E040080CF29 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				72E262842EC68E040080CF29 /* Message.swift */,
-				72E262852EC68E040080CF29 /* Promise.swift */,
-				72E262862EC68E040080CF29 /* UserProfile.swift */,
-				72E262A22EC68E040080CF29 /* NotificationAgent.swift */,
 				72E262C82EC68E040080CF29 /* Quote.swift */,
 				72E262CA2EC68E040080CF29 /* Affirmation.swift */,
 				72E262DB2EC68E040080CF29 /* AffirmationSession.swift */,
@@ -246,68 +184,72 @@
 		72E2628C2EC68E040080CF29 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				72E2628A2EC68E040080CF29 /* AICoachService.swift */,
-				72E2628B2EC68E040080CF29 /* NotificationManager.swift */,
 				72E262D02EC68E040080CF29 /* StorageService.swift */,
-				72E262D92EC68E040080CF29 /* SpeechService.swift */,
 				72E262DD2EC68E040080CF29 /* ProgressService.swift */,
 				AAAA00002EC6F00000000001 /* ContentLoader.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		72E2628E2EC68E040080CF29 /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				72E2628D2EC68E040080CF29 /* ChatViewModel.swift */,
-			);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
 		72E262932EC68E040080CF29 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				72E262C02EC68E040080CF29 /* Library/LibraryView.swift */,
-				72E262D22EC68E040080CF29 /* Library/StartAffirmationsView.swift */,
-				72E262D42EC68E040080CF29 /* Library/ImmersiveAffirmationView.swift */,
-				72E262C22EC68E040080CF29 /* Discover/DiscoverView.swift */,
-				72E262CC2EC68E040080CF29 /* Discover/QuoteCard.swift */,
-				72E262CE2EC68E040080CF29 /* Discover/AffirmationCard.swift */,
-				72E262C42EC68E040080CF29 /* Muse/MuseChatView.swift */,
-				72E262D62EC68E040080CF29 /* Muse/ChatBoxView.swift */,
-				72E262C62EC68E040080CF29 /* Progress/ProgressView.swift */,
 				72E262902EC68E040080CF29 /* ContentView.swift */,
-				72E2628F2EC68E040080CF29 /* ChatView.swift */,
 				72E262DE2EC68E040080CF29 /* FeedView.swift */,
-				726462232EC6C35100526FCE /* PromiseEditSheet.swift */,
-				72E262912EC68E040080CF29 /* PromiseListView.swift */,
-				72E262B42EC68E040080CF29 /* ScheduleView.swift */,
-				72E262B52EC68E040080CF29 /* HelpView.swift */,
-				72E262A42EC68E040080CF29 /* AgentCreationSheet.swift */,
 				72E262A62EC68E040080CF29 /* Theme.swift */,
-				72E262AC2EC68E040080CF29 /* Components/MultimodalInputView.swift */,
-				72E262AE2EC68E040080CF29 /* Components/SidebarView.swift */,
+				72E262F02EC68E040080CF29 /* Library */,
+				72E262F12EC68E040080CF29 /* Muse */,
+				72E262F22EC68E040080CF29 /* Progress */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		72EFBABE2EEE1BD500C40084 /* Frameworks */ = {
+		72E262F02EC68E040080CF29 /* Library */ = {
 			isa = PBXGroup;
 			children = (
-				72EFBABF2EEE1BD500C40084 /* WidgetKit.framework */,
-				72EFBAC12EEE1BD500C40084 /* SwiftUI.framework */,
+				72E262D22EC68E040080CF29 /* StartAffirmationsView.swift */,
+				72E262D42EC68E040080CF29 /* ImmersiveAffirmationView.swift */,
 			);
-			name = Frameworks;
+			path = Library;
+			sourceTree = "<group>";
+		};
+		72E262F12EC68E040080CF29 /* Muse */ = {
+			isa = PBXGroup;
+			children = (
+				72E262C42EC68E040080CF29 /* MuseChatView.swift */,
+				72E262D62EC68E040080CF29 /* ChatBoxView.swift */,
+			);
+			path = Muse;
+			sourceTree = "<group>";
+		};
+		72E262F22EC68E040080CF29 /* Progress */ = {
+			isa = PBXGroup;
+			children = (
+				72E262C62EC68E040080CF29 /* ProgressView.swift */,
+			);
+			path = Progress;
 			sourceTree = "<group>";
 		};
 		AAAA00062EC6F00000000004 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				72EFBAE92EEE27F100C40084 /* DJTAYEbackground.mp3 */,
 				AAAA00022EC6F00000000002 /* quotes.json */,
 				AAAA00042EC6F00000000003 /* affirmations.json */,
+				AAAA00062EC6F00000000005 /* DJTAYEbackground.mp3 */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		BBBB00102EC700000000000C /* MuseWidgetsExtension */ = {
+			isa = PBXGroup;
+			children = (
+				BBBB00002EC7000000000001 /* MuseWidgetsExtensionBundle.swift */,
+				BBBB00022EC7000000000002 /* MuseWidgetsExtension.swift */,
+				BBBB00042EC7000000000003 /* AppIntent.swift */,
+				BBBB00062EC7000000000004 /* Assets.xcassets */,
+				BBBB000D2EC7000000000009 /* Info.plist */,
+			);
+			path = MuseWidgetsExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -320,12 +262,12 @@
 				72E262532EC68CF40080CF29 /* Sources */,
 				72E262542EC68CF40080CF29 /* Frameworks */,
 				72E262552EC68CF40080CF29 /* Resources */,
-				72EFBAD42EEE1BD600C40084 /* Embed Foundation Extensions */,
+				BBBB000C2EC7000000000008 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				72EFBAD22EEE1BD600C40084 /* PBXTargetDependency */,
+				BBBB00112EC700000000000D /* PBXTargetDependency */,
 			);
 			name = Muse;
 			packageProductDependencies = (
@@ -374,26 +316,23 @@
 			productReference = 72E262702EC68CF60080CF29 /* MuseUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		72EFBABC2EEE1BD500C40084 /* MuseWidgetsExtensionExtension */ = {
+		BBBB000B2EC7000000000007 /* MuseWidgetsExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 72EFBAD82EEE1BD600C40084 /* Build configuration list for PBXNativeTarget "MuseWidgetsExtensionExtension" */;
+			buildConfigurationList = BBBB00122EC700000000000E /* Build configuration list for PBXNativeTarget "MuseWidgetsExtension" */;
 			buildPhases = (
-				72EFBAB92EEE1BD500C40084 /* Sources */,
-				72EFBABA2EEE1BD500C40084 /* Frameworks */,
-				72EFBABB2EEE1BD500C40084 /* Resources */,
+				BBBB00132EC700000000000F /* Sources */,
+				BBBB000F2EC700000000000B /* Frameworks */,
+				BBBB00142EC7000000000010 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				72EFBAC32EEE1BD500C40084 /* MuseWidgetsExtension */,
-			);
-			name = MuseWidgetsExtensionExtension;
+			name = MuseWidgetsExtension;
 			packageProductDependencies = (
 			);
-			productName = MuseWidgetsExtensionExtension;
-			productReference = 72EFBABD2EEE1BD500C40084 /* MuseWidgetsExtensionExtension.appex */;
+			productName = MuseWidgetsExtension;
+			productReference = BBBB00082EC7000000000005 /* MuseWidgetsExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -417,7 +356,7 @@
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = 72E262562EC68CF40080CF29;
 					};
-					72EFBABC2EEE1BD500C40084 = {
+					BBBB000B2EC7000000000007 = {
 						CreatedOnToolsVersion = 16.4;
 					};
 				};
@@ -439,7 +378,7 @@
 				72E262562EC68CF40080CF29 /* Muse */,
 				72E262652EC68CF60080CF29 /* MuseTests */,
 				72E2626F2EC68CF60080CF29 /* MuseUITests */,
-				72EFBABC2EEE1BD500C40084 /* MuseWidgetsExtensionExtension */,
+				BBBB000B2EC7000000000007 /* MuseWidgetsExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -449,11 +388,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72E262A82EC68E040080CF29 /* NotiAgentAppLogoWhite.png in Resources */,
 				72E262AA2EC68E040080CF29 /* Assets.xcassets in Resources */,
-				72EFBAEA2EEE27F100C40084 /* DJTAYEbackground.mp3 in Resources */,
 				AAAA00032EC6F00000000002 /* quotes.json in Resources */,
 				AAAA00052EC6F00000000003 /* affirmations.json in Resources */,
+				AAAA00072EC6F00000000005 /* DJTAYEbackground.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -471,10 +409,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		72EFBABB2EEE1BD500C40084 /* Resources */ = {
+		BBBB00142EC7000000000010 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBBB00072EC7000000000004 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -485,41 +424,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72E262952EC68E040080CF29 /* Config.swift in Sources */,
-				72E262962EC68E040080CF29 /* UserProfile.swift in Sources */,
-				72E262972EC68E040080CF29 /* ChatViewModel.swift in Sources */,
-				72E262982EC68E040080CF29 /* ChatView.swift in Sources */,
-				72E262992EC68E040080CF29 /* Message.swift in Sources */,
-				72E2629A2EC68E040080CF29 /* AICoachService.swift in Sources */,
-				726462242EC6C35100526FCE /* PromiseEditSheet.swift in Sources */,
-				72E2629B2EC68E040080CF29 /* NotificationManager.swift in Sources */,
-				72E2629D2EC68E040080CF29 /* PromiseKeeperApp.swift in Sources */,
+				72E262E12EC68E040080CF29 /* PromiseKeeperApp.swift in Sources */,
 				72E2629E2EC68E040080CF29 /* ContentView.swift in Sources */,
-				72E2629F2EC68E040080CF29 /* PromiseListView.swift in Sources */,
-				72E262B32EC68E040080CF29 /* ScheduleView.swift in Sources */,
-				72E262B62EC68E040080CF29 /* HelpView.swift in Sources */,
-				72E262C12EC68E040080CF29 /* Library/LibraryView.swift in Sources */,
-				72E262C32EC68E040080CF29 /* Discover/DiscoverView.swift in Sources */,
-				72E262C52EC68E040080CF29 /* Muse/MuseChatView.swift in Sources */,
-				72E262D72EC68E040080CF29 /* Muse/ChatBoxView.swift in Sources */,
-				72E262C72EC68E040080CF29 /* Progress/ProgressView.swift in Sources */,
+				72E262DF2EC68E040080CF29 /* FeedView.swift in Sources */,
+				72E262A52EC68E040080CF29 /* Theme.swift in Sources */,
+				72E262C52EC68E040080CF29 /* MuseChatView.swift in Sources */,
+				72E262D72EC68E040080CF29 /* ChatBoxView.swift in Sources */,
+				72E262C72EC68E040080CF29 /* ProgressView.swift in Sources */,
+				72E262D32EC68E040080CF29 /* StartAffirmationsView.swift in Sources */,
+				72E262D52EC68E040080CF29 /* ImmersiveAffirmationView.swift in Sources */,
 				72E262C92EC68E040080CF29 /* Quote.swift in Sources */,
 				72E262CB2EC68E040080CF29 /* Affirmation.swift in Sources */,
-				72E262CD2EC68E040080CF29 /* Discover/QuoteCard.swift in Sources */,
-				72E262CF2EC68E040080CF29 /* Discover/AffirmationCard.swift in Sources */,
-				72E262D12EC68E040080CF29 /* StorageService.swift in Sources */,
-				72E262D82EC68E040080CF29 /* SpeechService.swift in Sources */,
 				72E262DA2EC68E040080CF29 /* AffirmationSession.swift in Sources */,
+				72E262D12EC68E040080CF29 /* StorageService.swift in Sources */,
 				72E262DC2EC68E040080CF29 /* ProgressService.swift in Sources */,
-				72E262DF2EC68E040080CF29 /* FeedView.swift in Sources */,
-				72E262D32EC68E040080CF29 /* Library/StartAffirmationsView.swift in Sources */,
-				72E262D52EC68E040080CF29 /* Library/ImmersiveAffirmationView.swift in Sources */,
-				72E262A02EC68E040080CF29 /* Promise.swift in Sources */,
-				72E262A12EC68E040080CF29 /* NotificationAgent.swift in Sources */,
-				72E262A32EC68E040080CF29 /* AgentCreationSheet.swift in Sources */,
-				72E262A52EC68E040080CF29 /* Theme.swift in Sources */,
-				72E262AB2EC68E040080CF29 /* Components/MultimodalInputView.swift in Sources */,
-				72E262AD2EC68E040080CF29 /* Components/SidebarView.swift in Sources */,
 				AAAA00012EC6F00000000001 /* ContentLoader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -538,10 +456,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		72EFBAB92EEE1BD500C40084 /* Sources */ = {
+		BBBB00132EC700000000000F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBBB00012EC7000000000001 /* MuseWidgetsExtensionBundle.swift in Sources */,
+				BBBB00032EC7000000000002 /* MuseWidgetsExtension.swift in Sources */,
+				BBBB00052EC7000000000003 /* AppIntent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -558,10 +479,10 @@
 			target = 72E262562EC68CF40080CF29 /* Muse */;
 			targetProxy = 72E262712EC68CF60080CF29 /* PBXContainerItemProxy */;
 		};
-		72EFBAD22EEE1BD600C40084 /* PBXTargetDependency */ = {
+		BBBB00112EC700000000000D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 72EFBABC2EEE1BD500C40084 /* MuseWidgetsExtensionExtension */;
-			targetProxy = 72EFBAD12EEE1BD600C40084 /* PBXContainerItemProxy */;
+			target = BBBB000B2EC7000000000007 /* MuseWidgetsExtension */;
+			targetProxy = BBBB000A2EC7000000000006 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -619,7 +540,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -677,7 +598,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -699,14 +620,11 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Muse;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Muse needs access to your microphone to record your voice for speech-to-text conversion.";
-				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Muse needs access to speech recognition to convert your voice into text.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -732,14 +650,11 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Muse;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Muse needs access to your microphone to record your voice for speech-to-text conversion.";
-				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Muse needs access to speech recognition to convert your voice into text.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -761,7 +676,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.MuseTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -780,7 +695,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.MuseTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -825,7 +740,7 @@
 			};
 			name = Release;
 		};
-		72EFBAD52EEE1BD600C40084 /* Debug */ = {
+		BBBB00152EC7000000000011 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -853,7 +768,7 @@
 			};
 			name = Debug;
 		};
-		72EFBAD62EEE1BD600C40084 /* Release */ = {
+		BBBB00162EC7000000000012 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -920,11 +835,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		72EFBAD82EEE1BD600C40084 /* Build configuration list for PBXNativeTarget "MuseWidgetsExtensionExtension" */ = {
+		BBBB00122EC700000000000E /* Build configuration list for PBXNativeTarget "MuseWidgetsExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				72EFBAD52EEE1BD600C40084 /* Debug */,
-				72EFBAD62EEE1BD600C40084 /* Release */,
+				BBBB00152EC7000000000011 /* Debug */,
+				BBBB00162EC7000000000012 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
