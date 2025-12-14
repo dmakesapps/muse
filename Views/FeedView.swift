@@ -509,6 +509,12 @@ struct MixPopupView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var storage = StorageService.shared
     @State private var showFavorites = false
+    @State private var showMyAffirmations = false
+    
+    // Count of user-created affirmations
+    private var userCreatedCount: Int {
+        storage.savedAffirmations.filter { $0.category == "Created By You" }.count
+    }
     
     var body: some View {
         NavigationStack {
@@ -596,7 +602,8 @@ struct MixPopupView: View {
                                 title: "My own affirmations",
                                 icon: "pencil",
                                 isLocked: false,
-                                action: {}
+                                count: userCreatedCount,
+                                action: { showMyAffirmations = true }
                             )
                         }
                         .padding(.horizontal, 20)
@@ -636,6 +643,275 @@ struct MixPopupView: View {
             }
             .sheet(isPresented: $showFavorites) {
                 FavoritesView()
+            }
+            .sheet(isPresented: $showMyAffirmations) {
+                MyAffirmationsView()
+            }
+        }
+    }
+}
+
+// MARK: - My Affirmations View
+struct MyAffirmationsView: View {
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var storage = StorageService.shared
+    @State private var showCreateSheet = false
+    @State private var newAffirmationText = ""
+    
+    // Filter only user-created affirmations
+    private var userAffirmations: [Affirmation] {
+        storage.savedAffirmations.filter { $0.category == "Created By You" }
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.museDeepNavy
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Header
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.museSoftWhite)
+                                .frame(width: 32, height: 32)
+                                .background(
+                                    Circle()
+                                        .fill(Color.museDarkGray)
+                                )
+                        }
+                        
+                        Spacer()
+                        
+                        Text("My Affirmations")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.museSoftWhite)
+                        
+                        Spacer()
+                        
+                        Button(action: { showCreateSheet = true }) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.museSoftWhite)
+                                .frame(width: 32, height: 32)
+                                .background(
+                                    Circle()
+                                        .fill(Color.museAccentBlue)
+                                )
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .padding(.bottom, 24)
+                    
+                    // Create button
+                    Button(action: { showCreateSheet = true }) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 24))
+                            Text("Create New Affirmation")
+                                .font(.system(size: 16, weight: .medium))
+                        }
+                        .foregroundColor(.museSoftWhite)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.museAccentBlue.opacity(0.3))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.museAccentBlue, lineWidth: 1)
+                                )
+                        )
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 24)
+                    
+                    // Content
+                    if userAffirmations.isEmpty {
+                        Spacer()
+                        VStack(spacing: 16) {
+                            Image(systemName: "pencil.circle")
+                                .font(.system(size: 48))
+                                .foregroundColor(.museLightGray.opacity(0.5))
+                            Text("No affirmations yet")
+                                .font(.system(size: 16))
+                                .foregroundColor(.museLightGray)
+                            Text("Create your own personal affirmations")
+                                .font(.system(size: 14))
+                                .foregroundColor(.museLightGray.opacity(0.7))
+                        }
+                        Spacer()
+                    } else {
+                        ScrollView {
+                            LazyVStack(spacing: 16) {
+                                ForEach(userAffirmations) { affirmation in
+                                    UserAffirmationCard(
+                                        text: affirmation.text,
+                                        onDelete: {
+                                            storage.removeAffirmation(affirmation)
+                                        }
+                                    )
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.bottom, 40)
+                        }
+                    }
+                }
+            }
+            .sheet(isPresented: $showCreateSheet) {
+                CreateAffirmationSheet(onSave: { text in
+                    let newAffirmation = Affirmation(
+                        text: text,
+                        category: "Created By You"
+                    )
+                    storage.saveAffirmation(newAffirmation)
+                })
+            }
+        }
+    }
+}
+
+// MARK: - User Affirmation Card
+struct UserAffirmationCard: View {
+    let text: String
+    let onDelete: () -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Category tag
+            Text("CREATED BY YOU")
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .foregroundColor(.museGradientStart)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(
+                    Capsule()
+                        .fill(Color.museGradientStart.opacity(0.15))
+                )
+            
+            Text(text)
+                .font(.system(size: 16, weight: .medium, design: .serif))
+                .foregroundColor(.museSoftWhite)
+                .multilineTextAlignment(.leading)
+            
+            HStack {
+                Spacer()
+                Button(action: onDelete) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 14))
+                        .foregroundColor(.museLightGray)
+                }
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.museDarkGray.opacity(0.5))
+        )
+    }
+}
+
+// MARK: - Create Affirmation Sheet
+struct CreateAffirmationSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var affirmationText = ""
+    @FocusState private var isTextFieldFocused: Bool
+    let onSave: (String) -> Void
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.museDeepNavy
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 24) {
+                    // Header
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Text("Cancel")
+                                .font(.system(size: 16))
+                                .foregroundColor(.museLightGray)
+                        }
+                        
+                        Spacer()
+                        
+                        Text("New Affirmation")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.museSoftWhite)
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            if !affirmationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                onSave(affirmationText.trimmingCharacters(in: .whitespacesAndNewlines))
+                                dismiss()
+                            }
+                        }) {
+                            Text("Save")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(affirmationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .museLightGray : .museAccentBlue)
+                        }
+                        .disabled(affirmationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    
+                    // Tips
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Tips for great affirmations:")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.museSoftWhite)
+                        
+                        Text("• Start with \"I am\" or \"I have\"\n• Use present tense\n• Keep it positive\n• Make it personal and meaningful")
+                            .font(.system(size: 13))
+                            .foregroundColor(.museLightGray)
+                    }
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.museDarkGray.opacity(0.5))
+                    )
+                    .padding(.horizontal, 20)
+                    
+                    // Text editor
+                    ZStack(alignment: .topLeading) {
+                        if affirmationText.isEmpty {
+                            Text("I am...")
+                                .font(.system(size: 18, design: .serif))
+                                .foregroundColor(.museLightGray.opacity(0.5))
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 16)
+                        }
+                        
+                        TextEditor(text: $affirmationText)
+                            .font(.system(size: 18, design: .serif))
+                            .foregroundColor(.museSoftWhite)
+                            .scrollContentBackground(.hidden)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                            .focused($isTextFieldFocused)
+                    }
+                    .frame(minHeight: 150)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.museDarkGray.opacity(0.5))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.museMediumGray.opacity(0.3), lineWidth: 1)
+                            )
+                    )
+                    .padding(.horizontal, 20)
+                    
+                    Spacer()
+                }
+            }
+            .onAppear {
+                isTextFieldFocused = true
             }
         }
     }
