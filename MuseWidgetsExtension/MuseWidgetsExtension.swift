@@ -73,6 +73,39 @@ struct WidgetAffirmation: Codable, Identifiable {
     }
 }
 
+// MARK: - Default Content (shown when user hasn't saved any)
+struct DefaultContent {
+    static let quotes: [WidgetQuote] = [
+        WidgetQuote(text: "The privilege of a lifetime is to become who you truly are.", author: "Carl Jung", category: "Wisdom"),
+        WidgetQuote(text: "What you seek is seeking you.", author: "Rumi", category: "Purpose"),
+        WidgetQuote(text: "The only way out is through.", author: "Robert Frost", category: "Growth"),
+        WidgetQuote(text: "Be the change you wish to see in the world.", author: "Mahatma Gandhi", category: "Purpose"),
+        WidgetQuote(text: "In the middle of difficulty lies opportunity.", author: "Albert Einstein", category: "Growth"),
+        WidgetQuote(text: "The mind is everything. What you think you become.", author: "Buddha", category: "Wisdom"),
+        WidgetQuote(text: "Your task is not to seek for love, but to find all the barriers you have built against it.", author: "Rumi", category: "Love"),
+        WidgetQuote(text: "Until you make the unconscious conscious, it will direct your life.", author: "Carl Jung", category: "Self-Discovery"),
+        WidgetQuote(text: "Life isn't about finding yourself. Life is about creating yourself.", author: "George Bernard Shaw", category: "Purpose"),
+        WidgetQuote(text: "The present moment is the only moment available to us.", author: "Thich Nhat Hanh", category: "Mindfulness"),
+        WidgetQuote(text: "Realize deeply that the present moment is all you ever have.", author: "Eckhart Tolle", category: "Presence"),
+        WidgetQuote(text: "You are not a drop in the ocean. You are the entire ocean in a drop.", author: "Rumi", category: "Self-Worth"),
+    ]
+    
+    static let affirmations: [WidgetAffirmation] = [
+        WidgetAffirmation(text: "I am worthy of love and belonging.", category: "Self-Worth"),
+        WidgetAffirmation(text: "I trust the journey of my life.", category: "Trust"),
+        WidgetAffirmation(text: "I am capable of achieving my goals.", category: "Confidence"),
+        WidgetAffirmation(text: "I release what no longer serves me.", category: "Letting Go"),
+        WidgetAffirmation(text: "I am exactly where I need to be.", category: "Trust"),
+        WidgetAffirmation(text: "I choose peace over worry.", category: "Peace"),
+        WidgetAffirmation(text: "I am growing stronger every day.", category: "Growth"),
+        WidgetAffirmation(text: "I attract positive energy into my life.", category: "Abundance"),
+        WidgetAffirmation(text: "I am grateful for this moment.", category: "Gratitude"),
+        WidgetAffirmation(text: "I believe in my ability to succeed.", category: "Confidence"),
+        WidgetAffirmation(text: "I am open to new possibilities.", category: "Openness"),
+        WidgetAffirmation(text: "I radiate love and positivity.", category: "Love"),
+    ]
+}
+
 // MARK: - Quote Widget
 struct QuoteEntry: TimelineEntry {
     let date: Date
@@ -81,31 +114,31 @@ struct QuoteEntry: TimelineEntry {
 
 struct QuoteProvider: TimelineProvider {
     func placeholder(in context: Context) -> QuoteEntry {
-        QuoteEntry(date: Date(), quote: WidgetQuote(text: "The only way out is through.", author: "Robert Frost", category: "Wisdom"))
+        QuoteEntry(date: Date(), quote: DefaultContent.quotes.randomElement()!)
     }
     
     func getSnapshot(in context: Context, completion: @escaping (QuoteEntry) -> Void) {
-        let quotes = SharedDataService.shared.loadSavedQuotes()
-        let quote = quotes.randomElement() ?? WidgetQuote(text: "Save your favorite quotes to see them here.", author: "Muse", category: "Welcome")
+        let savedQuotes = SharedDataService.shared.loadSavedQuotes()
+        // Use saved quotes if available, otherwise use defaults
+        let quotes = savedQuotes.isEmpty ? DefaultContent.quotes : savedQuotes
+        let quote = quotes.randomElement()!
         completion(QuoteEntry(date: Date(), quote: quote))
     }
     
     func getTimeline(in context: Context, completion: @escaping (Timeline<QuoteEntry>) -> Void) {
-        let quotes = SharedDataService.shared.loadSavedQuotes()
+        let savedQuotes = SharedDataService.shared.loadSavedQuotes()
+        // Use saved quotes if available, otherwise use defaults
+        let quotes = savedQuotes.isEmpty ? DefaultContent.quotes : savedQuotes
+        
         var entries: [QuoteEntry] = []
         let currentDate = Date()
         
-        if quotes.isEmpty {
-            // Show placeholder if no saved quotes
-            let entry = QuoteEntry(date: currentDate, quote: WidgetQuote(text: "Save your favorite quotes to see them here.", author: "Muse", category: "Welcome"))
-            entries.append(entry)
-        } else {
-            // Cycle through saved quotes every hour
-            for hourOffset in 0..<min(quotes.count, 24) {
-                let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-                let quote = quotes[hourOffset % quotes.count]
-                entries.append(QuoteEntry(date: entryDate, quote: quote))
-            }
+        // Shuffle and cycle through quotes every hour
+        let shuffledQuotes = quotes.shuffled()
+        for hourOffset in 0..<min(shuffledQuotes.count, 24) {
+            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
+            let quote = shuffledQuotes[hourOffset % shuffledQuotes.count]
+            entries.append(QuoteEntry(date: entryDate, quote: quote))
         }
         
         let timeline = Timeline(entries: entries, policy: .atEnd)
@@ -218,30 +251,31 @@ struct AffirmationEntry: TimelineEntry {
 
 struct AffirmationProvider: TimelineProvider {
     func placeholder(in context: Context) -> AffirmationEntry {
-        AffirmationEntry(date: Date(), affirmation: WidgetAffirmation(text: "I am capable of achieving my goals.", category: "Confidence"))
+        AffirmationEntry(date: Date(), affirmation: DefaultContent.affirmations.randomElement()!)
     }
     
     func getSnapshot(in context: Context, completion: @escaping (AffirmationEntry) -> Void) {
-        let affirmations = SharedDataService.shared.loadSavedAffirmations()
-        let affirmation = affirmations.randomElement() ?? WidgetAffirmation(text: "Save your favorite affirmations to see them here.", category: "Welcome")
+        let savedAffirmations = SharedDataService.shared.loadSavedAffirmations()
+        // Use saved affirmations if available, otherwise use defaults
+        let affirmations = savedAffirmations.isEmpty ? DefaultContent.affirmations : savedAffirmations
+        let affirmation = affirmations.randomElement()!
         completion(AffirmationEntry(date: Date(), affirmation: affirmation))
     }
     
     func getTimeline(in context: Context, completion: @escaping (Timeline<AffirmationEntry>) -> Void) {
-        let affirmations = SharedDataService.shared.loadSavedAffirmations()
+        let savedAffirmations = SharedDataService.shared.loadSavedAffirmations()
+        // Use saved affirmations if available, otherwise use defaults
+        let affirmations = savedAffirmations.isEmpty ? DefaultContent.affirmations : savedAffirmations
+        
         var entries: [AffirmationEntry] = []
         let currentDate = Date()
         
-        if affirmations.isEmpty {
-            let entry = AffirmationEntry(date: currentDate, affirmation: WidgetAffirmation(text: "Save your favorite affirmations to see them here.", category: "Welcome"))
-            entries.append(entry)
-        } else {
-            // Cycle through saved affirmations every hour
-            for hourOffset in 0..<min(affirmations.count, 24) {
-                let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-                let affirmation = affirmations[hourOffset % affirmations.count]
-                entries.append(AffirmationEntry(date: entryDate, affirmation: affirmation))
-            }
+        // Shuffle and cycle through affirmations every hour
+        let shuffledAffirmations = affirmations.shuffled()
+        for hourOffset in 0..<min(shuffledAffirmations.count, 24) {
+            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
+            let affirmation = shuffledAffirmations[hourOffset % shuffledAffirmations.count]
+            entries.append(AffirmationEntry(date: entryDate, affirmation: affirmation))
         }
         
         let timeline = Timeline(entries: entries, policy: .atEnd)

@@ -90,7 +90,7 @@
 		72E262DD2EC68E040080CF29 /* ProgressService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressService.swift; sourceTree = "<group>"; };
 		72E262DE2EC68E040080CF29 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		72E262E02EC68E040080CF29 /* PromiseKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseKeeperApp.swift; sourceTree = "<group>"; };
-		72EFBB072EEE3DAE00C40084 /* Muse.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Muse.entitlements; sourceTree = "<group>"; };
+		72EFBB082EEE3E5C00C40084 /* Muse.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Muse.entitlements; sourceTree = "<group>"; };
 		AAAA00002EC6F00000000001 /* ContentLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentLoader.swift; sourceTree = "<group>"; };
 		AAAA00022EC6F00000000002 /* quotes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = quotes.json; sourceTree = "<group>"; };
 		AAAA00042EC6F00000000003 /* affirmations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = affirmations.json; sourceTree = "<group>"; };
@@ -165,7 +165,7 @@
 		72E262592EC68CF40080CF29 /* Muse */ = {
 			isa = PBXGroup;
 			children = (
-				72EFBB072EEE3DAE00C40084 /* Muse.entitlements */,
+				72EFBB082EEE3E5C00C40084 /* Muse.entitlements */,
 				72E262E02EC68E040080CF29 /* PromiseKeeperApp.swift */,
 			);
 			path = Muse;
