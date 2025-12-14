@@ -9,6 +9,8 @@ struct FeedView: View {
     let onMessageTap: () -> Void
     @State private var showMixPopup = false
     @State private var showPracticePopup = false
+    @State private var selectedTagFilter: String? = nil  // Filter by specific tag
+    @State private var showCategoryPicker = false
     
     enum ContentCategory: String {
         case affirmation = "affirmation"
@@ -20,13 +22,31 @@ struct FeedView: View {
     @State private var quotes: [Quote] = []
     @State private var affirmations: [Affirmation] = []
     
-    // Filter content by selected category
-    private var filteredContent: [AnyContentItem] {
+    // Get all unique categories for current content type
+    private var availableCategories: [String] {
         if selectedCategory == .affirmation {
-            return affirmations.map { AnyContentItem(affirmation: $0) }
+            return Array(Set(affirmations.map { $0.category })).sorted()
         } else {
-            return quotes.map { AnyContentItem(quote: $0) }
+            return Array(Set(quotes.map { $0.category })).sorted()
         }
+    }
+    
+    // Filter content by selected category AND tag filter
+    private var filteredContent: [AnyContentItem] {
+        var items: [AnyContentItem]
+        
+        if selectedCategory == .affirmation {
+            items = affirmations.map { AnyContentItem(affirmation: $0) }
+        } else {
+            items = quotes.map { AnyContentItem(quote: $0) }
+        }
+        
+        // Apply tag filter if selected
+        if let tagFilter = selectedTagFilter {
+            items = items.filter { $0.category == tagFilter }
+        }
+        
+        return items
     }
     
     var body: some View {
@@ -57,7 +77,7 @@ struct FeedView: View {
                                     Color.museDeepNavy
                                     
                                     VStack(spacing: 16) {
-                                        // Category tag
+                                        // Category tag - long press to filter by category
                                         Text(item.category.uppercased())
                                             .font(.system(size: 11, weight: .semibold, design: .rounded))
                                             .foregroundColor(item.tagColor)
@@ -66,7 +86,16 @@ struct FeedView: View {
                                             .background(
                                                 Capsule()
                                                     .fill(item.tagColor.opacity(0.15))
+                                                    .overlay(
+                                                        Capsule()
+                                                            .stroke(selectedTagFilter == item.category ? item.tagColor : Color.clear, lineWidth: 2)
+                                                    )
                                             )
+                                            .onLongPressGesture {
+                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                                impactFeedback.impactOccurred()
+                                                showCategoryPicker = true
+                                            }
                                         
                                         Text(item.text)
                                             .font(.system(size: fontSizeFor(text: item.text), weight: .medium, design: .serif))
@@ -93,11 +122,15 @@ struct FeedView: View {
                         get: { currentIndex },
                         set: { if let newValue = $0 { currentIndex = newValue } }
                     ))
-                    // Force ScrollView to recreate when category changes
-                    .id(selectedCategory)
+                    // Force ScrollView to recreate when category or filter changes
+                    .id("\(selectedCategory.rawValue)-\(selectedTagFilter ?? "all")")
                 }
                 .ignoresSafeArea()
                 .onChange(of: selectedCategory) { _, _ in
+                    currentIndex = 0
+                    selectedTagFilter = nil  // Reset filter when switching content type
+                }
+                .onChange(of: selectedTagFilter) { _, _ in
                     currentIndex = 0
                 }
             }
@@ -268,6 +301,15 @@ struct FeedView: View {
         }
         .sheet(isPresented: $showPracticePopup) {
             PracticePopupView()
+        }
+        .sheet(isPresented: $showCategoryPicker) {
+            CategoryPickerView(
+                categories: availableCategories,
+                selectedCategory: $selectedTagFilter,
+                contentType: selectedCategory
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
         .onAppear {
             // Load content from JSON files
@@ -1325,6 +1367,146 @@ struct FavoriteCard: View {
 struct PracticePopupView: View {
     var body: some View {
         StartAffirmationsView()
+    }
+}
+
+// MARK: - Category Picker View
+struct CategoryPickerView: View {
+    @Environment(\.dismiss) private var dismiss
+    let categories: [String]
+    @Binding var selectedCategory: String?
+    let contentType: FeedView.ContentCategory
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.museDeepNavy
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Header
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.museSoftWhite)
+                                .frame(width: 32, height: 32)
+                                .background(
+                                    Circle()
+                                        .fill(Color.museDarkGray)
+                                )
+                        }
+                        
+                        Spacer()
+                        
+                        Text("Filter by Category")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.museSoftWhite)
+                        
+                        Spacer()
+                        
+                        // Clear filter button
+                        if selectedCategory != nil {
+                            Button(action: {
+                                selectedCategory = nil
+                                dismiss()
+                            }) {
+                                Text("Clear")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.museAccentBlue)
+                            }
+                        } else {
+                            Color.clear
+                                .frame(width: 40)
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .padding(.bottom, 16)
+                    
+                    // Current filter indicator
+                    if let current = selectedCategory {
+                        HStack {
+                            Text("Currently showing:")
+                                .font(.system(size: 13))
+                                .foregroundColor(.museLightGray)
+                            
+                            Text(current)
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(contentType == .affirmation ? .museGradientStart : .museTeal)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 16)
+                    }
+                    
+                    // Show all option
+                    Button(action: {
+                        selectedCategory = nil
+                        dismiss()
+                    }) {
+                        HStack {
+                            Image(systemName: "square.grid.2x2")
+                                .font(.system(size: 18))
+                                .foregroundColor(.museSoftWhite)
+                            
+                            Text("Show All \(contentType == .affirmation ? "Affirmations" : "Quotes")")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.museSoftWhite)
+                            
+                            Spacer()
+                            
+                            if selectedCategory == nil {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.museAccentBlue)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(selectedCategory == nil ? Color.museAccentBlue.opacity(0.2) : Color.museDarkGray.opacity(0.5))
+                        )
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 12)
+                    
+                    // Categories list
+                    ScrollView {
+                        LazyVStack(spacing: 8) {
+                            ForEach(categories, id: \.self) { category in
+                                Button(action: {
+                                    selectedCategory = category
+                                    dismiss()
+                                }) {
+                                    HStack {
+                                        Text(category)
+                                            .font(.system(size: 15, weight: .medium))
+                                            .foregroundColor(.museSoftWhite)
+                                        
+                                        Spacer()
+                                        
+                                        if selectedCategory == category {
+                                            Image(systemName: "checkmark")
+                                                .font(.system(size: 14, weight: .semibold))
+                                                .foregroundColor(.museAccentBlue)
+                                        }
+                                    }
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 14)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(selectedCategory == category ? Color.museAccentBlue.opacity(0.2) : Color.museDarkGray.opacity(0.5))
+                                    )
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 40)
+                    }
+                }
+            }
+        }
     }
 }
 
