@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		72B90C152EEF62E600A446A2 /* KrishnaCmaj.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72B90C142EEF62E600A446A2 /* KrishnaCmaj.mp3 */; };
 		72E2629E2EC68E040080CF29 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262902EC68E040080CF29 /* ContentView.swift */; };
 		72E262A52EC68E040080CF29 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262A62EC68E040080CF29 /* Theme.swift */; };
 		72E262AA2EC68E040080CF29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72E262A92EC68E040080CF29 /* Assets.xcassets */; };
@@ -31,6 +32,8 @@
 		BBBB00052EC7000000000003 /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00042EC7000000000003 /* AppIntent.swift */; };
 		BBBB00072EC7000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBBB00062EC7000000000004 /* Assets.xcassets */; };
 		BBBB00092EC7000000000005 /* MuseWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BBBB00082EC7000000000005 /* MuseWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CCCC00012EEE500000000001 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCC00002EEE500000000001 /* SpeechService.swift */; };
+		CCCC00032EEE500000000002 /* OpenAIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCC00022EEE500000000002 /* OpenAIConfig.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +75,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		72B90C142EEF62E600A446A2 /* KrishnaCmaj.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = KrishnaCmaj.mp3; sourceTree = "<group>"; };
 		72E262572EC68CF40080CF29 /* Muse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Muse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		72E262662EC68CF60080CF29 /* MuseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		72E262702EC68CF60080CF29 /* MuseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -102,6 +106,8 @@
 		BBBB00082EC7000000000005 /* MuseWidgetsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MuseWidgetsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBBB000D2EC7000000000009 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BBBB000E2EC700000000000A /* MuseWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MuseWidgetsExtension.entitlements; sourceTree = "<group>"; };
+		CCCC00002EEE500000000001 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
+		CCCC00022EEE500000000002 /* OpenAIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIConfig.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -187,6 +193,8 @@
 				72E262D02EC68E040080CF29 /* StorageService.swift */,
 				72E262DD2EC68E040080CF29 /* ProgressService.swift */,
 				AAAA00002EC6F00000000001 /* ContentLoader.swift */,
+				CCCC00002EEE500000000001 /* SpeechService.swift */,
+				CCCC00022EEE500000000002 /* OpenAIConfig.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -235,6 +243,7 @@
 			children = (
 				AAAA00022EC6F00000000002 /* quotes.json */,
 				AAAA00042EC6F00000000003 /* affirmations.json */,
+				72B90C142EEF62E600A446A2 /* KrishnaCmaj.mp3 */,
 				AAAA00062EC6F00000000005 /* DJTAYEbackground.mp3 */,
 			);
 			path = Resources;
@@ -392,6 +401,7 @@
 				AAAA00032EC6F00000000002 /* quotes.json in Resources */,
 				AAAA00052EC6F00000000003 /* affirmations.json in Resources */,
 				AAAA00072EC6F00000000005 /* DJTAYEbackground.mp3 in Resources */,
+				72B90C152EEF62E600A446A2 /* KrishnaCmaj.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,6 +449,8 @@
 				72E262D12EC68E040080CF29 /* StorageService.swift in Sources */,
 				72E262DC2EC68E040080CF29 /* ProgressService.swift in Sources */,
 				AAAA00012EC6F00000000001 /* ContentLoader.swift in Sources */,
+				CCCC00012EEE500000000001 /* SpeechService.swift in Sources */,
+				CCCC00032EEE500000000002 /* OpenAIConfig.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

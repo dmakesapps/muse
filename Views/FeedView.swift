@@ -552,10 +552,58 @@ struct MixPopupView: View {
     @StateObject private var storage = StorageService.shared
     @State private var showFavorites = false
     @State private var showMyAffirmations = false
+    @State private var selectedCategory: String? = nil
     
     // Count of user-created affirmations
     private var userCreatedCount: Int {
         storage.savedAffirmations.filter { $0.category == "Created By You" }.count
+    }
+    
+    // Get all unique categories from affirmations
+    private var allCategories: [String] {
+        ContentLoader.shared.getAffirmationCategories()
+    }
+    
+    // Get icon for category
+    private func iconForCategory(_ category: String) -> String {
+        switch category.lowercased() {
+        case "self-love", "self-worth", "self-care", "self-acceptance":
+            return "heart.fill"
+        case "confidence":
+            return "star.fill"
+        case "inner peace", "peace":
+            return "leaf.fill"
+        case "gratitude":
+            return "hands.clap.fill"
+        case "strength", "resilience":
+            return "bolt.fill"
+        case "love", "relationships":
+            return "heart.circle.fill"
+        case "growth", "transformation":
+            return "arrow.up.right.circle.fill"
+        case "mental health", "anxiety relief", "healing":
+            return "brain.head.profile"
+        case "abundance", "manifestation", "success":
+            return "sparkles"
+        case "courage":
+            return "flame.fill"
+        case "trust", "faith":
+            return "hand.raised.fill"
+        case "forgiveness", "acceptance":
+            return "hands.sparkles.fill"
+        case "positivity":
+            return "sun.max.fill"
+        case "boundaries":
+            return "shield.fill"
+        case "compassion":
+            return "hand.wave.fill"
+        case "health":
+            return "heart.text.square.fill"
+        case "christianity", "faith":
+            return "book.closed.fill"
+        default:
+            return "sparkle"
+        }
     }
     
     var body: some View {
@@ -650,27 +698,22 @@ struct MixPopupView: View {
                         }
                         .padding(.horizontal, 20)
                         
-                        // Most popular section
-                        Text("Most popular")
+                        // Categories section
+                        Text("Categories")
                             .font(.system(size: 20, weight: .semibold))
                             .foregroundColor(.museSoftWhite)
                             .padding(.horizontal, 20)
                             .padding(.top, 8)
                         
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                            MixCategoryCard(
-                                title: "Christianity",
-                                icon: "book.closed",
-                                isLocked: false,
-                                action: {}
-                            )
-                            
-                            MixCategoryCard(
-                                title: "Routine",
-                                icon: "sunrise",
-                                isLocked: true,
-                                action: {}
-                            )
+                            ForEach(allCategories, id: \.self) { category in
+                                MixCategoryCard(
+                                    title: category,
+                                    icon: iconForCategory(category),
+                                    isLocked: false,
+                                    action: { selectedCategory = category }
+                                )
+                            }
                         }
                         .padding(.horizontal, 20)
                         .padding(.bottom, 100)
@@ -689,7 +732,146 @@ struct MixPopupView: View {
             .sheet(isPresented: $showMyAffirmations) {
                 MyAffirmationsView()
             }
+            .sheet(item: $selectedCategory) { category in
+                CategoryAffirmationsView(category: category)
+            }
         }
+    }
+}
+
+// MARK: - String extension for sheet item
+extension String: @retroactive Identifiable {
+    public var id: String { self }
+}
+
+// MARK: - Category Affirmations View
+struct CategoryAffirmationsView: View {
+    let category: String
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var storage = StorageService.shared
+    
+    // Get affirmations for this category
+    private var affirmations: [Affirmation] {
+        ContentLoader.shared.loadAffirmations().filter { $0.category == category }
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.museDeepNavy
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Header
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.museSoftWhite)
+                                .frame(width: 32, height: 32)
+                                .background(
+                                    Circle()
+                                        .fill(Color.museDarkGray)
+                                )
+                        }
+                        
+                        Spacer()
+                        
+                        Text(category)
+                            .font(.museHeadline())
+                            .foregroundColor(.museSoftWhite)
+                        
+                        Spacer()
+                        
+                        // Invisible spacer for balance
+                        Color.clear.frame(width: 32, height: 32)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .padding(.bottom, 16)
+                    
+                    // Affirmations count
+                    Text("\(affirmations.count) affirmations")
+                        .font(.museCaption())
+                        .foregroundColor(.museLightGray)
+                        .padding(.bottom, 16)
+                    
+                    if affirmations.isEmpty {
+                        Spacer()
+                        VStack(spacing: 16) {
+                            Image(systemName: "text.quote")
+                                .font(.system(size: 48))
+                                .foregroundColor(.museLightGray.opacity(0.5))
+                            
+                            Text("No affirmations in this category")
+                                .font(.museBodyMedium())
+                                .foregroundColor(.museLightGray)
+                        }
+                        Spacer()
+                    } else {
+                        ScrollView {
+                            LazyVStack(spacing: 12) {
+                                ForEach(affirmations) { affirmation in
+                                    CategoryAffirmationRow(
+                                        affirmation: affirmation,
+                                        isSaved: storage.isAffirmationSaved(affirmation),
+                                        onSave: {
+                                            if storage.isAffirmationSaved(affirmation) {
+                                                storage.removeAffirmation(affirmation)
+                                            } else {
+                                                storage.saveAffirmation(affirmation)
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.bottom, 100)
+                        }
+                    }
+                }
+            }
+            .navigationBarHidden(true)
+        }
+    }
+}
+
+// MARK: - Category Affirmation Row
+struct CategoryAffirmationRow: View {
+    let affirmation: Affirmation
+    let isSaved: Bool
+    let onSave: () -> Void
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(affirmation.text)
+                    .font(.museBodyMedium())
+                    .foregroundColor(.museSoftWhite)
+                    .fixedSize(horizontal: false, vertical: true)
+                
+                Text(affirmation.category.uppercased())
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.museGradientStart)
+            }
+            
+            Spacer()
+            
+            Button(action: onSave) {
+                Image(systemName: isSaved ? "heart.fill" : "heart")
+                    .font(.system(size: 20))
+                    .foregroundColor(isSaved ? .museGradientStart : .museLightGray)
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color.museDarkGray)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.museMediumGray.opacity(0.3), lineWidth: 1)
+                )
+        )
     }
 }
 

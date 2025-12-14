@@ -346,6 +346,29 @@ struct StartAffirmationsView: View {
                 }
             }
             
+            // Music Selector
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Background Music")
+                    .font(.museHeadline())
+                    .foregroundColor(.museSoftWhite)
+                
+                VStack(spacing: 10) {
+                    ForEach(BackgroundMusicTrack.allCases) { track in
+                        MusicTrackButton(
+                            track: track,
+                            isSelected: storage.selectedMusicTrack == track,
+                            onSelect: {
+                                storage.selectedMusicTrack = track
+                                BackgroundMusicManager.shared.selectedTrack = track
+                            },
+                            onPreview: {
+                                BackgroundMusicManager.shared.preview(track: track)
+                            }
+                        )
+                    }
+                }
+            }
+            
             // Duration Selector
             VStack(alignment: .leading, spacing: 12) {
                 Text("Duration")
@@ -368,6 +391,10 @@ struct StartAffirmationsView: View {
                     }
                 }
             }
+        }
+        .onDisappear {
+            // Stop any music preview when leaving this view
+            BackgroundMusicManager.shared.stopPreview()
         }
     }
     
@@ -448,6 +475,88 @@ struct StartAffirmationsView: View {
             selectedAffirmations.remove(affirmation.id)
         } else {
             selectedAffirmations.insert(affirmation.id)
+        }
+    }
+}
+
+// MARK: - Music Track Button
+struct MusicTrackButton: View {
+    let track: BackgroundMusicTrack
+    let isSelected: Bool
+    let onSelect: () -> Void
+    let onPreview: () -> Void
+    
+    @State private var isPreviewing = false
+    
+    var body: some View {
+        Button(action: onSelect) {
+            HStack(spacing: 14) {
+                // Icon
+                Image(systemName: track.icon)
+                    .font(.system(size: 20))
+                    .foregroundColor(isSelected ? .museSoftWhite : .museGradientStart)
+                    .frame(width: 44, height: 44)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(isSelected ? Color.museGradientStart : Color.museGradientStart.opacity(0.15))
+                    )
+                
+                // Track info
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(track.rawValue)
+                        .font(.museBodyMedium())
+                        .foregroundColor(.museSoftWhite)
+                    
+                    Text(track.description)
+                        .font(.museCaption())
+                        .foregroundColor(.museLightGray)
+                }
+                
+                Spacer()
+                
+                // Preview button (only for tracks with audio)
+                if track.fileName != nil {
+                    Button(action: {
+                        isPreviewing.toggle()
+                        if isPreviewing {
+                            onPreview()
+                        } else {
+                            BackgroundMusicManager.shared.stopPreview()
+                        }
+                    }) {
+                        Image(systemName: isPreviewing ? "stop.fill" : "play.fill")
+                            .font(.system(size: 12))
+                            .foregroundColor(.museAccentBlue)
+                            .frame(width: 32, height: 32)
+                            .background(
+                                Circle()
+                                    .fill(Color.museAccentBlue.opacity(0.15))
+                            )
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+                
+                // Selection indicator
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 22))
+                    .foregroundColor(isSelected ? .museSuccessGreen : .museLightGray)
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(isSelected ? Color.museSuccessGreen.opacity(0.1) : Color.museDarkGray)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(isSelected ? Color.museSuccessGreen.opacity(0.5) : Color.museMediumGray.opacity(0.3), lineWidth: 1)
+                    )
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+        .onChange(of: isSelected) { _, newValue in
+            if newValue {
+                // Stop preview when selected
+                isPreviewing = false
+            }
         }
     }
 }
@@ -669,6 +778,49 @@ struct CountdownView: View {
     }
 }
 
+// MARK: - Background Music Track
+enum BackgroundMusicTrack: String, CaseIterable, Identifiable {
+    case none = "None"
+    case djTaye = "Ambient Waves"
+    case krishna = "Krishna C Major"
+    
+    var id: String { rawValue }
+    
+    var fileName: String? {
+        switch self {
+        case .none: return nil
+        case .djTaye: return "DJTAYEbackground"
+        case .krishna: return "KrishnaCmaj"
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .none: return "speaker.slash"
+        case .djTaye: return "waveform"
+        case .krishna: return "music.note"
+        }
+    }
+    
+    var description: String {
+        switch self {
+        case .none: return "No background music"
+        case .djTaye: return "Calm ambient waves"
+        case .krishna: return "Peaceful meditation"
+        }
+    }
+    
+    /// Volume multiplier to normalize loudness across tracks
+    /// Adjust these values to balance the perceived volume
+    var volumeMultiplier: Float {
+        switch self {
+        case .none: return 0.0
+        case .djTaye: return 1.0      // Reference volume
+        case .krishna: return 0.5     // Krishna is louder, so reduce to 50%
+        }
+    }
+}
+
 // MARK: - Background Music Manager
 import AVFoundation
 
@@ -678,6 +830,7 @@ class BackgroundMusicManager: ObservableObject {
     private var audioPlayer: AVAudioPlayer?
     @Published var volume: Float = 0.5
     @Published var isPlaying = false
+    @Published var selectedTrack: BackgroundMusicTrack = .djTaye
     
     private init() {
         setupAudioSession()
@@ -692,9 +845,20 @@ class BackgroundMusicManager: ObservableObject {
         }
     }
     
+    /// Get the effective volume (user volume × track multiplier)
+    private var effectiveVolume: Float {
+        volume * selectedTrack.volumeMultiplier
+    }
+    
     func play(fadeInDuration: TimeInterval = 2.0) {
-        guard let url = Bundle.main.url(forResource: "DJTAYEbackground", withExtension: "mp3") else {
-            print("Could not find DJTAYEbackground.mp3")
+        // If no track selected, don't play anything
+        guard let fileName = selectedTrack.fileName else {
+            print("🎵 No music track selected")
+            return
+        }
+        
+        guard let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") else {
+            print("🎵 Could not find \(fileName).mp3")
             return
         }
         
@@ -706,8 +870,10 @@ class BackgroundMusicManager: ObservableObject {
             audioPlayer?.play()
             isPlaying = true
             
-            // Fade in
-            fadeToVolume(volume, duration: fadeInDuration)
+            print("🎵 Playing: \(selectedTrack.rawValue) at volume multiplier: \(selectedTrack.volumeMultiplier)")
+            
+            // Fade in to effective volume (user volume × track multiplier)
+            fadeToVolume(effectiveVolume, duration: fadeInDuration)
         } catch {
             print("Failed to play audio: \(error)")
         }
@@ -726,7 +892,43 @@ class BackgroundMusicManager: ObservableObject {
     
     func setVolume(_ newVolume: Float) {
         volume = newVolume
-        audioPlayer?.volume = newVolume
+        // Apply volume with track multiplier
+        audioPlayer?.volume = newVolume * selectedTrack.volumeMultiplier
+    }
+    
+    /// Preview a track (plays a short clip)
+    func preview(track: BackgroundMusicTrack) {
+        // Stop current playback first
+        audioPlayer?.stop()
+        audioPlayer = nil
+        isPlaying = false
+        
+        guard let fileName = track.fileName else { return }
+        guard let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") else { return }
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.numberOfLoops = 0 // Don't loop for preview
+            // Apply volume with track's multiplier for accurate preview
+            audioPlayer?.volume = volume * track.volumeMultiplier
+            audioPlayer?.prepareToPlay()
+            audioPlayer?.play()
+            isPlaying = true
+            
+            // Stop after 5 seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
+                self?.audioPlayer?.stop()
+                self?.isPlaying = false
+            }
+        } catch {
+            print("Failed to preview audio: \(error)")
+        }
+    }
+    
+    func stopPreview() {
+        audioPlayer?.stop()
+        audioPlayer = nil
+        isPlaying = false
     }
     
     private func fadeToVolume(_ targetVolume: Float, duration: TimeInterval, completion: (() -> Void)? = nil) {
@@ -760,21 +962,31 @@ struct AffirmationDisplayView: View {
     let onComplete: () -> Void
     
     @StateObject private var musicManager = BackgroundMusicManager.shared
+    @StateObject private var speechService = SpeechService.shared
     @State private var randomizedAffirmations: [Affirmation] = []
     @State private var currentIndex = 0
     @State private var elapsedTime = 0
     @State private var timer: Timer?
-    @State private var affirmationTimer: Timer?
     @State private var opacity: Double = 1.0
     @State private var sessionStartTime: Date = Date()
     @State private var completedAffirmations: [String] = []
     @State private var lastShownAffirmationId: UUID? = nil
     @State private var showVolumeSlider = false
+    @State private var isStopped = false  // Flag to prevent scheduled tasks from running after stop
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
-    // Time each affirmation displays (in seconds)
-    private let displayDuration: Double = 5.0
+    // Phase of the current affirmation
+    enum AffirmationPhase {
+        case speaking      // Voice is speaking
+        case yourTurn      // User's turn to repeat
+        case transitioning // Fading to next affirmation
+    }
+    
+    @State private var currentPhase: AffirmationPhase = .speaking
+    
+    // Time for user to repeat the affirmation (in seconds)
+    private let userRepeatDuration: Double = 6.0
     
     var body: some View {
         ZStack {
@@ -805,11 +1017,49 @@ struct AffirmationDisplayView: View {
                 Spacer()
             }
             
-            // Affirmation text
+            // Affirmation text and phase indicator
             if currentIndex < randomizedAffirmations.count {
-                VStack(spacing: 0) {
+                VStack(spacing: 32) {
                     Spacer()
                     
+                    // Phase indicator
+                    HStack(spacing: 12) {
+                        if currentPhase == .speaking {
+                            // Speaking indicator with animation
+                            HStack(spacing: 6) {
+                                ForEach(0..<3, id: \.self) { i in
+                                    SoundWaveBar(delay: Double(i) * 0.15)
+                                }
+                            }
+                            .frame(width: 24, height: 16)
+                            
+                            Text("Listen...")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.museGradientStart)
+                        } else if currentPhase == .yourTurn {
+                            Image(systemName: "mic.fill")
+                                .font(.system(size: 14))
+                                .foregroundColor(.museTeal)
+                            
+                            Text("Your turn...")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.museTeal)
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(
+                        Capsule()
+                            .fill(currentPhase == .speaking ? Color.museGradientStart.opacity(0.15) : Color.museTeal.opacity(0.15))
+                            .overlay(
+                                Capsule()
+                                    .stroke(currentPhase == .speaking ? Color.museGradientStart.opacity(0.3) : Color.museTeal.opacity(0.3), lineWidth: 1)
+                            )
+                    )
+                    .opacity(currentPhase == .transitioning ? 0 : 1)
+                    .animation(.easeInOut(duration: 0.3), value: currentPhase)
+                    
+                    // Affirmation text
                     Text(randomizedAffirmations[currentIndex].text)
                         .font(.system(size: 36, weight: .medium, design: .serif))
                         .foregroundColor(.museSoftWhite)
@@ -820,6 +1070,15 @@ struct AffirmationDisplayView: View {
                         .opacity(opacity)
                     
                     Spacer()
+                    
+                    // Tap to continue hint (during yourTurn phase)
+                    if currentPhase == .yourTurn {
+                        Text("Tap anywhere when ready")
+                            .font(.museCaption())
+                            .foregroundColor(.museLightGray.opacity(0.6))
+                            .padding(.bottom, 40)
+                            .transition(.opacity)
+                    }
                 }
             }
             
@@ -862,7 +1121,7 @@ struct AffirmationDisplayView: View {
                                     .overlay(
                                         Circle()
                                             .stroke(Color.museMediumGray.opacity(0.6), lineWidth: 1)
-                                    )
+                                        )
                             )
                     }
                     .padding(.trailing, 30)
@@ -912,31 +1171,44 @@ struct AffirmationDisplayView: View {
         .onAppear { start() }
         .onDisappear { stop() }
         .onTapGesture {
-            // Hide volume slider when tapping elsewhere
             if showVolumeSlider {
                 withAnimation(.spring(response: 0.3)) {
                     showVolumeSlider = false
                 }
+            } else if currentPhase == .yourTurn {
+                // User tapped to proceed to next affirmation
+                transitionToNext()
             }
         }
     }
     
+    // MARK: - Session Control
     private func start() {
+        print("🚀 AffirmationDisplayView: start() called")
+        print("🚀 AffirmationDisplayView: affirmations count = \(affirmations.count)")
+        
         guard !affirmations.isEmpty else {
+            print("⚠️ AffirmationDisplayView: No affirmations! Completing...")
             onComplete()
             return
         }
+        
+        // Reset stopped flag
+        isStopped = false
         
         sessionStartTime = Date()
         completedAffirmations = []
         randomizedAffirmations = affirmations.shuffled()
         currentIndex = 0
         
+        print("🚀 AffirmationDisplayView: First affirmation: \(randomizedAffirmations.first?.text.prefix(30) ?? "none")...")
+        
         // Start background music with fade in
         musicManager.play(fadeInDuration: 2.0)
         
-        // Start the affirmation cycle timer
-        scheduleNextAffirmation()
+        // Start speaking the first affirmation
+        print("🚀 AffirmationDisplayView: Calling speakCurrentAffirmation()...")
+        speakCurrentAffirmation()
         
         // Overall session timer
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
@@ -947,14 +1219,66 @@ struct AffirmationDisplayView: View {
         }
     }
     
-    private func scheduleNextAffirmation() {
-        affirmationTimer?.invalidate()
-        affirmationTimer = Timer.scheduledTimer(withTimeInterval: displayDuration, repeats: false) { _ in
-            transitionToNext()
+    private func speakCurrentAffirmation() {
+        print("🎤 speakCurrentAffirmation() called, currentIndex = \(currentIndex)")
+        
+        // Check if session was stopped
+        guard !isStopped else {
+            print("🛑 speakCurrentAffirmation: Session stopped, not speaking")
+            return
+        }
+        
+        guard currentIndex < randomizedAffirmations.count else {
+            print("⚠️ speakCurrentAffirmation: Index out of bounds!")
+            return
+        }
+        
+        currentPhase = .speaking
+        let text = randomizedAffirmations[currentIndex].text
+        
+        print("🎤 Speaking text: \(text)")
+        
+        // Speak the affirmation using OpenAI TTS
+        speechService.speak(text) {
+            // Voice finished speaking, transition to user's turn
+            DispatchQueue.main.async {
+                // Check if stopped before transitioning
+                guard !isStopped else {
+                    print("🛑 Speech complete but session stopped, not transitioning")
+                    return
+                }
+                
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    currentPhase = .yourTurn
+                }
+                
+                // Auto-advance after userRepeatDuration if user doesn't tap
+                DispatchQueue.main.asyncAfter(deadline: .now() + userRepeatDuration) {
+                    // Check if stopped before auto-advancing
+                    guard !isStopped else {
+                        print("🛑 Auto-advance cancelled, session stopped")
+                        return
+                    }
+                    if currentPhase == .yourTurn {
+                        transitionToNext()
+                    }
+                }
+            }
         }
     }
     
     private func transitionToNext() {
+        // Check if session was stopped
+        guard !isStopped else {
+            print("🛑 transitionToNext: Session stopped, not transitioning")
+            return
+        }
+        
+        currentPhase = .transitioning
+        
+        // Stop any ongoing speech
+        speechService.stopSpeaking()
+        
         if currentIndex < randomizedAffirmations.count {
             completedAffirmations.append(randomizedAffirmations[currentIndex].text)
             lastShownAffirmationId = randomizedAffirmations[currentIndex].id
@@ -966,6 +1290,12 @@ struct AffirmationDisplayView: View {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            // Check if stopped before continuing
+            guard !isStopped else {
+                print("🛑 Fade transition cancelled, session stopped")
+                return
+            }
+            
             // Move to next affirmation
             currentIndex = (currentIndex + 1) % randomizedAffirmations.count
             
@@ -979,8 +1309,15 @@ struct AffirmationDisplayView: View {
                 opacity = 1.0
             }
             
-            // Schedule next transition
-            scheduleNextAffirmation()
+            // Start speaking the new affirmation
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                // Final check before speaking
+                guard !isStopped else {
+                    print("🛑 Speaking new affirmation cancelled, session stopped")
+                    return
+                }
+                speakCurrentAffirmation()
+            }
         }
     }
     
@@ -1006,8 +1343,26 @@ struct AffirmationDisplayView: View {
     }
     
     private func stop() {
+        print("🛑 AffirmationDisplayView: stop() called")
+        
+        // Set stopped flag FIRST to prevent any scheduled tasks from running
+        isStopped = true
+        
+        // Stop speech
+        speechService.stopSpeaking()
+        
         // Stop background music with fade out
         musicManager.stop(fadeOutDuration: 1.5)
+        
+        // Invalidate timer
+        timer?.invalidate()
+        timer = nil
+        
+        // Only save session if we actually started
+        guard !completedAffirmations.isEmpty || elapsedTime > 0 else {
+            onComplete()
+            return
+        }
         
         let sessionDuration = Date().timeIntervalSince(sessionStartTime)
         let affirmationCount = completedAffirmations.count
@@ -1026,11 +1381,28 @@ struct AffirmationDisplayView: View {
             print("Error saving session: \(error)")
         }
         
-        timer?.invalidate()
-        affirmationTimer?.invalidate()
-        timer = nil
-        affirmationTimer = nil
         onComplete()
+    }
+}
+
+// MARK: - Sound Wave Animation Bar
+struct SoundWaveBar: View {
+    let delay: Double
+    @State private var isAnimating = false
+    
+    var body: some View {
+        RoundedRectangle(cornerRadius: 2)
+            .fill(Color.museGradientStart)
+            .frame(width: 3, height: isAnimating ? 16 : 6)
+            .animation(
+                Animation.easeInOut(duration: 0.4)
+                    .repeatForever(autoreverses: true)
+                    .delay(delay),
+                value: isAnimating
+            )
+            .onAppear {
+                isAnimating = true
+            }
     }
 }
 

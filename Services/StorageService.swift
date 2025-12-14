@@ -47,8 +47,15 @@ class StorageService: ObservableObject {
     
     @Published var savedAffirmations: [Affirmation] = []
     
+    @Published var selectedMusicTrack: BackgroundMusicTrack = .djTaye {
+        didSet {
+            saveMusicTrackPreference()
+        }
+    }
+    
     private let quotesKey = "savedQuotes"
     private let affirmationsKey = "savedAffirmations"
+    private let musicTrackKey = "selectedMusicTrack"
     
     // App Group UserDefaults for widget sharing
     private var sharedUserDefaults: UserDefaults? {
@@ -57,6 +64,20 @@ class StorageService: ObservableObject {
     
     init() {
         loadSavedItems()
+        loadMusicTrackPreference()
+    }
+    
+    // MARK: - Music Track Preference
+    private func saveMusicTrackPreference() {
+        UserDefaults.standard.set(selectedMusicTrack.rawValue, forKey: musicTrackKey)
+    }
+    
+    private func loadMusicTrackPreference() {
+        if let savedValue = UserDefaults.standard.string(forKey: musicTrackKey),
+           let track = BackgroundMusicTrack(rawValue: savedValue) {
+            selectedMusicTrack = track
+            BackgroundMusicManager.shared.selectedTrack = track
+        }
     }
     
     // MARK: - Quotes

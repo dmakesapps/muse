@@ -29,7 +29,10 @@ struct ImmersiveAffirmationView: View {
             startCountdown()
         }
         .onDisappear {
+            // Stop everything when leaving immersive mode
             timer?.invalidate()
+            SpeechService.shared.stopSpeaking()
+            BackgroundMusicManager.shared.stop(fadeOutDuration: 0.5)
         }
     }
     
@@ -44,5 +47,6 @@ struct ImmersiveAffirmationView: View {
         }
     }
 }
+
 
 
