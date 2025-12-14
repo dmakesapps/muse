@@ -183,23 +183,12 @@ struct QuoteWidgetEntryView: View {
                 )
             
             if let quote = entry.quote {
-                VStack(spacing: 6) {
-                    // Category tag
-                    Text(quote.category.uppercased())
-                        .font(.system(size: 9, weight: .semibold, design: .rounded))
-                        .foregroundColor(Color(red: 0.4, green: 0.8, blue: 0.8)) // Teal
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(
-                            Capsule()
-                                .fill(Color(red: 0.4, green: 0.8, blue: 0.8).opacity(0.15))
-                        )
-                    
+                VStack(spacing: 8) {
                     Text(quote.text)
                         .font(.system(size: fontSize, weight: .medium, design: .serif))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
-                        .lineLimit(family == .systemSmall ? 5 : 7)
+                        .lineLimit(family == .systemSmall ? 6 : 8)
                         .minimumScaleFactor(0.6)
                     
                     Text("— \(quote.author)")
@@ -320,23 +309,12 @@ struct AffirmationWidgetEntryView: View {
                 )
             
             if let affirmation = entry.affirmation {
-                VStack(spacing: 6) {
-                    // Category tag - purple for affirmations
-                    Text(affirmation.category.uppercased())
-                        .font(.system(size: 9, weight: .semibold, design: .rounded))
-                        .foregroundColor(Color(red: 0.6, green: 0.4, blue: 0.9)) // Purple
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(
-                            Capsule()
-                                .fill(Color(red: 0.6, green: 0.4, blue: 0.9).opacity(0.15))
-                        )
-                    
+                VStack(spacing: 8) {
                     Text(affirmation.text)
                         .font(.system(size: fontSize, weight: .medium, design: .serif))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
-                        .lineLimit(family == .systemSmall ? 5 : 7)
+                        .lineLimit(family == .systemSmall ? 6 : 8)
                         .minimumScaleFactor(0.6)
                 }
                 .padding(.horizontal, 14)
