@@ -259,23 +259,9 @@ struct FeedView: View {
                     
                     Spacer()
                     
-                    // Practice button (center)
+                    // Practice button (center) - Glowing Start button style (transparent center with animated glow)
                     if selectedCategory == .affirmation {
-                        Button(action: { showPracticePopup = true }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "figure.mind.and.body")
-                                    .font(.system(size: 18))
-                                Text("Practice")
-                                    .font(.system(size: 15, weight: .medium))
-                            }
-                            .foregroundColor(.museSoftWhite)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 14)
-                            .background(
-                                Capsule()
-                                    .fill(Color.museDarkGray.opacity(0.6))
-                            )
-                        }
+                        GlowingStartButton(action: { showPracticePopup = true })
                     }
                     
                     Spacer()
@@ -377,7 +363,8 @@ struct AnyContentItem: Identifiable {
     
     init(quote: Quote) {
         self.id = quote.id
-        self.text = quote.text
+        // Add quotation marks to quotes
+        self.text = "\"\(quote.text)\""
         self.author = quote.author
         self.category = quote.category
         self.isAffirmation = false
@@ -1141,6 +1128,70 @@ struct CreateAffirmationSheet: View {
     }
 }
 
+// MARK: - Glowing Start Button
+struct GlowingStartButton: View {
+    let action: () -> Void
+    @State private var glowScale: CGFloat = 1.0
+    @State private var glowOpacity: Double = 0.5
+    
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                // Animated pulsing glow layers (behind)
+                Circle()
+                    .fill(Color.clear)
+                    .frame(width: 120, height: 120)
+                    .scaleEffect(glowScale)
+                    .shadow(color: .white.opacity(glowOpacity * 0.8), radius: 20 * glowScale, x: 0, y: 0)
+                    .shadow(color: .white.opacity(glowOpacity * 0.6), radius: 30 * glowScale, x: 0, y: 0)
+                    .shadow(color: .white.opacity(glowOpacity * 0.4), radius: 40 * glowScale, x: 0, y: 0)
+                    .shadow(color: .white.opacity(glowOpacity * 0.3), radius: 50 * glowScale, x: 0, y: 0)
+                
+                // Outer animated glow ring
+                Circle()
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                .white.opacity(glowOpacity * 0.6),
+                                .white.opacity(glowOpacity * 0.3),
+                                .white.opacity(glowOpacity * 0.1)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 2
+                    )
+                    .frame(width: 120, height: 120)
+                    .scaleEffect(glowScale)
+                
+                // Inner border (static)
+                Circle()
+                    .stroke(Color.white.opacity(0.5), lineWidth: 2)
+                    .frame(width: 120, height: 120)
+                
+                // Text
+                Text("Start")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
+            }
+        }
+        .onAppear {
+            startPulseAnimation()
+        }
+    }
+    
+    private func startPulseAnimation() {
+        // Animate both scale and opacity for a more visible pulse
+        withAnimation(
+            Animation.easeInOut(duration: 2.0)
+                .repeatForever(autoreverses: true)
+        ) {
+            glowScale = 1.15
+            glowOpacity = 1.0
+        }
+    }
+}
+
 // MARK: - Mix Category Card
 struct MixCategoryCard: View {
     let title: String
@@ -1337,7 +1388,7 @@ struct FavoritesView: View {
                                 LazyVStack(spacing: 16) {
                                     ForEach(storage.savedQuotes) { quote in
                                         FavoriteCard(
-                                            text: quote.text,
+                                            text: "\"\(quote.text)\"",
                                             author: quote.author,
                                             category: quote.category,
                                             isAffirmation: false,
