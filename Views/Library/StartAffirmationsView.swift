@@ -59,8 +59,22 @@ struct StartAffirmationsView: View {
     
     var body: some View {
         ZStack {
-            Color.museDeepNavy
+            // Background
+            if let uiImage = UIImage(named: "backgroundjungle2") {
+                GeometryReader { geometry in
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                        .overlay(.ultraThinMaterial)
+                        .overlay(Color.black.opacity(0.3))
+                }
                 .ignoresSafeArea()
+            } else {
+                Color.museDeepNavy
+                    .ignoresSafeArea()
+            }
             
             VStack(spacing: 0) {
                 // Header with close button
@@ -124,13 +138,14 @@ struct StartAffirmationsView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 18)
                         .background(
-                            LinearGradient(
-                                colors: [.museGradientStart, .museGradientEnd],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.museDarkGray.opacity(0.6))
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .fill(.ultraThinMaterial)
+                                    )
+                                    .pulsingRainbowBorder()
                         )
-                        .cornerRadius(16)
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 30)
@@ -736,8 +751,23 @@ struct CountdownView: View {
     
     var body: some View {
         ZStack {
-            Color.museDeepNavy
-                .ignoresSafeArea(.all)
+            // Background
+            // Background
+            if let uiImage = UIImage(named: "backgroundjungle2") {
+                GeometryReader { geometry in
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                        .overlay(.ultraThinMaterial)
+                        .overlay(Color.black.opacity(0.3))
+                }
+                .ignoresSafeArea()
+            } else {
+                Color.museDeepNavy
+                    .ignoresSafeArea(.all)
+            }
             
             VStack(spacing: 20) {
                 Text("\(countdown)")
@@ -990,8 +1020,23 @@ struct AffirmationDisplayView: View {
     
     var body: some View {
         ZStack {
-            Color.museDeepNavy
-                .ignoresSafeArea(.all)
+            // Background
+            // Background
+            if let uiImage = UIImage(named: "backgroundjungle2") {
+                GeometryReader { geometry in
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                        .overlay(.ultraThinMaterial)
+                        .overlay(Color.black.opacity(0.3))
+                }
+                .ignoresSafeArea()
+            } else {
+                Color.museDeepNavy
+                    .ignoresSafeArea(.all)
+            }
             
             // Progress bar
             VStack {
@@ -1048,6 +1093,7 @@ struct AffirmationDisplayView: View {
                     }
                     .padding(.horizontal, 20)
                     .padding(.vertical, 10)
+                    .frame(height: 44) // Fixed height to prevent layout shift
                     .background(
                         Capsule()
                             .fill(currentPhase == .speaking ? Color.museGradientStart.opacity(0.15) : Color.museTeal.opacity(0.15))
@@ -1071,14 +1117,7 @@ struct AffirmationDisplayView: View {
                     
                     Spacer()
                     
-                    // Tap to continue hint (during yourTurn phase)
-                    if currentPhase == .yourTurn {
-                        Text("Tap anywhere when ready")
-                            .font(.museCaption())
-                            .foregroundColor(.museLightGray.opacity(0.6))
-                            .padding(.bottom, 40)
-                            .transition(.opacity)
-                    }
+
                 }
             }
             

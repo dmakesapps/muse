@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		72B90C152EEF62E600A446A2 /* KrishnaCmaj.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72B90C142EEF62E600A446A2 /* KrishnaCmaj.mp3 */; };
+		72B90C192EEFCDCA00A446A2 /* backgroundjungle2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 72B90C182EEFCDCA00A446A2 /* backgroundjungle2.jpg */; };
 		72E2629E2EC68E040080CF29 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262902EC68E040080CF29 /* ContentView.swift */; };
 		72E262A52EC68E040080CF29 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262A62EC68E040080CF29 /* Theme.swift */; };
 		72E262AA2EC68E040080CF29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72E262A92EC68E040080CF29 /* Assets.xcassets */; };
@@ -76,6 +77,7 @@
 
 /* Begin PBXFileReference section */
 		72B90C142EEF62E600A446A2 /* KrishnaCmaj.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = KrishnaCmaj.mp3; sourceTree = "<group>"; };
+		72B90C182EEFCDCA00A446A2 /* backgroundjungle2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = backgroundjungle2.jpg; sourceTree = "<group>"; };
 		72E262572EC68CF40080CF29 /* Muse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Muse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		72E262662EC68CF60080CF29 /* MuseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		72E262702EC68CF60080CF29 /* MuseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -245,6 +247,7 @@
 				AAAA00042EC6F00000000003 /* affirmations.json */,
 				72B90C142EEF62E600A446A2 /* KrishnaCmaj.mp3 */,
 				AAAA00062EC6F00000000005 /* DJTAYEbackground.mp3 */,
+				72B90C182EEFCDCA00A446A2 /* backgroundjungle2.jpg */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -402,6 +405,7 @@
 				AAAA00052EC6F00000000003 /* affirmations.json in Resources */,
 				AAAA00072EC6F00000000005 /* DJTAYEbackground.mp3 in Resources */,
 				72B90C152EEF62E600A446A2 /* KrishnaCmaj.mp3 in Resources */,
+				72B90C192EEFCDCA00A446A2 /* backgroundjungle2.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

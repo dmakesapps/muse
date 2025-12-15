@@ -15,8 +15,22 @@ struct ProgressView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.museDeepNavy
+                // Background
+                if let uiImage = UIImage(named: "backgroundjungle2") {
+                    GeometryReader { geometry in
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .clipped()
+                            .blur(radius: 30)
+                            .overlay(Color.black.opacity(0.3))
+                    }
                     .ignoresSafeArea()
+                } else {
+                    Color.museDeepNavy
+                        .ignoresSafeArea()
+                }
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -118,18 +132,9 @@ struct StreakCounterView: View {
             .background(
                 RoundedRectangle(cornerRadius: 16)
                     .fill(Color.museDarkGray.opacity(0.6))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [Color.orange.opacity(0.6), Color.orange.opacity(0.2)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 2
-                            )
-                    )
+                    .rainbowBorder()
             )
+
         }
         .onAppear {
             withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
@@ -213,6 +218,7 @@ struct MetricCard: View {
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color.museDarkGray.opacity(0.6))
+                .rainbowBorder()
         )
     }
 }
@@ -272,6 +278,7 @@ struct SessionsOverTimeChart: View {
                 .background(
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color.museDarkGray.opacity(0.6))
+                        .rainbowBorder()
                 )
             }
         }
@@ -332,6 +339,7 @@ struct SessionsByDayChart: View {
                 .background(
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color.museDarkGray.opacity(0.6))
+                        .rainbowBorder()
                 )
             }
         }
@@ -359,6 +367,7 @@ struct EmptyChartView: View {
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color.museDarkGray.opacity(0.6))
+                .rainbowBorder()
         )
     }
 }

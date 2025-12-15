@@ -48,10 +48,7 @@ struct ChatBoxView: View {
                     ZStack(alignment: .topLeading) {
                         RoundedRectangle(cornerRadius: 16)
                             .fill(Color.museDarkGray)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(Color.museMediumGray.opacity(0.5), lineWidth: 1)
-                            )
+                            .rainbowBorder()
                         
                         if messageText.isEmpty {
                             Text("What would you like to do?")
@@ -120,7 +117,7 @@ struct ChatBoxView: View {
                 .padding(.bottom, 16)
             }
             .background(
-                Color.museDeepNavy
+                Color.clear // Allow background from parent to show
                     .ignoresSafeArea(edges: .bottom)
             )
         }

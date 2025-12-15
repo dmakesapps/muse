@@ -51,10 +51,11 @@ class SpeechService: NSObject, ObservableObject {
         try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
         
         // Load cached file references
+        // Load cached file references
         loadCachedReferences()
         
         // Setup audio session
-        setupAudioSession()
+        // setupAudioSession() // Don't override global session
     }
     
     // MARK: - Audio Session
@@ -261,8 +262,8 @@ class SpeechService: NSObject, ObservableObject {
         currentlyPlayingText = nil
         onSpeechComplete = nil
         
-        // Deactivate audio session
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        // Deactivate audio session - COMMENTED OUT to keep background music playing
+        // try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
     
     // MARK: - Cache Management

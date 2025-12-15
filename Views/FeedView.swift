@@ -52,8 +52,23 @@ struct FeedView: View {
     var body: some View {
         ZStack {
             // Background
-            Color.museDeepNavy
-                .ignoresSafeArea()
+            // Background
+            ZStack {
+                if let uiImage = UIImage(named: "backgroundjungle2") {
+                    GeometryReader { geometry in
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .clipped()
+                            .blur(radius: 30)
+                            .overlay(Color.black.opacity(0.3))
+                    }
+                } else {
+                    Color.museDeepNavy
+                }
+            }
+            .ignoresSafeArea()
             
             if filteredContent.isEmpty {
                 // Empty state
@@ -74,21 +89,22 @@ struct FeedView: View {
                             ForEach(Array(filteredContent.enumerated()), id: \.element.id) { index, item in
                                 // Each page fills the screen
                                 ZStack {
-                                    Color.museDeepNavy
+                                    Color.clear
                                     
                                     VStack(spacing: 16) {
                                         // Category tag - long press to filter by category
                                         Text(item.category.uppercased())
                                             .font(.system(size: 11, weight: .semibold, design: .rounded))
-                                            .foregroundColor(item.tagColor)
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 6)
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 8)
                                             .background(
                                                 Capsule()
-                                                    .fill(item.tagColor.opacity(0.15))
+                                                    .fill(item.tagColor)
+                                                    .shadow(color: item.tagColor.opacity(0.3), radius: 8, x: 0, y: 4)
                                                     .overlay(
                                                         Capsule()
-                                                            .stroke(selectedTagFilter == item.category ? item.tagColor : Color.clear, lineWidth: 2)
+                                                            .stroke(selectedTagFilter == item.category ? Color.white : Color.clear, lineWidth: 2)
                                                     )
                                             )
                                             .onLongPressGesture {
@@ -107,9 +123,13 @@ struct FeedView: View {
                                             Text("— \(author)")
                                                 .font(.system(size: fontSizeFor(text: item.text) * 0.65, weight: .regular, design: .serif))
                                                 .foregroundColor(.museLightGray)
+                                                .padding(.top, 8)
                                         }
                                     }
-                                    .padding(.horizontal, 40)
+
+                                    .frame(width: item.isAffirmation ? UIScreen.main.bounds.width - 64 : nil)
+                                    .padding(.horizontal, item.isAffirmation ? 0 : 40)
+                                    .position(item.isAffirmation ? CGPoint(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height * 0.45) : CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2))
                                 }
                                 .frame(width: geometry.size.width, height: geometry.size.height)
                                 .id(index)
@@ -140,16 +160,8 @@ struct FeedView: View {
                 // Top bar
                 HStack {
                     // Profile button
-                    Button(action: onProfileTap) {
-                        Image(systemName: "person")
-                            .font(.system(size: 20))
-                            .foregroundColor(.museSoftWhite)
-                            .frame(width: 50, height: 50)
-                            .background(
-                                Circle()
-                                    .fill(Color.museDarkGray.opacity(0.6))
-                            )
-                    }
+                    // Profile button (Top Left)
+                    GlassIconButton(icon: "person", action: onProfileTap)
                     
                     Spacer()
                     
@@ -182,21 +194,14 @@ struct FeedView: View {
                     .background(
                         Capsule()
                             .fill(Color.museDarkGray.opacity(0.6))
+                            .pulsingRainbowBorder()
                     )
                     
                     Spacer()
                     
                     // Message button
-                    Button(action: onMessageTap) {
-                        Image(systemName: "message")
-                            .font(.system(size: 20))
-                            .foregroundColor(.museSoftWhite)
-                            .frame(width: 50, height: 50)
-                            .background(
-                                Circle()
-                                    .fill(Color.museDarkGray.opacity(0.6))
-                            )
-                    }
+                    // Message button (Top Right)
+                    GlassIconButton(icon: "message", action: onMessageTap)
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 10)
@@ -246,16 +251,8 @@ struct FeedView: View {
                 // Bottom buttons
                 HStack {
                     // Mix button
-                    Button(action: { showMixPopup = true }) {
-                        Image(systemName: "square.grid.2x2")
-                            .font(.system(size: 20))
-                            .foregroundColor(.museSoftWhite)
-                            .frame(width: 50, height: 50)
-                            .background(
-                                Circle()
-                                    .fill(Color.museDarkGray.opacity(0.6))
-                            )
-                    }
+                    // Mix button (Bottom Left)
+                    GlassIconButton(icon: "square.grid.2x2", action: { showMixPopup = true })
                     
                     Spacer()
                     
@@ -267,16 +264,8 @@ struct FeedView: View {
                     Spacer()
                     
                     // Placeholder for symmetry (or another button)
-                    Button(action: {}) {
-                        Image(systemName: "paintbrush")
-                            .font(.system(size: 20))
-                            .foregroundColor(.museSoftWhite)
-                            .frame(width: 50, height: 50)
-                            .background(
-                                Circle()
-                                    .fill(Color.museDarkGray.opacity(0.6))
-                            )
-                    }
+                    // Paintbrush button (Bottom Right)
+                    GlassIconButton(icon: "paintbrush", action: {})
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 40)
@@ -533,6 +522,37 @@ struct ContentCard: View {
     }
 }
 
+
+
+// MARK: - Reusable Glass Icon Button
+struct GlassIconButton: View {
+    let icon: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(.white.opacity(0.9))
+                .frame(width: 50, height: 50)
+                .background(
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                        .blendMode(.overlay) // Adds a nice blend with the background
+                )
+                .background(
+                    Circle()
+                        .fill(Color.black.opacity(0.2)) // Slight darkening for contrast
+                )
+                .overlay(
+                    Circle()
+                        .stroke(Color.white.opacity(0.3), lineWidth: 1) // Frosted border
+                )
+                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        }
+    }
+}
+
 // MARK: - Mix Popup View
 struct MixPopupView: View {
     @Environment(\.dismiss) private var dismiss
@@ -596,8 +616,22 @@ struct MixPopupView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.museDeepNavy
+                // Background
+                if let uiImage = UIImage(named: "backgroundjungle2") {
+                    GeometryReader { geometry in
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .clipped()
+                            .blur(radius: 30)
+                            .overlay(Color.black.opacity(0.3))
+                    }
                     .ignoresSafeArea()
+                } else {
+                    Color.museDeepNavy
+                        .ignoresSafeArea()
+                }
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
@@ -625,6 +659,7 @@ struct MixPopupView: View {
                                     .background(
                                         Capsule()
                                             .fill(Color.museDarkGray)
+                                            .rainbowBorder()
                                     )
                             }
                         }
@@ -659,6 +694,7 @@ struct MixPopupView: View {
                                 isLocked: false,
                                 action: {}
                             )
+                            .rainbowBorder()
                             
                             MixCategoryCard(
                                 title: "Reframe Thoughts (AI)",
@@ -666,6 +702,7 @@ struct MixPopupView: View {
                                 isLocked: true,
                                 action: {}
                             )
+                            .rainbowBorder()
                             
                             MixCategoryCard(
                                 title: "Favorites",
@@ -674,6 +711,7 @@ struct MixPopupView: View {
                                 count: storage.savedAffirmations.count + storage.savedQuotes.count,
                                 action: { showFavorites = true }
                             )
+                            .rainbowBorder()
                             
                             MixCategoryCard(
                                 title: "My own affirmations",
@@ -682,6 +720,7 @@ struct MixPopupView: View {
                                 count: userCreatedCount,
                                 action: { showMyAffirmations = true }
                             )
+                            .rainbowBorder()
                         }
                         .padding(.horizontal, 20)
                         
@@ -700,6 +739,7 @@ struct MixPopupView: View {
                                     isLocked: false,
                                     action: { selectedCategory = category }
                                 )
+                                .rainbowBorder()
                             }
                         }
                         .padding(.horizontal, 20)
@@ -931,10 +971,7 @@ struct MyAffirmationsView: View {
                         .background(
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(Color.museAccentBlue.opacity(0.3))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.museAccentBlue, lineWidth: 1)
-                                )
+                                .rainbowBorder()
                         )
                     }
                     .padding(.horizontal, 20)
@@ -1400,6 +1437,7 @@ struct FavoritesView: View {
                                 }
                                 .padding(.horizontal, 20)
                                 .padding(.bottom, 40)
+                                .rainbowBorder()
                             }
                         }
                     }
@@ -1699,6 +1737,7 @@ struct CategoryPickerView: View {
                         .background(
                             RoundedRectangle(cornerRadius: 12)
                                 .fill(selectedCategory == nil ? Color.museAccentBlue.opacity(0.2) : Color.museDarkGray.opacity(0.5))
+                                .rainbowBorder()
                         )
                     }
                     .padding(.horizontal, 20)

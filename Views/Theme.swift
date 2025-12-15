@@ -63,6 +63,30 @@ extension View {
     func glassmorphism() -> some View {
         modifier(GlassmorphismModifier())
     }
+    
+    func rainbowBorder() -> some View {
+        self.overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            Color(hex: "FF3B30"), // Red
+                            Color(hex: "FF9500"), // Orange
+                            Color(hex: "FFCC00"), // Yellow
+                            Color(hex: "34C759"), // Green
+                            Color(hex: "00C7BE"), // Teal
+                            Color(hex: "007AFF"), // Blue
+                            Color(hex: "AF52DE"), // Purple
+                            Color(hex: "FF2D55")  // Pink
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 2
+                )
+        )
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
 }
 
 // MARK: - Typography System
@@ -153,3 +177,60 @@ extension Color {
     }
 }
 
+
+// MARK: - Pulsing Rainbow Border
+// MARK: - Pulsing Rainbow Border
+struct PulsingRainbowBorderModifier: ViewModifier {
+    @State private var rotation: Double = 0
+    @State private var isPulsing = false
+    
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                GeometryReader { geometry in
+                    let maxDimension = max(geometry.size.width, geometry.size.height) * 2
+                    
+                    ZStack {
+                        AngularGradient(
+                            gradient: Gradient(colors: [
+                                Color(hex: "FF3B30"), // Red
+                                Color(hex: "FF9500"), // Orange
+                                Color(hex: "FFCC00"), // Yellow
+                                Color(hex: "34C759"), // Green
+                                Color(hex: "00C7BE"), // Teal
+                                Color(hex: "007AFF"), // Blue
+                                Color(hex: "AF52DE"), // Purple
+                                Color(hex: "FF2D55"), // Pink
+                                Color(hex: "FF3B30")  // Red (loop)
+                            ]),
+                            center: .center
+                        )
+                        .frame(width: maxDimension, height: maxDimension)
+                        .rotationEffect(.degrees(rotation))
+                    }
+                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                }
+                .mask(
+                    Capsule()
+                        .stroke(lineWidth: 3) // Slightly thicker for "full" look
+                )
+                .scaleEffect(isPulsing ? 1.01 : 1.0) // Very subtle scale pulse
+                .allowsHitTesting(false) // Prevent blocking touches on surrounding views
+            )
+            .onAppear {
+                withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) {
+                    rotation = 360
+                }
+                
+                withAnimation(.easeInOut(duration: 4.0).repeatForever(autoreverses: true)) {
+                    isPulsing = true
+                }
+            }
+    }
+}
+
+extension View {
+    func pulsingRainbowBorder() -> some View {
+        modifier(PulsingRainbowBorderModifier())
+    }
+}
