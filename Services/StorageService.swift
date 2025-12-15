@@ -47,7 +47,7 @@ class StorageService: ObservableObject {
     
     @Published var savedAffirmations: [Affirmation] = []
     
-    @Published var selectedMusicTrack: BackgroundMusicTrack = .djTaye {
+    @Published var selectedMusicTrack: BackgroundMusicTrack = .forest {
         didSet {
             saveMusicTrackPreference()
         }
@@ -179,3 +179,191 @@ class StorageService: ObservableObject {
     }
 }
 
+
+// MARK: - Background Music Manager
+import AVFoundation
+import SwiftUI
+
+class BackgroundMusicManager: ObservableObject {
+    static let shared = BackgroundMusicManager()
+    
+    private var audioPlayer: AVAudioPlayer?
+    
+    @AppStorage("selectedMusicTrack") var selectedTrack: BackgroundMusicTrack = .none {
+        didSet {
+            playTrack()
+        }
+    }
+    
+    @AppStorage("musicVolume") var volume: Double = 0.5 {
+        didSet {
+            // Only update player if not currently fading
+            audioPlayer?.volume = Float(volume)
+        }
+    }
+    
+    // Helper to set volume from float (compatibility)
+    func setVolume(_ newVolume: Float) {
+        volume = Double(newVolume)
+    }
+    
+    private init() {
+        // Configure audio session
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Failed to set audio session: \(error)")
+        }
+    }
+    
+    func playTrack() {
+        play(fadeInDuration: 0)
+    }
+    
+    func play(fadeInDuration: TimeInterval = 0) {
+        // Stop current player if track changed, otherwise just ensure playing
+        if let player = audioPlayer, player.isPlaying {
+             if let currentUrl = player.url, 
+                let selectedName = selectedTrack.fileName,
+                currentUrl.lastPathComponent.contains(selectedName) {
+                 return // Already playing correct track
+             }
+             stop()
+        }
+        
+        guard selectedTrack != .none, let fileName = selectedTrack.fileName else {
+            return
+        }
+        
+        guard let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") else {
+            print("Could not find sound file: \(fileName)")
+            return
+        }
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.numberOfLoops = -1 // Loop indefinitely
+            
+            if fadeInDuration > 0 {
+                audioPlayer?.volume = 0
+                audioPlayer?.prepareToPlay()
+                audioPlayer?.play()
+                audioPlayer?.setVolume(Float(volume), fadeDuration: fadeInDuration)
+            } else {
+                audioPlayer?.volume = Float(volume)
+                audioPlayer?.prepareToPlay()
+                audioPlayer?.play()
+            }
+        } catch {
+            print("Could not create audio player: \(error)")
+        }
+    }
+    
+    func stop(fadeOutDuration: TimeInterval = 0) {
+        if fadeOutDuration > 0, let player = audioPlayer, player.isPlaying {
+            player.setVolume(0, fadeDuration: fadeOutDuration)
+            // We can't easily detect when fade finishes with just setVolume, 
+            // so we schedule the stop.
+            DispatchQueue.main.asyncAfter(deadline: .now() + fadeOutDuration) { [weak self] in
+                self?.audioPlayer?.stop()
+                self?.audioPlayer = nil
+            }
+        } else {
+            audioPlayer?.stop()
+            audioPlayer = nil
+        }
+    }
+    
+    func preview(track: BackgroundMusicTrack) {
+        // Stop current playback first
+        audioPlayer?.stop()
+        audioPlayer = nil
+        
+        guard let fileName = track.fileName else { return }
+        guard let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") else { return }
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.numberOfLoops = 0 // Don't loop for preview
+            
+            // Apply volume with track's multiplier for accurate preview
+            // Use the current volume setting
+            let volumeMultiplier = track.volumeMultiplier
+            audioPlayer?.volume = Float(volume) * volumeMultiplier
+            
+            audioPlayer?.prepareToPlay()
+            audioPlayer?.play()
+            
+            // Stop after 5 seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
+                // Only stop if we are still playing the preview (simple check)
+                 if self?.audioPlayer?.numberOfLoops == 0 {
+                    self?.audioPlayer?.stop()
+                    // Revert to selected track if needed, but for now just stop
+                }
+            }
+        } catch {
+            print("Failed to preview audio: \(error)")
+        }
+    }
+    
+    // Call this when the app starts or view appears to resume music
+    func startIfNeeded() {
+        if audioPlayer == nil && selectedTrack != .none {
+            playTrack()
+        } else if let player = audioPlayer, !player.isPlaying {
+            player.play()
+        }
+    }
+    
+    // Stop temporary preview
+    func stopPreview() {
+        // If we were previewing, we revert to main track. 
+        // For simplicity now, we just play whatever is selected.
+    }
+}
+
+enum BackgroundMusicTrack: String, CaseIterable, Identifiable {
+    case none = "None"
+    case forest = "Forest Birds"
+    case river = "River"
+    case rain = "Rain"
+    
+    var id: String { self.rawValue }
+    
+    var fileName: String? {
+        switch self {
+        case .none: return nil
+        case .forest: return "forestbirds"
+        case .river: return "river"
+        case .rain: return "rain"
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .none: return "speaker.slash.fill"
+        case .forest: return "leaf.fill"
+        case .river: return "water.waves"
+        case .rain: return "cloud.rain.fill"
+        }
+    }
+    
+    var description: String {
+        switch self {
+        case .none: return "No background music"
+        case .forest: return "Peaceful forest sounds"
+        case .river: return "Flowing river water"
+        case .rain: return "Gentle rain ambiance"
+        }
+    }
+    
+    /// Volume multiplier to normalize loudness across tracks
+    var volumeMultiplier: Float {
+        switch self {
+        case .none: return 0.0
+        default: return 0.8 // Default for others
+        }
+    }
+}

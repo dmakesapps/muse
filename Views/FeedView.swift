@@ -280,7 +280,8 @@ struct FeedView: View {
         }
         .sheet(isPresented: $showBackgroundPicker) {
             BackgroundPickerView(selectedBackground: $selectedBackground, options: backgroundOptions)
-                .presentationDetents([.height(260)])
+                // Use a larger detent or allow dynamic sizing
+                .presentationDetents([.fraction(0.8), .large])
                 .presentationDragIndicator(.visible)
         }
         .onAppear {
@@ -419,6 +420,16 @@ struct TopBarView: View {
             )
             
             Spacer()
+                        // Add new affirmation or other actions
+            Button(action: {
+                print("Add button tapped")
+            }) {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 24))
+                    .foregroundColor(.museSoftWhite)
+            }
+            
+            Spacer()
             
             // Right: Message button
             Button(action: onMessageTap) {
@@ -427,8 +438,12 @@ struct TopBarView: View {
                     .foregroundColor(.museSoftWhite)
             }
         }
+        .padding(.top, 10) // Fixed safe area padding
         .padding(.horizontal, 20)
-        .padding(.vertical, 12)
+        .onAppear {
+            // Start background music if enabled
+            BackgroundMusicManager.shared.startIfNeeded()
+        }
     }
 }
 
@@ -1805,63 +1820,144 @@ struct BackgroundPickerView: View {
         ZStack {
             Color.museDeepNavy.ignoresSafeArea()
             
-            VStack(spacing: 20) {
-                Text("Choose Background")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.museSoftWhite)
-                    .padding(.top, 24)
-                
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 16) {
-                        ForEach(options, id: \.self) { bg in
-                            Button(action: {
-                                withAnimation {
-                                    selectedBackground = bg
-                                }
-                            }) {
-                                ZStack {
-                                    if bg == "SolidDark" {
-                                        Rectangle()
-                                            .fill(Color.museDeepNavy)
-                                            .frame(width: 100, height: 160)
-                                            .cornerRadius(12)
-                                            .overlay(
-                                                Text("Dark")
-                                                    .font(.system(size: 14, weight: .medium))
-                                                    .foregroundColor(.museSoftWhite)
-                                            )
-                                    } else if let uiImage = UIImage(named: bg) {
-                                        Image(uiImage: uiImage)
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .frame(width: 100, height: 160)
-                                            .clipped()
-                                            .cornerRadius(12)
-                                    } else {
-                                        Rectangle()
-                                            .fill(Color.gray)
-                                            .frame(width: 100, height: 160)
-                                            .cornerRadius(12)
-                                            .overlay(Text(bg).font(.caption).foregroundColor(.white))
-                                    }
-                                    
-                                    if selectedBackground == bg {
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .stroke(Color.white, lineWidth: 3)
-                                            .frame(width: 100, height: 160)
+                ScrollView {
+                    VStack(spacing: 20) {
+                        Text("Choose Background")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundColor(.museSoftWhite)
+                            .padding(.top, 24)
+                        
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 16) {
+                                ForEach(options, id: \.self) { bg in
+                                    Button(action: {
+                                        withAnimation {
+                                            selectedBackground = bg
+                                        }
+                                    }) {
+                                        ZStack {
+                                            if bg == "SolidDark" {
+                                                Rectangle()
+                                                    .fill(Color.museDeepNavy)
+                                                    .frame(width: 100, height: 160)
+                                                    .cornerRadius(12)
+                                                    .overlay(
+                                                        Text("Dark")
+                                                            .font(.system(size: 14, weight: .medium))
+                                                            .foregroundColor(.museSoftWhite)
+                                                    )
+                                            } else if let uiImage = UIImage(named: bg) {
+                                                Image(uiImage: uiImage)
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fill)
+                                                    .frame(width: 100, height: 160)
+                                                    .clipped()
+                                                    .cornerRadius(12)
+                                            } else {
+                                                Rectangle()
+                                                    .fill(Color.gray)
+                                                    .frame(width: 100, height: 160)
+                                                    .cornerRadius(12)
+                                                    .overlay(Text(bg).font(.caption).foregroundColor(.white))
+                                            }
                                             
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .font(.system(size: 24))
-                                            .foregroundColor(.white)
-                                            .shadow(radius: 4)
+                                            if selectedBackground == bg {
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .stroke(Color.white, lineWidth: 3)
+                                                    .frame(width: 100, height: 160)
+                                                    
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .font(.system(size: 24))
+                                                    .foregroundColor(.white)
+                                                    .shadow(radius: 4)
+                                            }
+                                        }
                                     }
                                 }
                             }
+                            .padding(.horizontal, 20)
+                        }
+                        .padding(.bottom, 20)
+                        
+                        Divider()
+                            .background(Color.museMediumGray)
+                            .padding(.horizontal, 20)
+                        
+                        // Music Selection
+                        VStack(spacing: 16) {
+                            HStack {
+                                Text("Background Music")
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundColor(.museSoftWhite)
+                                
+                                Spacer()
+                            }
+                            .padding(.horizontal, 20)
+                            
+                            MusicPickerView()
+                        }
+                        .padding(.bottom, 30)
+                    }
+                }
+        }
+    }
+}
+
+struct MusicPickerView: View {
+    @ObservedObject private var musicManager = BackgroundMusicManager.shared
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            // Volume Slider
+            if musicManager.selectedTrack != .none {
+                HStack(spacing: 12) {
+                    Image(systemName: "speaker.fill")
+                        .foregroundColor(.museLightGray)
+                    
+                    Slider(value: $musicManager.volume, in: 0...1)
+                        .accentColor(.museAccentBlue)
+                    
+                    Image(systemName: "speaker.wave.3.fill")
+                        .foregroundColor(.museSoftWhite)
+                }
+                .padding(.horizontal, 20)
+            }
+            
+            // Track Selector
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    ForEach(BackgroundMusicTrack.allCases) { track in
+                        Button(action: {
+                            withAnimation {
+                                musicManager.selectedTrack = track
+                            }
+                        }) {
+                            VStack(spacing: 8) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(musicManager.selectedTrack == track ? Color.museAccentBlue : Color.museDarkGray)
+                                        .frame(width: 80, height: 80)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(Color.museMediumGray, lineWidth: 1)
+                                        )
+                                    
+                                    Image(systemName: track.icon)
+                                        .font(.system(size: 32))
+                                        .foregroundColor(musicManager.selectedTrack == track ? .white : .museLightGray)
+                                }
+                                
+                                Text(track.rawValue)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(musicManager.selectedTrack == track ? .museSoftWhite : .museLightGray)
+                                    .multilineTextAlignment(.center)
+                                    .frame(width: 80)
+                                    .lineLimit(2)
+                            }
                         }
                     }
-                    .padding(.horizontal, 20)
                 }
-                .padding(.bottom, 20)
+                .padding(.horizontal, 20)
             }
         }
     }

@@ -17,4 +17,5 @@ struct OpenAIConfig {
     static var isConfigured: Bool {
         !apiKey.isEmpty && apiKey != "YOUR_OPENAI_API_KEY_HERE"
     }
+}
 
