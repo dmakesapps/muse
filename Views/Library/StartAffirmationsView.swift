@@ -10,6 +10,7 @@ struct StartAffirmationsView: View {
     @State private var selectedCategory: String? = nil
     @State private var duration: AffirmationDuration = .oneMinute
     @State private var isActive = false
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     
     enum AffirmationSource: String, CaseIterable {
         case favorites = "Favorites"
@@ -60,21 +61,8 @@ struct StartAffirmationsView: View {
     var body: some View {
         ZStack {
             // Background
-            if let uiImage = UIImage(named: "backgroundjungle2") {
-                GeometryReader { geometry in
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .clipped()
-                        .overlay(.ultraThinMaterial)
-                        .overlay(Color.black.opacity(0.3))
-                }
+            MuseBackgroundView(selectedBackground: selectedBackground)
                 .ignoresSafeArea()
-            } else {
-                Color.museDeepNavy
-                    .ignoresSafeArea()
-            }
             
             VStack(spacing: 0) {
                 // Header with close button
@@ -748,26 +736,12 @@ struct CountdownView: View {
     let onComplete: () -> Void
     @State private var scale: CGFloat = 1.0
     @Environment(\.dismiss) private var dismiss
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     
     var body: some View {
         ZStack {
-            // Background
-            // Background
-            if let uiImage = UIImage(named: "backgroundjungle2") {
-                GeometryReader { geometry in
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .clipped()
-                        .overlay(.ultraThinMaterial)
-                        .overlay(Color.black.opacity(0.3))
-                }
+            MuseBackgroundView(selectedBackground: selectedBackground)
                 .ignoresSafeArea()
-            } else {
-                Color.museDeepNavy
-                    .ignoresSafeArea(.all)
-            }
             
             VStack(spacing: 20) {
                 Text("\(countdown)")

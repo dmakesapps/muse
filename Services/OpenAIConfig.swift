@@ -11,11 +11,10 @@ import Foundation
 /// - A backend proxy to protect your key
 struct OpenAIConfig {
     // Replace with your OpenAI API key
-    static let apiKey = "YOUR_OPENAI_API_KEY_HERE"
+    static let apiKey = ""
     
     /// Check if a valid API key is configured
     static var isConfigured: Bool {
         !apiKey.isEmpty && apiKey != "YOUR_OPENAI_API_KEY_HERE"
-    }
     }
 

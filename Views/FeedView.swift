@@ -11,6 +11,10 @@ struct FeedView: View {
     @State private var showPracticePopup = false
     @State private var selectedTagFilter: String? = nil  // Filter by specific tag
     @State private var showCategoryPicker = false
+    @State private var showBackgroundPicker = false
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
+    let backgroundOptions = ["backgroundjungle2", "Gradient1", "Gradient2", "SolidDark"]
     
     enum ContentCategory: String {
         case affirmation = "affirmation"
@@ -53,22 +57,9 @@ struct FeedView: View {
         ZStack {
             // Background
             // Background
-            ZStack {
-                if let uiImage = UIImage(named: "backgroundjungle2") {
-                    GeometryReader { geometry in
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: geometry.size.width, height: geometry.size.height)
-                            .clipped()
-                            .blur(radius: 30)
-                            .overlay(Color.black.opacity(0.3))
-                    }
-                } else {
-                    Color.museDeepNavy
-                }
-            }
-            .ignoresSafeArea()
+            // Background
+            MuseBackgroundView(selectedBackground: selectedBackground)
+                .ignoresSafeArea()
             
             if filteredContent.isEmpty {
                 // Empty state
@@ -265,7 +256,7 @@ struct FeedView: View {
                     
                     // Placeholder for symmetry (or another button)
                     // Paintbrush button (Bottom Right)
-                    GlassIconButton(icon: "paintbrush", action: {})
+                    GlassIconButton(icon: "paintbrush", action: { showBackgroundPicker = true })
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 40)
@@ -284,7 +275,13 @@ struct FeedView: View {
                 contentType: selectedCategory
             )
             .presentationDetents([.medium, .large])
+            .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showBackgroundPicker) {
+            BackgroundPickerView(selectedBackground: $selectedBackground, options: backgroundOptions)
+                .presentationDetents([.height(260)])
+                .presentationDragIndicator(.visible)
         }
         .onAppear {
             // Load content from JSON files
@@ -557,6 +554,7 @@ struct GlassIconButton: View {
 struct MixPopupView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var storage = StorageService.shared
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     @State private var showFavorites = false
     @State private var showMyAffirmations = false
     @State private var selectedCategory: String? = nil
@@ -617,21 +615,8 @@ struct MixPopupView: View {
         NavigationStack {
             ZStack {
                 // Background
-                if let uiImage = UIImage(named: "backgroundjungle2") {
-                    GeometryReader { geometry in
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: geometry.size.width, height: geometry.size.height)
-                            .clipped()
-                            .blur(radius: 30)
-                            .overlay(Color.black.opacity(0.3))
-                    }
+                MuseBackgroundView(selectedBackground: selectedBackground)
                     .ignoresSafeArea()
-                } else {
-                    Color.museDeepNavy
-                        .ignoresSafeArea()
-                }
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
@@ -776,6 +761,7 @@ struct CategoryAffirmationsView: View {
     let category: String
     @Environment(\.dismiss) private var dismiss
     @StateObject private var storage = StorageService.shared
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     
     // Get affirmations for this category
     private var affirmations: [Affirmation] {
@@ -785,7 +771,7 @@ struct CategoryAffirmationsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.museDeepNavy
+                MuseBackgroundView(selectedBackground: selectedBackground)
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
@@ -906,6 +892,7 @@ struct CategoryAffirmationRow: View {
 struct MyAffirmationsView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var storage = StorageService.shared
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     @State private var showCreateSheet = false
     @State private var newAffirmationText = ""
     
@@ -917,7 +904,7 @@ struct MyAffirmationsView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.museDeepNavy
+                MuseBackgroundView(selectedBackground: selectedBackground)
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
@@ -1280,13 +1267,14 @@ struct MixCategoryCard: View {
 struct FavoritesView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var storage = StorageService.shared
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     @State private var selectedTab = 0
     @State private var showFeed = false
     
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.museDeepNavy
+                MuseBackgroundView(selectedBackground: selectedBackground)
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
@@ -1454,6 +1442,7 @@ struct FavoritesView: View {
 struct FavoritesFeedView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var storage = StorageService.shared
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     let showAffirmations: Bool
     @State private var currentIndex = 0
     
@@ -1478,7 +1467,7 @@ struct FavoritesFeedView: View {
     
     var body: some View {
         ZStack {
-            Color.museDeepNavy
+            MuseBackgroundView(selectedBackground: selectedBackground)
                 .ignoresSafeArea()
             
             if items.isEmpty {
@@ -1498,7 +1487,7 @@ struct FavoritesFeedView: View {
                             ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                                 ZStack {
                                     // Solid background prevents text cutoff during scroll
-                                    Color.museDeepNavy
+                                    Color.clear
                                     
                                     VStack(spacing: 16) {
                                         // Category tag
@@ -1777,6 +1766,102 @@ struct CategoryPickerView: View {
                         .padding(.bottom, 40)
                     }
                 }
+            }
+        }
+    }
+}
+// MARK: - Reusable Background View
+struct MuseBackgroundView: View {
+    let selectedBackground: String
+    
+    var body: some View {
+        ZStack {
+            if selectedBackground == "SolidDark" {
+                Color.museDeepNavy
+            } else if let uiImage = UIImage(named: selectedBackground) {
+                GeometryReader { geometry in
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                        .blur(radius: 30)
+                        .overlay(Color.black.opacity(0.3))
+                }
+            } else {
+                Color.museDeepNavy
+            }
+        }
+    }
+}
+
+// MARK: - Background Picker View
+struct BackgroundPickerView: View {
+    @Binding var selectedBackground: String
+    let options: [String]
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        ZStack {
+            Color.museDeepNavy.ignoresSafeArea()
+            
+            VStack(spacing: 20) {
+                Text("Choose Background")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundColor(.museSoftWhite)
+                    .padding(.top, 24)
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(options, id: \.self) { bg in
+                            Button(action: {
+                                withAnimation {
+                                    selectedBackground = bg
+                                }
+                            }) {
+                                ZStack {
+                                    if bg == "SolidDark" {
+                                        Rectangle()
+                                            .fill(Color.museDeepNavy)
+                                            .frame(width: 100, height: 160)
+                                            .cornerRadius(12)
+                                            .overlay(
+                                                Text("Dark")
+                                                    .font(.system(size: 14, weight: .medium))
+                                                    .foregroundColor(.museSoftWhite)
+                                            )
+                                    } else if let uiImage = UIImage(named: bg) {
+                                        Image(uiImage: uiImage)
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                            .frame(width: 100, height: 160)
+                                            .clipped()
+                                            .cornerRadius(12)
+                                    } else {
+                                        Rectangle()
+                                            .fill(Color.gray)
+                                            .frame(width: 100, height: 160)
+                                            .cornerRadius(12)
+                                            .overlay(Text(bg).font(.caption).foregroundColor(.white))
+                                    }
+                                    
+                                    if selectedBackground == bg {
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color.white, lineWidth: 3)
+                                            .frame(width: 100, height: 160)
+                                            
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .font(.system(size: 24))
+                                            .foregroundColor(.white)
+                                            .shadow(radius: 4)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                }
+                .padding(.bottom, 20)
             }
         }
     }

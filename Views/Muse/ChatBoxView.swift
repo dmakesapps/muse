@@ -4,9 +4,14 @@ struct ChatBoxView: View {
     @State private var messageText: String = ""
     @State private var messages: [ChatMessage] = []
     @FocusState private var isInputFocused: Bool
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack {
+            MuseBackgroundView(selectedBackground: selectedBackground)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
             // Messages area
             ScrollViewReader { proxy in
                 ScrollView {
@@ -74,8 +79,8 @@ struct ChatBoxView: View {
                         sendMessage()
                     }) {
                         Image(systemName: "arrow.up.circle.fill")
-                            .font(.system(size: 32, weight: .medium))
-                            .foregroundColor(messageText.isEmpty ? .museMediumGray : .museAccentBlue)
+                        .font(.system(size: 32, weight: .medium))
+                        .foregroundColor(messageText.isEmpty ? .museMediumGray : .museAccentBlue)
                     }
                     .disabled(messageText.isEmpty)
                 }
@@ -120,6 +125,7 @@ struct ChatBoxView: View {
                 Color.clear // Allow background from parent to show
                     .ignoresSafeArea(edges: .bottom)
             )
+        }
         }
     }
     

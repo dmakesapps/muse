@@ -12,25 +12,15 @@ struct ProgressView: View {
         case month = "30 Days"
     }
     
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
     var body: some View {
         NavigationStack {
             ZStack {
+
                 // Background
-                if let uiImage = UIImage(named: "backgroundjungle2") {
-                    GeometryReader { geometry in
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: geometry.size.width, height: geometry.size.height)
-                            .clipped()
-                            .blur(radius: 30)
-                            .overlay(Color.black.opacity(0.3))
-                    }
+                MuseBackgroundView(selectedBackground: selectedBackground)
                     .ignoresSafeArea()
-                } else {
-                    Color.museDeepNavy
-                        .ignoresSafeArea()
-                }
                 
                 ScrollView {
                     VStack(spacing: 24) {
