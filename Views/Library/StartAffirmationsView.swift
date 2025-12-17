@@ -1885,6 +1885,7 @@ struct AffirmationDisplayView: View {
     @State private var isStopped = false  // Flag to prevent scheduled tasks from running after stop
     @State private var isFinishingUp = false // Flag to let current affirmation finish before stopping
     @State private var isAnimatingGradient = false
+    @State private var showControls = true
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
@@ -1945,6 +1946,8 @@ struct AffirmationDisplayView: View {
                 
                 Spacer()
             }
+            .opacity(showControls ? 1 : 0)
+            .animation(.easeInOut(duration: 0.3), value: showControls)
             
             // Affirmation text and phase indicator
             if currentIndex < randomizedAffirmations.count {
@@ -2052,6 +2055,8 @@ struct AffirmationDisplayView: View {
                 }
                 Spacer()
             }
+            .opacity(showControls ? 1 : 0)
+            .animation(.easeInOut(duration: 0.3), value: showControls)
             
             // Volume slider overlay
             if showVolumeSlider {
@@ -2098,9 +2103,11 @@ struct AffirmationDisplayView: View {
                 withAnimation(.spring(response: 0.3)) {
                     showVolumeSlider = false
                 }
-            } else if currentPhase == .yourTurn {
-                // User tapped to proceed to next affirmation
-                transitionToNext()
+            } else {
+                // Toggle controls visibility
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showControls.toggle()
+                }
             }
         }
     }

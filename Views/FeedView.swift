@@ -253,7 +253,7 @@ struct FeedView: View {
                         
                         // Practice button (center) - Glowing Start button style
                         // HIDDEN IN LANDSCAPE
-                        if selectedCategory == .affirmation && !isLandscape {
+                        if !isLandscape {
                             GlowingStartButton(action: { showPracticePopup = true })
                         }
                         
