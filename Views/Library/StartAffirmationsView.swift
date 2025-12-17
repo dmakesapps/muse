@@ -112,6 +112,8 @@ struct ImmersiveBreathworkView: View {
     @State private var showControls = true
     @State private var soundEnabled = true
     @State private var audioPlayer: AVAudioPlayer?
+    @State private var countdown = 3
+    @State private var isCountingDown = true
     
     private let timer = Timer.publish(every: 0.05, on: .main, in: .common).autoconnect()
     
@@ -166,16 +168,14 @@ struct ImmersiveBreathworkView: View {
             }
         }
         .onReceive(timer) { _ in
-            guard isRunning && !isPaused else { return }
+            guard isRunning && !isPaused && !isCountingDown else { return }
             updateBreathing()
         }
         .onAppear {
             print("💨 ImmersiveBreathworkView appeared with pattern: \(pattern.rawValue)")
             // Enable background audio for immersive session
             BackgroundMusicManager.shared.isInImmersiveMode = true
-            startBreathing()
-            // Play initial inhale sound
-            playPhaseSound(for: .inhale)
+            startCountdown()
         }
         .onDisappear {
             // Disable background audio when leaving immersive session
@@ -297,9 +297,19 @@ struct ImmersiveBreathworkView: View {
                 .scaleEffect(circleScale)
             
             // Center text - exactly centered
-            Text(phaseText)
-                .font(.system(size: 28, weight: .semibold))
-                .foregroundColor(.museSoftWhite)
+            if isCountingDown {
+                Text("\(countdown)")
+                    .font(.system(size: 48, weight: .semibold)) // Slightly larger but same weight
+                    .foregroundColor(.museSoftWhite)
+                    .transition(.opacity)
+                    .id("countdown-\(countdown)")
+            } else {
+                Text(phaseText)
+                    .font(.system(size: 28, weight: .semibold))
+                    .foregroundColor(.museSoftWhite)
+                    .transition(.opacity)
+                    .id("phase-\(currentPhaseIndex)") // Animate between phases too
+            }
         }
         .frame(width: circleSize, height: circleSize)
     }
@@ -394,13 +404,39 @@ struct ImmersiveBreathworkView: View {
     }
     
     // MARK: - Breathing Logic
+    private func startCountdown() {
+        countdown = 3
+        isCountingDown = true
+        
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            if countdown > 1 {
+                countdown -= 1
+            } else {
+                timer.invalidate()
+                
+                withAnimation(.easeInOut(duration: 1.0)) {
+                    isCountingDown = false
+                }
+                
+                // Start breathing shortly after visual transition
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    startBreathing()
+                    // Play initial inhale sound manually since we're starting fresh
+                    playPhaseSound(for: .inhale)
+                }
+            }
+        }
+    }
+    
     private let minScale: CGFloat = 0.3  // Very small when exhaled
     private let maxScale: CGFloat = 1.0  // Full size when inhaled
     
     private func startBreathing() {
         currentPhaseIndex = 0
         phaseProgress = 0
-        circleScale = minScale // Start small
+        withAnimation(.easeOut(duration: 0.5)) {
+            circleScale = minScale // Start small
+        }
     }
     
     private func updateBreathing() {
@@ -504,8 +540,7 @@ struct StartAffirmationsView: View {
     @State private var selectedCategory: String? = nil
     @State private var duration: AffirmationDuration = .oneMinute
     @State private var isActive = false
-    @State private var showBreathwork = false
-    @State private var selectedBreathingPattern: BreathingPattern = .boxBreathing
+    @State private var activeBreathworkPattern: BreathingPattern? // Use item for sheet logic
     @State private var allAffirmations: [Affirmation] = []
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     
@@ -513,6 +548,7 @@ struct StartAffirmationsView: View {
         case affirmations = "Affirmations"
         case breathwork = "Breathwork"
     }
+
     
     enum AffirmationSource: String, CaseIterable {
         case favorites = "Favorites"
@@ -669,10 +705,10 @@ struct StartAffirmationsView: View {
                 }
             )
         }
-        .fullScreenCover(isPresented: $showBreathwork) {
+        .fullScreenCover(item: $activeBreathworkPattern) { pattern in
             ImmersiveBreathworkView(
-                pattern: selectedBreathingPattern,
-                onComplete: { showBreathwork = false }
+                pattern: pattern,
+                onComplete: { activeBreathworkPattern = nil }
             )
         }
     }
@@ -771,9 +807,7 @@ struct StartAffirmationsView: View {
                         icon: "square",
                         color: .museAccentBlue
                     ) {
-                        print("💨 Selected Box Breathing")
-                        selectedBreathingPattern = .boxBreathing
-                        showBreathwork = true
+                        activeBreathworkPattern = .boxBreathing
                     }
                     
                     BreathworkPatternButton(
@@ -782,9 +816,7 @@ struct StartAffirmationsView: View {
                         icon: "moon.fill",
                         color: .museTeal
                     ) {
-                        print("💨 Selected 4-7-8")
-                        selectedBreathingPattern = .relaxation478
-                        showBreathwork = true
+                        activeBreathworkPattern = .relaxation478
                     }
                     
                     BreathworkPatternButton(
@@ -793,9 +825,7 @@ struct StartAffirmationsView: View {
                         icon: "leaf.fill",
                         color: .green
                     ) {
-                        print("💨 Selected 4-6 Calming")
-                        selectedBreathingPattern = .calming46
-                        showBreathwork = true
+                        activeBreathworkPattern = .calming46
                     }
                     
                     BreathworkPatternButton(
@@ -804,9 +834,7 @@ struct StartAffirmationsView: View {
                         icon: "bolt.fill",
                         color: .orange
                     ) {
-                        print("💨 Selected Energizing")
-                        selectedBreathingPattern = .energizing
-                        showBreathwork = true
+                        activeBreathworkPattern = .energizing
                     }
                 }
                 .padding(.top, 20)
@@ -1493,45 +1521,45 @@ struct BreathworkPatternButton: View {
     let action: () -> Void
     
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: 14) {
-                Image(systemName: icon)
-                    .font(.system(size: 22))
-                    .foregroundColor(color)
-                    .frame(width: 50, height: 50)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(color.opacity(0.15))
-                    )
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 22))
+                .foregroundColor(color)
+                .frame(width: 50, height: 50)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(color.opacity(0.15))
+                )
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.museHeadline())
+                    .foregroundColor(.museSoftWhite)
                 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                        .font(.museHeadline())
-                        .foregroundColor(.museSoftWhite)
-                    
-                    Text(subtitle)
-                        .font(.museCaption())
-                        .foregroundColor(.museLightGray)
-                }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
+                Text(subtitle)
+                    .font(.museCaption())
                     .foregroundColor(.museLightGray)
             }
-            .padding(14)
-            .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(Color.white.opacity(0.08))
-                    .background(
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(.thinMaterial)
-                            .opacity(0.5)
-                    )
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 14))
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.museLightGray)
         }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color.white.opacity(0.08))
+                .background(
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(.thinMaterial)
+                        .opacity(0.5)
+                )
+        )
+        .contentShape(Rectangle()) // Ensure entire area is clickable
+        .onTapGesture(perform: action)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }
 
