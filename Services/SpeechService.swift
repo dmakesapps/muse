@@ -7,8 +7,6 @@ class SpeechService: NSObject, ObservableObject {
     static let shared = SpeechService()
     
     // MARK: - Configuration
-    // Add your OpenAI API key here or load from environment/config
-    // Get your key at: https://platform.openai.com/api-keys
     private let apiKey = OpenAIConfig.apiKey
     private let apiEndpoint = "https://api.openai.com/v1/audio/speech"
     
@@ -33,7 +31,7 @@ class SpeechService: NSObject, ObservableObject {
     // MARK: - Audio Player
     private var audioPlayer: AVAudioPlayer?
     private var onSpeechComplete: (() -> Void)?
-    private var isCancelled = false  // Flag to cancel pending operations
+    private var currentSpeechId: UUID? // Track current speech request to handle cancellation
     
     // MARK: - Cache
     private let cacheDirectory: URL
@@ -41,27 +39,23 @@ class SpeechService: NSObject, ObservableObject {
     
     // MARK: - Initialization
     private override init() {
-        // Create cache directory for audio files
         let cachePath = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
         self.cacheDirectory = cachePath.appendingPathComponent("OpenAITTSCache", isDirectory: true)
         
         super.init()
         
-        // Ensure cache directory exists
+        // Clear old cache (cache key format changed to include punctuation normalization)
+        try? FileManager.default.removeItem(at: cacheDirectory)
         try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
-        
-        // Load cached file references
-        // Load cached file references
-        loadCachedReferences()
-        
-        // Setup audio session
-        // setupAudioSession() // Don't override global session
+        cachedAudioURLs = [:]
     }
     
     // MARK: - Audio Session
-    private func setupAudioSession() {
+    private func ensureAudioSessionActive() {
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
+            // Use .playback category with .mixWithOthers to blend with background music
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try AVAudioSession.sharedInstance().setActive(true)
         } catch {
             print("⚠️ SpeechService: Failed to setup audio session: \(error)")
         }
@@ -70,84 +64,98 @@ class SpeechService: NSObject, ObservableObject {
     // MARK: - Speaking
     
     /// Speak the given text using OpenAI TTS
-    /// - Parameters:
-    ///   - text: The text to speak
-    ///   - completion: Called when speech finishes
     func speak(_ text: String, completion: (() -> Void)? = nil) {
         print("🎙️ SpeechService: speak() called with text: \(text.prefix(50))...")
         
-        // Reset cancel flag for new speech
-        isCancelled = false
+        // Normalize text for TTS - add period if no ending punctuation
+        // This makes the voice read it with proper sentence intonation
+        let normalizedText = normalizeForSpeech(text)
         
-        // Stop any current playback (but don't set isCancelled since we're starting new speech)
-        if let player = audioPlayer {
-            player.stop()
-        }
+        // Generate unique ID for this speech request
+        let speechId = UUID()
+        currentSpeechId = speechId
+        
+        // Stop any current playback
+        audioPlayer?.stop()
         audioPlayer = nil
         
-        onSpeechComplete = completion
-        currentlyPlayingText = text
+        // Reset state
+        isSpeaking = false
+        isGenerating = false
+        error = nil
         
-        // Check cache first
-        let cacheKey = generateCacheKey(for: text)
+        onSpeechComplete = completion
+        currentlyPlayingText = text // Keep original text for display
+        
+        // Check cache first (use normalized text for cache key)
+        let cacheKey = generateCacheKey(for: normalizedText)
         if let cachedURL = cachedAudioURLs[cacheKey], FileManager.default.fileExists(atPath: cachedURL.path) {
             print("✅ SpeechService: Using cached audio for: \(text.prefix(30))...")
-            playAudio(from: cachedURL)
+            playAudio(from: cachedURL, speechId: speechId)
             return
         }
         
         print("🌐 SpeechService: No cache found, calling OpenAI API...")
         
-        // Generate new audio
-        Task {
-            await generateAndPlay(text: text, cacheKey: cacheKey)
+        // Generate new audio (use normalized text)
+        Task { @MainActor in
+            await generateAndPlay(text: normalizedText, cacheKey: cacheKey, speechId: speechId)
         }
     }
     
-    /// Generate audio from OpenAI and play it
-    private func generateAndPlay(text: String, cacheKey: String) async {
-        print("🔄 SpeechService: generateAndPlay() starting...")
+    /// Normalize text for speech - ensures proper sentence intonation
+    private func normalizeForSpeech(_ text: String) -> String {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Check if cancelled before starting
-        guard !isCancelled else {
-            print("🛑 SpeechService: Cancelled before generation started")
+        // Check if text already ends with sentence-ending punctuation
+        let sentenceEndings: [Character] = [".", "!", "?", "…"]
+        if let lastChar = trimmed.last, sentenceEndings.contains(lastChar) {
+            return trimmed
+        }
+        
+        // Add period for proper sentence intonation
+        return trimmed + "."
+    }
+    
+    /// Generate audio from OpenAI and play it
+    @MainActor
+    private func generateAndPlay(text: String, cacheKey: String, speechId: UUID) async {
+        // Check if this request is still current
+        guard currentSpeechId == speechId else {
+            print("🛑 SpeechService: Request \(speechId) cancelled (new request started)")
             return
         }
         
-        await MainActor.run {
-            isGenerating = true
-            error = nil
-        }
+        isGenerating = true
         
         do {
             let audioURL = try await generateSpeech(for: text, cacheKey: cacheKey)
             
-            // Check if cancelled after generation (before playing)
-            guard !isCancelled else {
-                print("🛑 SpeechService: Cancelled after generation, not playing")
-                await MainActor.run {
-                    isGenerating = false
-                }
+            // Check again if this request is still current
+            guard currentSpeechId == speechId else {
+                print("🛑 SpeechService: Request \(speechId) cancelled after generation")
+                isGenerating = false
                 return
             }
             
             print("✅ SpeechService: Audio generated successfully, playing...")
+            isGenerating = false
+            playAudio(from: audioURL, speechId: speechId)
             
-            await MainActor.run {
-                isGenerating = false
-                playAudio(from: audioURL)
-            }
         } catch {
             print("❌ SpeechService: Failed to generate speech: \(error)")
-            print("❌ SpeechService: Error details: \(error.localizedDescription)")
-            await MainActor.run {
-                isGenerating = false
-                self.error = error.localizedDescription
-                isSpeaking = false
-                currentlyPlayingText = nil
-                onSpeechComplete?()
-                onSpeechComplete = nil
-            }
+            
+            // Only update state if this is still the current request
+            guard currentSpeechId == speechId else { return }
+            
+            isGenerating = false
+            self.error = error.localizedDescription
+            isSpeaking = false
+            currentlyPlayingText = nil
+            
+            let callback = onSpeechComplete
+            onSpeechComplete = nil
+            callback?()
         }
     }
     
@@ -155,11 +163,15 @@ class SpeechService: NSObject, ObservableObject {
     private func generateSpeech(for text: String, cacheKey: String) async throws -> URL {
         print("📡 SpeechService: Calling OpenAI API...")
         
+        guard !apiKey.isEmpty && apiKey != "your-api-key-here" else {
+            throw SpeechError.apiError(statusCode: 0, message: "OpenAI API key not configured")
+        }
+        
         var request = URLRequest(url: URL(string: apiEndpoint)!)
         request.httpMethod = "POST"
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.timeoutInterval = 30 // 30 second timeout
+        request.timeoutInterval = 30
         
         let body: [String: Any] = [
             "model": model,
@@ -178,7 +190,6 @@ class SpeechService: NSObject, ObservableObject {
         print("📡 SpeechService: Received response, data size: \(data.count) bytes")
         
         guard let httpResponse = response as? HTTPURLResponse else {
-            print("❌ SpeechService: Invalid response type")
             throw SpeechError.invalidResponse
         }
         
@@ -203,26 +214,27 @@ class SpeechService: NSObject, ObservableObject {
     }
     
     /// Play audio from URL
-    private func playAudio(from url: URL) {
+    private func playAudio(from url: URL, speechId: UUID) {
         print("🔊 SpeechService: playAudio() called with URL: \(url.lastPathComponent)")
         
-        // Check if cancelled
-        guard !isCancelled else {
-            print("🛑 SpeechService: Cancelled, not playing audio")
+        // Check if this request is still current
+        guard currentSpeechId == speechId else {
+            print("🛑 SpeechService: Request \(speechId) cancelled, not playing")
             return
         }
         
+        // Ensure audio session is active before playing
+        ensureAudioSessionActive()
+        
         do {
-            try AVAudioSession.sharedInstance().setActive(true)
-            print("🔊 SpeechService: Audio session activated")
-            
             audioPlayer = try AVAudioPlayer(contentsOf: url)
             audioPlayer?.delegate = self
+            audioPlayer?.volume = 1.0
             audioPlayer?.prepareToPlay()
             
-            // Double-check cancellation right before playing
-            guard !isCancelled else {
-                print("🛑 SpeechService: Cancelled right before play")
+            // Final check before playing
+            guard currentSpeechId == speechId else {
+                print("🛑 SpeechService: Request \(speechId) cancelled right before play")
                 audioPlayer = nil
                 return
             }
@@ -230,30 +242,52 @@ class SpeechService: NSObject, ObservableObject {
             let success = audioPlayer?.play() ?? false
             print("🔊 SpeechService: play() returned: \(success), duration: \(audioPlayer?.duration ?? 0) seconds")
             
-            isSpeaking = true
+            if success {
+                isSpeaking = true
+            } else {
+                // Retry once after a short delay
+                print("⚠️ SpeechService: play() returned false, retrying...")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+                    guard let self = self, self.currentSpeechId == speechId else { return }
+                    
+                    let retrySuccess = self.audioPlayer?.play() ?? false
+                    print("🔊 SpeechService: Retry play() returned: \(retrySuccess)")
+                    
+                    if retrySuccess {
+                        self.isSpeaking = true
+                    } else {
+                        // Give up and call completion
+                        self.finishSpeech()
+                    }
+                }
+            }
             
         } catch {
             print("❌ SpeechService: Audio playback failed: \(error)")
             self.error = "Playback failed: \(error.localizedDescription)"
-            isSpeaking = false
-            currentlyPlayingText = nil
-            onSpeechComplete?()
-            onSpeechComplete = nil
+            finishSpeech()
         }
+    }
+    
+    /// Clean up after speech finishes
+    private func finishSpeech() {
+        isSpeaking = false
+        currentlyPlayingText = nil
+        
+        let callback = onSpeechComplete
+        onSpeechComplete = nil
+        callback?()
     }
     
     /// Stop current speech and cancel any pending operations
     func stopSpeaking() {
         print("🛑 SpeechService: stopSpeaking() called")
         
-        // Set cancel flag to prevent pending async operations from playing
-        isCancelled = true
+        // Invalidate current speech request
+        currentSpeechId = nil
         
         // Stop audio player
-        if let player = audioPlayer {
-            player.stop()
-            print("🛑 SpeechService: Audio player stopped")
-        }
+        audioPlayer?.stop()
         audioPlayer = nil
         
         // Reset state
@@ -261,19 +295,14 @@ class SpeechService: NSObject, ObservableObject {
         isGenerating = false
         currentlyPlayingText = nil
         onSpeechComplete = nil
-        
-        // Deactivate audio session - COMMENTED OUT to keep background music playing
-        // try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
     
     // MARK: - Cache Management
     
     private func generateCacheKey(for text: String) -> String {
-        // Include voice and speed in cache key so regeneration happens if settings change
-        let settingsHash = "\(voice)_\(speed)"
+        let settingsHash = "\(voice)_\(speed)_\(model)"
         let combined = text + settingsHash
         
-        // Create a simple hash for the filename
         var hash: UInt64 = 5381
         for char in combined.utf8 {
             hash = ((hash << 5) &+ hash) &+ UInt64(char)
@@ -338,23 +367,19 @@ class SpeechService: NSObject, ObservableObject {
 // MARK: - AVAudioPlayerDelegate
 extension SpeechService: AVAudioPlayerDelegate {
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        print("🔊 SpeechService: audioPlayerDidFinishPlaying, success: \(flag)")
         DispatchQueue.main.async {
-            self.isSpeaking = false
-            self.currentlyPlayingText = nil
-            self.onSpeechComplete?()
-            self.onSpeechComplete = nil
+            self.finishSpeech()
         }
     }
     
     func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
+        print("❌ SpeechService: audioPlayerDecodeErrorDidOccur: \(error?.localizedDescription ?? "unknown")")
         DispatchQueue.main.async {
-            self.isSpeaking = false
-            self.currentlyPlayingText = nil
             if let error = error {
                 self.error = "Decode error: \(error.localizedDescription)"
             }
-            self.onSpeechComplete?()
-            self.onSpeechComplete = nil
+            self.finishSpeech()
         }
     }
 }

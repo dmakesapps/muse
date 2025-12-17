@@ -55,27 +55,30 @@ struct FeedView: View {
     
     var body: some View {
         ZStack {
-            // Background
-            // Background
-            // Background
-            MuseBackgroundView(selectedBackground: selectedBackground)
-                .ignoresSafeArea()
-            
-            if filteredContent.isEmpty {
-                // Empty state
-                VStack(spacing: 16) {
-                    Image(systemName: "quote.bubble")
-                        .font(.system(size: 48))
-                        .foregroundColor(.museLightGray.opacity(0.5))
-                    
-                    Text("No \(selectedCategory.rawValue.capitalized)s yet")
-                        .font(.museHeadline())
-                        .foregroundColor(.museLightGray)
-                }
-            } else {
-                // Vertical swipe feed using native vertical paging
-                GeometryReader { geometry in
-                    ScrollView(.vertical, showsIndicators: false) {
+            // LAYER 1: CONTENT (Full Screen, Ignores Safe Area)
+            GeometryReader { geometry in
+                let isLandscape = geometry.size.width > geometry.size.height
+                
+                ZStack {
+                    // Background
+                    MuseBackgroundView(selectedBackground: selectedBackground)
+                    //.ignoresSafeArea() - handled by parent
+                
+                if filteredContent.isEmpty {
+                    // Empty state
+                    VStack(spacing: 16) {
+                        Image(systemName: "quote.bubble")
+                            .font(.system(size: 48))
+                            .foregroundColor(.museLightGray.opacity(0.5))
+                        
+                        Text("No \(selectedCategory.rawValue.capitalized)s yet")
+                            .font(.museHeadline())
+                            .foregroundColor(.museLightGray)
+                    }
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                } else {
+                    // Vertical swipe feed using native vertical paging
+                    ScrollView([.vertical], showsIndicators: false) {
                         LazyVStack(spacing: 0) {
                             ForEach(Array(filteredContent.enumerated()), id: \.element.id) { index, item in
                                 // Each page fills the screen
@@ -117,10 +120,8 @@ struct FeedView: View {
                                                 .padding(.top, 8)
                                         }
                                     }
-
-                                    .frame(width: item.isAffirmation ? UIScreen.main.bounds.width - 64 : nil)
+                                    .frame(maxWidth: item.isAffirmation ? geometry.size.width - (isLandscape ? 160 : 64) : nil)
                                     .padding(.horizontal, item.isAffirmation ? 0 : 40)
-                                    .position(item.isAffirmation ? CGPoint(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height * 0.45) : CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2))
                                 }
                                 .frame(width: geometry.size.width, height: geometry.size.height)
                                 .id(index)
@@ -133,133 +134,140 @@ struct FeedView: View {
                         get: { currentIndex },
                         set: { if let newValue = $0 { currentIndex = newValue } }
                     ))
-                    // Force ScrollView to recreate when category or filter changes
-                    .id("\(selectedCategory.rawValue)-\(selectedTagFilter ?? "all")")
+                    //.ignoresSafeArea() // Already handled by parent GeometryReader
+                    // Force ScrollView to recreate when category, filter, or orientation changes
+                    .id("\(selectedCategory.rawValue)-\(selectedTagFilter ?? "all")-\(geometry.size.width)-\(geometry.size.height)")
                 }
-                .ignoresSafeArea()
-                .onChange(of: selectedCategory) { _, _ in
-                    currentIndex = 0
-                    selectedTagFilter = nil  // Reset filter when switching content type
-                }
-                .onChange(of: selectedTagFilter) { _, _ in
-                    currentIndex = 0
+                
                 }
             }
+            .ignoresSafeArea() // Ensure content flows under notches/home bars for smoother feel
             
-            // Fixed UI overlay
-            VStack {
-                // Top bar
-                HStack {
-                    // Profile button
-                    // Profile button (Top Left)
-                    GlassIconButton(icon: "person", action: onProfileTap)
-                    
-                    Spacer()
-                    
-                    // Category selector
-                    HStack(spacing: 0) {
-                        Button {
-                            withAnimation(.spring(response: 0.3)) {
-                                selectedCategory = .affirmation
+            // LAYER 2: UI OVERLAY (Respects Safe Area naturally)
+            GeometryReader { proxy in // Use proxy to check orientation only
+                let isLandscape = proxy.size.width > proxy.size.height
+                
+                VStack {
+                    // Top bar
+                    HStack {
+                        // Profile button
+                        GlassIconButton(icon: "person", action: onProfileTap)
+                        
+                        Spacer()
+                        
+                        // Category selector
+                        if !isLandscape {
+                            HStack(spacing: 0) {
+                                Button {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        selectedCategory = .affirmation
+                                    }
+                                } label: {
+                                    Text("Affirmations")
+                                        .font(.system(size: 15, weight: selectedCategory == .affirmation ? .semibold : .regular))
+                                        .foregroundColor(selectedCategory == .affirmation ? .museSoftWhite : .museLightGray)
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
+                                }
+                                
+                                Button {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        selectedCategory = .quote
+                                    }
+                                } label: {
+                                    Text("Quotes")
+                                        .font(.system(size: 15, weight: selectedCategory == .quote ? .semibold : .regular))
+                                        .foregroundColor(selectedCategory == .quote ? .museSoftWhite : .museLightGray)
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
+                                }
                             }
-                        } label: {
-                            Text("Affirmations")
-                                .font(.system(size: 15, weight: selectedCategory == .affirmation ? .semibold : .regular))
-                                .foregroundColor(selectedCategory == .affirmation ? .museSoftWhite : .museLightGray)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 10)
+                            .background(
+                                Capsule()
+                                    .fill(Color.museDarkGray.opacity(0.6))
+                                    .pulsingRainbowBorder()
+                            )
                         }
                         
-                        Button {
-                            withAnimation(.spring(response: 0.3)) {
-                                selectedCategory = .quote
-                            }
-                        } label: {
-                            Text("Quotes")
-                                .font(.system(size: 15, weight: selectedCategory == .quote ? .semibold : .regular))
-                                .foregroundColor(selectedCategory == .quote ? .museSoftWhite : .museLightGray)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 10)
-                        }
+                        Spacer()
+                        
+                        // Message button
+                        GlassIconButton(icon: "message", action: onMessageTap)
                     }
-                    .background(
-                        Capsule()
-                            .fill(Color.museDarkGray.opacity(0.6))
-                            .pulsingRainbowBorder()
-                    )
+                    .padding(.horizontal, 16)
+                    .padding(.top, 10)
                     
                     Spacer()
                     
-                    // Message button
-                    // Message button (Top Right)
-                    GlassIconButton(icon: "message", action: onMessageTap)
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 10)
-                
-                Spacer()
-                
-                // Share and Heart buttons - centered
-                HStack(spacing: 32) {
-                    Button(action: {
-                        if currentIndex < filteredContent.count {
-                            shareContent(filteredContent[currentIndex])
-                        }
-                    }) {
-                        Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 22))
-                            .foregroundColor(.museSoftWhite)
-                    }
-                    
-                    Button(action: {
-                        if currentIndex < filteredContent.count {
-                            let item = filteredContent[currentIndex]
-                            // Toggle save state
-                            if item.isSaved(storage: storage) {
-                                // Remove from saved
-                                if let affirmation = item.affirmation {
-                                    storage.removeAffirmation(affirmation)
-                                } else if let quote = item.quote {
-                                    storage.removeQuote(quote)
+                    // Share and Heart buttons - centered
+                    // HIDDEN IN LANDSCAPE
+                    if !isLandscape {
+                        HStack(spacing: 32) {
+                            Button(action: {
+                                if currentIndex < filteredContent.count {
+                                    shareContent(filteredContent[currentIndex])
                                 }
-                            } else {
-                                // Add to saved
-                                if let affirmation = item.affirmation {
-                                    storage.saveAffirmation(affirmation)
-                                } else if let quote = item.quote {
-                                    storage.saveQuote(quote)
+                            }) {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.system(size: 22))
+                                    .foregroundColor(.museSoftWhite)
+                            }
+                            
+                            Button(action: {
+                                if currentIndex < filteredContent.count {
+                                    let item = filteredContent[currentIndex]
+                                    // Toggle save state
+                                    if item.isSaved(storage: storage) {
+                                        // Remove from saved
+                                        if let affirmation = item.affirmation {
+                                            storage.removeAffirmation(affirmation)
+                                        } else if let quote = item.quote {
+                                            storage.removeQuote(quote)
+                                        }
+                                    } else {
+                                        // Add to saved
+                                        if let affirmation = item.affirmation {
+                                            storage.saveAffirmation(affirmation)
+                                        } else if let quote = item.quote {
+                                            storage.saveQuote(quote)
+                                        }
+                                    }
                                 }
+                            }) {
+                                Image(systemName: currentIndex < filteredContent.count && filteredContent[currentIndex].isSaved(storage: storage) ? "heart.fill" : "heart")
+                                    .font(.system(size: 22))
+                                    .foregroundColor(currentIndex < filteredContent.count && filteredContent[currentIndex].isSaved(storage: storage) ? .red : .museSoftWhite)
                             }
                         }
-                    }) {
-                        Image(systemName: currentIndex < filteredContent.count && filteredContent[currentIndex].isSaved(storage: storage) ? "heart.fill" : "heart")
-                            .font(.system(size: 22))
-                            .foregroundColor(currentIndex < filteredContent.count && filteredContent[currentIndex].isSaved(storage: storage) ? .red : .museSoftWhite)
-                    }
-                }
-                .padding(.bottom, 30)
-                
-                // Bottom buttons
-                HStack {
-                    // Mix button
-                    // Mix button (Bottom Left)
-                    GlassIconButton(icon: "square.grid.2x2", action: { showMixPopup = true })
-                    
-                    Spacer()
-                    
-                    // Practice button (center) - Glowing Start button style (transparent center with animated glow)
-                    if selectedCategory == .affirmation {
-                        GlowingStartButton(action: { showPracticePopup = true })
+                        .padding(.bottom, 30)
                     }
                     
-                    Spacer()
-                    
-                    // Placeholder for symmetry (or another button)
-                    // Paintbrush button (Bottom Right)
-                    GlassIconButton(icon: "paintbrush", action: { showBackgroundPicker = true })
+                    // Bottom buttons
+                    HStack {
+                        // Mix button
+                        if !isLandscape {
+                            GlassIconButton(icon: "square.grid.2x2", action: { showMixPopup = true })
+                        }
+                        
+                        Spacer()
+                        
+                        // Practice button (center) - Glowing Start button style
+                        // HIDDEN IN LANDSCAPE
+                        if selectedCategory == .affirmation && !isLandscape {
+                            GlowingStartButton(action: { showPracticePopup = true })
+                        }
+                        
+                        Spacer()
+                        
+                        // Paintbrush button
+                        if !isLandscape {
+                            GlassIconButton(icon: "paintbrush", action: { showBackgroundPicker = true })
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 10) // Standard padding
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 40)
             }
         }
         .sheet(isPresented: $showMixPopup) {
@@ -293,6 +301,9 @@ struct FeedView: View {
                 affirmations = ContentLoader.shared.loadAffirmations()
             }
         }
+        .ignoresSafeArea(.keyboard) // Only ignore keyboard, but respect safe areas for the UI layer by default (since we didn't add .ignoresSafeArea(.all) to the root)
+        // Note: The first GeometryReader HAS .ignoresSafeArea() attached to it, so it will bleed.
+        // The second GeometryReader/VStack DOES NOT, so it will respect safe areas.
     }
     
     // Calculate font size based on word count
@@ -1497,7 +1508,7 @@ struct FavoritesFeedView: View {
             } else {
                 // Vertical swipe feed using native vertical paging
                 GeometryReader { geometry in
-                    ScrollView(.vertical, showsIndicators: false) {
+                    ScrollView([.vertical], showsIndicators: false) {
                         LazyVStack(spacing: 0) {
                             ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                                 ZStack {
@@ -1827,7 +1838,7 @@ struct BackgroundPickerView: View {
                             .foregroundColor(.museSoftWhite)
                             .padding(.top, 24)
                         
-                        ScrollView(.horizontal, showsIndicators: false) {
+                        ScrollView([.horizontal], showsIndicators: false) {
                             HStack(spacing: 16) {
                                 ForEach(options, id: \.self) { bg in
                                     Button(action: {
@@ -1924,7 +1935,7 @@ struct MusicPickerView: View {
             }
             
             // Track Selector
-            ScrollView(.horizontal, showsIndicators: false) {
+            ScrollView([.horizontal], showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(BackgroundMusicTrack.allCases) { track in
                         Button(action: {

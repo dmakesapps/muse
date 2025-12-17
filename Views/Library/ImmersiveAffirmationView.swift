@@ -1,4 +1,5 @@
 import SwiftUI
+import AVFoundation
 
 struct ImmersiveAffirmationView: View {
     let affirmations: [Affirmation]
@@ -6,14 +7,20 @@ struct ImmersiveAffirmationView: View {
     let onComplete: () -> Void
     
     @State private var showCountdown = true
-    @State private var countdown = 5
+    @State private var countdown = 3
     @State private var timer: Timer?
+    @State private var bellPlayer: AVAudioPlayer?
+    
+    // Track which tip to show (persisted across sessions)
+    @AppStorage("affirmationTipIndex") private var tipIndex: Int = 0
     
     var body: some View {
         Group {
             if showCountdown {
-                CountdownView(countdown: $countdown, onComplete: {
+                CountdownView(countdown: $countdown, tipIndex: tipIndex, onComplete: {
                     showCountdown = false
+                    // Increment tip index for next session (cycle through 0-3)
+                    tipIndex = (tipIndex + 1) % 4
                 })
             } else {
                 AffirmationDisplayView(
@@ -26,18 +33,23 @@ struct ImmersiveAffirmationView: View {
             }
         }
         .onAppear {
+            // Enable background audio for immersive session
+            BackgroundMusicManager.shared.isInImmersiveMode = true
+            // Play bell sound once (it will continue even when countdown ends)
+            playBellSound()
             startCountdown()
         }
         .onDisappear {
-            // Stop everything when leaving immersive mode
+            // Disable background audio when leaving immersive session
+            BackgroundMusicManager.shared.isInImmersiveMode = false
+            // Stop speech but keep background music playing
             timer?.invalidate()
             SpeechService.shared.stopSpeaking()
-            BackgroundMusicManager.shared.stop(fadeOutDuration: 0.5)
         }
     }
     
     private func startCountdown() {
-        countdown = 5
+        countdown = 3
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
             if countdown > 0 {
                 countdown -= 1
@@ -46,7 +58,19 @@ struct ImmersiveAffirmationView: View {
             }
         }
     }
+    
+    private func playBellSound() {
+        guard let url = Bundle.main.url(forResource: "bell321", withExtension: "mp3") else {
+            print("Bell sound not found: bell321.mp3")
+            return
+        }
+        
+        do {
+            bellPlayer = try AVAudioPlayer(contentsOf: url)
+            bellPlayer?.volume = 0.8
+            bellPlayer?.play()
+        } catch {
+            print("Error playing bell sound: \(error.localizedDescription)")
+        }
+    }
 }
-
-
-

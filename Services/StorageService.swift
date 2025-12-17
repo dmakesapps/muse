@@ -207,13 +207,53 @@ class BackgroundMusicManager: ObservableObject {
         volume = Double(newVolume)
     }
     
+    // Track if user is in an immersive session (breathwork or affirmations)
+    var isInImmersiveMode = false
+    
+    // Track if music was playing before going to background
+    private var wasPlayingBeforeBackground = false
+    
     private init() {
-        // Configure audio session
+        // Configure audio session for background playback
         do {
-            try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
             print("Failed to set audio session: \(error)")
+        }
+        
+        // Add observers for app lifecycle
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appWillResignActive),
+            name: UIApplication.willResignActiveNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appDidBecomeActive),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc private func appWillResignActive() {
+        // Only pause audio if NOT in immersive mode
+        if !isInImmersiveMode {
+            wasPlayingBeforeBackground = audioPlayer?.isPlaying ?? false
+            audioPlayer?.pause()
+        }
+    }
+    
+    @objc private func appDidBecomeActive() {
+        // Resume music if it was playing before (and we're not in immersive mode)
+        if !isInImmersiveMode && wasPlayingBeforeBackground && selectedTrack != .none {
+            audioPlayer?.play()
         }
     }
     

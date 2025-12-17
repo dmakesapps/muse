@@ -1,16 +1,537 @@
 import SwiftUI
 import SwiftData
+import AVFoundation
 
+// MARK: - Breathing Pattern
+enum BreathingPattern: String, CaseIterable, Identifiable {
+    case boxBreathing = "Box Breathing"
+    case relaxation478 = "4-7-8 Relaxation"
+    case calming46 = "4-6 Calming"
+    case energizing = "Energizing Breath"
+    
+    var id: String { rawValue }
+    
+    var description: String {
+        switch self {
+        case .boxBreathing:
+            return "4-4-4-4 pattern • Stress relief"
+        case .relaxation478:
+            return "4-7-8 pattern • Deep relaxation"
+        case .calming46:
+            return "4-6 pattern • Simple calm"
+        case .energizing:
+            return "2-1-4-1 pattern • Energy boost"
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .boxBreathing: return "square"
+        case .relaxation478: return "moon.fill"
+        case .calming46: return "leaf.fill"
+        case .energizing: return "bolt.fill"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .boxBreathing: return .museAccentBlue
+        case .relaxation478: return .museTeal
+        case .calming46: return .green
+        case .energizing: return .orange
+        }
+    }
+    
+    // Phase durations in seconds
+    var phases: [BreathPhase] {
+        switch self {
+        case .boxBreathing:
+            return [
+                BreathPhase(type: .inhale, duration: 4),
+                BreathPhase(type: .holdIn, duration: 4),
+                BreathPhase(type: .exhale, duration: 4),
+                BreathPhase(type: .holdOut, duration: 4)
+            ]
+        case .relaxation478:
+            return [
+                BreathPhase(type: .inhale, duration: 4),
+                BreathPhase(type: .holdIn, duration: 7),
+                BreathPhase(type: .exhale, duration: 8),
+                BreathPhase(type: .holdOut, duration: 0)
+            ]
+        case .calming46:
+            return [
+                BreathPhase(type: .inhale, duration: 4),
+                BreathPhase(type: .holdIn, duration: 0),
+                BreathPhase(type: .exhale, duration: 6),
+                BreathPhase(type: .holdOut, duration: 0)
+            ]
+        case .energizing:
+            return [
+                BreathPhase(type: .inhale, duration: 2),
+                BreathPhase(type: .holdIn, duration: 1),
+                BreathPhase(type: .exhale, duration: 4),
+                BreathPhase(type: .holdOut, duration: 1)
+            ]
+        }
+    }
+    
+    var totalCycleDuration: Double {
+        phases.reduce(0) { $0 + $1.duration }
+    }
+}
+
+// MARK: - Breath Phase
+struct BreathPhase {
+    enum PhaseType: String {
+        case inhale = "Inhale"
+        case holdIn = "Hold"
+        case exhale = "Exhale"
+        case holdOut = "Rest"
+    }
+    
+    let type: PhaseType
+    let duration: Double
+}
+
+// MARK: - Immersive Breathwork View
+struct ImmersiveBreathworkView: View {
+    let pattern: BreathingPattern
+    let onComplete: () -> Void
+    
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
+    @State private var currentPhaseIndex = 0
+    @State private var phaseProgress: Double = 0
+    @State private var elapsedTime: TimeInterval = 0
+    @State private var isRunning = true
+    @State private var isPaused = false
+    @State private var circleScale: CGFloat = 0.5
+    @State private var hapticEnabled = true
+    @State private var showControls = true
+    @State private var soundEnabled = true
+    @State private var audioPlayer: AVAudioPlayer?
+    
+    private let timer = Timer.publish(every: 0.05, on: .main, in: .common).autoconnect()
+    
+    private var currentPhase: BreathPhase {
+        let phases = pattern.phases.filter { $0.duration > 0 }
+        return phases[currentPhaseIndex % phases.count]
+    }
+    
+    private var activePhases: [BreathPhase] {
+        pattern.phases.filter { $0.duration > 0 }
+    }
+    
+    private var phaseText: String {
+        currentPhase.type.rawValue
+    }
+    
+    private var formattedTime: String {
+        let minutes = Int(elapsedTime) / 60
+        let seconds = Int(elapsedTime) % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+    
+    var body: some View {
+        ZStack {
+            // Background
+            MuseBackgroundView(selectedBackground: selectedBackground)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Top info bar
+                topInfoBar
+                    .padding(.top, 60)
+                    .opacity(showControls ? 1 : 0)
+                
+                Spacer()
+                
+                // Breathing circle - always visible
+                breathingCircle
+                
+                Spacer()
+                
+                // Bottom controls
+                bottomControls
+                    .padding(.bottom, 40)
+                    .opacity(showControls ? 1 : 0)
+            }
+        }
+        .contentShape(Rectangle()) // Make entire area tappable
+        .onTapGesture {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                showControls.toggle()
+            }
+        }
+        .onReceive(timer) { _ in
+            guard isRunning && !isPaused else { return }
+            updateBreathing()
+        }
+        .onAppear {
+            // Enable background audio for immersive session
+            BackgroundMusicManager.shared.isInImmersiveMode = true
+            startBreathing()
+            // Play initial inhale sound
+            playPhaseSound(for: .inhale)
+        }
+        .onDisappear {
+            // Disable background audio when leaving immersive session
+            BackgroundMusicManager.shared.isInImmersiveMode = false
+            // Clean up audio
+            audioPlayer?.stop()
+            audioPlayer = nil
+        }
+    }
+    
+    // MARK: - Top Info Bar
+    private var topInfoBar: some View {
+        HStack(spacing: 16) {
+            // Inhale indicator
+            VStack(spacing: 4) {
+                Image(systemName: "nose")
+                    .font(.system(size: 20))
+                    .foregroundColor(.museSoftWhite.opacity(0.8))
+                
+                HStack(spacing: 2) {
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: 8))
+                    Text("\(Int(pattern.phases.first { $0.type == .inhale }?.duration ?? 4))")
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .foregroundColor(.museSuccessGreen)
+            }
+            
+            // Hold after inhale indicator
+            if let holdInDuration = pattern.phases.first(where: { $0.type == .holdIn })?.duration, holdInDuration > 0 {
+                VStack(spacing: 4) {
+                    Image(systemName: "pause.fill")
+                        .font(.system(size: 18))
+                        .foregroundColor(.museSoftWhite.opacity(0.8))
+                    
+                    HStack(spacing: 2) {
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 8))
+                        Text("\(Int(holdInDuration))")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundColor(.museAccentBlue)
+                }
+            }
+            
+            // Exhale indicator
+            VStack(spacing: 4) {
+                Image(systemName: "mouth")
+                    .font(.system(size: 20))
+                    .foregroundColor(.museSoftWhite.opacity(0.8))
+                
+                HStack(spacing: 2) {
+                    Image(systemName: "arrow.down")
+                        .font(.system(size: 8))
+                    Text("\(Int(pattern.phases.first { $0.type == .exhale }?.duration ?? 4))")
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .foregroundColor(.museSuccessGreen)
+            }
+            
+            // Hold after exhale indicator
+            if let holdOutDuration = pattern.phases.first(where: { $0.type == .holdOut })?.duration, holdOutDuration > 0 {
+                VStack(spacing: 4) {
+                    Image(systemName: "pause.fill")
+                        .font(.system(size: 18))
+                        .foregroundColor(.museSoftWhite.opacity(0.8))
+                    
+                    HStack(spacing: 2) {
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 8))
+                        Text("\(Int(holdOutDuration))")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundColor(.museAccentBlue)
+                }
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.museDarkGray.opacity(0.6))
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(.ultraThinMaterial)
+                )
+        )
+    }
+    
+    // MARK: - Breathing Circle
+    private let circleSize: CGFloat = 280  // Outer circle size
+    
+    private var breathingCircle: some View {
+        ZStack {
+            // Outer static circle (reference ring)
+            Circle()
+                .stroke(Color.museSoftWhite.opacity(0.2), lineWidth: 2)
+                .frame(width: circleSize, height: circleSize)
+            
+            // Middle reference circle (subtle background)
+            Circle()
+                .fill(Color.museSoftWhite.opacity(0.05))
+                .frame(width: circleSize - 4, height: circleSize - 4)
+            
+            // Animated inner circle - base size equals outer circle so it fills completely at scale 1.0
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            Color.museSoftWhite.opacity(0.5),
+                            Color.museSoftWhite.opacity(0.25)
+                        ],
+                        center: .center,
+                        startRadius: 0,
+                        endRadius: circleSize / 2
+                    )
+                )
+                .frame(width: circleSize, height: circleSize)
+                .scaleEffect(circleScale)
+            
+            // Center text - exactly centered
+            Text(phaseText)
+                .font(.system(size: 28, weight: .semibold))
+                .foregroundColor(.museSoftWhite)
+        }
+        .frame(width: circleSize, height: circleSize)
+    }
+    
+    // MARK: - Bottom Controls
+    private var bottomControls: some View {
+        VStack(spacing: 20) {
+            // Control buttons
+            HStack(spacing: 40) {
+                // Haptic toggle
+                Button(action: {
+                    hapticEnabled.toggle()
+                    if hapticEnabled {
+                        let impact = UIImpactFeedbackGenerator(style: .light)
+                        impact.impactOccurred()
+                    }
+                }) {
+                    Image(systemName: hapticEnabled ? "iphone.radiowaves.left.and.right" : "iphone.slash")
+                        .font(.system(size: 20))
+                        .foregroundColor(.museSoftWhite)
+                        .frame(width: 50, height: 50)
+                        .background(
+                            Circle()
+                                .fill(Color.museDarkGray.opacity(0.6))
+                                .background(
+                                    Circle()
+                                        .fill(.ultraThinMaterial)
+                                )
+                                .clipShape(Circle())
+                        )
+                }
+                
+                // Sound toggle
+                Button(action: {
+                    soundEnabled.toggle()
+                }) {
+                    Image(systemName: soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(.museSoftWhite)
+                        .frame(width: 50, height: 50)
+                        .background(
+                            Circle()
+                                .fill(Color.museDarkGray.opacity(0.6))
+                                .background(
+                                    Circle()
+                                        .fill(.ultraThinMaterial)
+                                )
+                                .clipShape(Circle())
+                        )
+                }
+                
+                // Pause/Play button
+                Button(action: {
+                    isPaused.toggle()
+                    if !isPaused && hapticEnabled {
+                        let impact = UIImpactFeedbackGenerator(style: .medium)
+                        impact.impactOccurred()
+                    }
+                }) {
+                    Image(systemName: isPaused ? "play.fill" : "pause.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(.museSoftWhite)
+                        .frame(width: 70, height: 70)
+                        .background(
+                            Circle()
+                                .fill(Color.museDarkGray.opacity(0.6))
+                                .background(
+                                    Circle()
+                                        .fill(.ultraThinMaterial)
+                                )
+                                .clipShape(Circle())
+                        )
+                }
+                
+                // Close button
+                Button(action: {
+                    isRunning = false
+                    onComplete()
+                }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 20))
+                        .foregroundColor(.museSoftWhite)
+                        .frame(width: 50, height: 50)
+                        .background(
+                            Circle()
+                                .fill(Color.museDarkGray.opacity(0.6))
+                                .background(
+                                    Circle()
+                                        .fill(.ultraThinMaterial)
+                                )
+                                .clipShape(Circle())
+                        )
+                }
+            }
+            
+            // Timer display
+            Text(formattedTime)
+                .font(.system(size: 18, weight: .medium, design: .rounded))
+                .foregroundColor(.museSoftWhite)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 10)
+                .background(
+                    Capsule()
+                        .fill(Color.museDarkGray.opacity(0.6))
+                        .background(
+                            Capsule()
+                                .fill(.ultraThinMaterial)
+                        )
+                        .clipShape(Capsule())
+                )
+        }
+    }
+    
+    // MARK: - Breathing Logic
+    private let minScale: CGFloat = 0.3  // Very small when exhaled
+    private let maxScale: CGFloat = 1.0  // Full size when inhaled
+    
+    private func startBreathing() {
+        currentPhaseIndex = 0
+        phaseProgress = 0
+        circleScale = minScale // Start small
+    }
+    
+    private func updateBreathing() {
+        elapsedTime += 0.05
+        
+        let phaseDuration = currentPhase.duration
+        phaseProgress += 0.05 / phaseDuration
+        
+        if phaseProgress >= 1.0 {
+            // Move to next phase
+            phaseProgress = 0
+            let previousPhaseIndex = currentPhaseIndex
+            currentPhaseIndex = (currentPhaseIndex + 1) % activePhases.count
+            
+            // Get the new phase type
+            let newPhaseType = activePhases[currentPhaseIndex].type
+            
+            // Play sound for new phase
+            if soundEnabled {
+                playPhaseSound(for: newPhaseType)
+            }
+            
+            // Haptic feedback on phase change
+            if hapticEnabled {
+                let impact = UIImpactFeedbackGenerator(style: .medium)
+                impact.impactOccurred()
+            }
+        }
+        
+        // Update circle scale based on current phase
+        updateCircleScaleContinuous()
+    }
+    
+    private func playPhaseSound(for phaseType: BreathPhase.PhaseType) {
+        let soundName: String
+        switch phaseType {
+        case .inhale:
+            soundName = "gonghold"
+        case .holdIn, .holdOut:
+            soundName = "gonginhale"
+        case .exhale:
+            soundName = "gongexhale"
+        }
+        
+        guard let url = Bundle.main.url(forResource: soundName, withExtension: "mp3") else {
+            print("Sound file not found: \(soundName).mp3")
+            return
+        }
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.volume = 0.7
+            audioPlayer?.play()
+        } catch {
+            print("Error playing sound: \(error.localizedDescription)")
+        }
+    }
+    
+    private func updateCircleScaleContinuous() {
+        let scaleRange = maxScale - minScale
+        
+        switch currentPhase.type {
+        case .inhale:
+            // Expand from minScale to maxScale
+            let newScale = minScale + (scaleRange * phaseProgress)
+            withAnimation(.linear(duration: 0.05)) {
+                circleScale = newScale
+            }
+        case .holdIn:
+            // Stay at maxScale
+            if circleScale != maxScale {
+                withAnimation(.easeOut(duration: 0.1)) {
+                    circleScale = maxScale
+                }
+            }
+        case .exhale:
+            // Contract from maxScale to minScale
+            let newScale = maxScale - (scaleRange * phaseProgress)
+            withAnimation(.linear(duration: 0.05)) {
+                circleScale = newScale
+            }
+        case .holdOut:
+            // Stay at minScale
+            if circleScale != minScale {
+                withAnimation(.easeOut(duration: 0.1)) {
+                    circleScale = minScale
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Start Affirmations View
 struct StartAffirmationsView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var storage = StorageService.shared
+    @State private var selectedMode: PracticeMode? = nil
     @State private var selectedSource: AffirmationSource? = nil
     @State private var selectedAffirmations: Set<UUID> = []
     @State private var useRandom: Bool = false
     @State private var selectedCategory: String? = nil
     @State private var duration: AffirmationDuration = .oneMinute
     @State private var isActive = false
+    @State private var showBreathwork = false
+    @State private var selectedBreathingPattern: BreathingPattern = .boxBreathing
+    @State private var allAffirmations: [Affirmation] = []
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
+    enum PracticeMode: String, CaseIterable {
+        case affirmations = "Affirmations"
+        case breathwork = "Breathwork"
+    }
     
     enum AffirmationSource: String, CaseIterable {
         case favorites = "Favorites"
@@ -34,27 +555,35 @@ struct StartAffirmationsView: View {
         }
     }
     
-    // Get unique categories from saved affirmations
+    // Get the current affirmation pool based on selected source
+    private var currentAffirmationPool: [Affirmation] {
+        if selectedSource == .library {
+            return allAffirmations
+        }
+        return storage.savedAffirmations
+    }
+    
+    // Get unique categories from current affirmation pool
     private var availableCategories: [String] {
-        let categories = storage.savedAffirmations.map { $0.category }
+        let categories = currentAffirmationPool.map { $0.category }
         return Array(Set(categories)).sorted()
     }
     
     // Filter affirmations by selected category
     private var filteredAffirmations: [Affirmation] {
         if let category = selectedCategory {
-            return storage.savedAffirmations.filter { $0.category == category }
+            return currentAffirmationPool.filter { $0.category == category }
         }
-        return storage.savedAffirmations
+        return currentAffirmationPool
     }
     
     // Get the affirmations to use for the session
     var selectedAffirmationsList: [Affirmation] {
         if useRandom {
-            // Use all saved affirmations (or filtered by category)
+            // Use all affirmations from current pool (or filtered by category)
             return filteredAffirmations
         } else {
-            return storage.savedAffirmations.filter { selectedAffirmations.contains($0.id) }
+            return currentAffirmationPool.filter { selectedAffirmations.contains($0.id) }
         }
     }
     
@@ -77,7 +606,7 @@ struct StartAffirmationsView: View {
                     
                     Spacer()
                     
-                    Text("Start Affirmations")
+                    Text(headerTitle)
                         .font(.museDisplaySmall())
                         .foregroundColor(.museSoftWhite)
                     
@@ -92,15 +621,25 @@ struct StartAffirmationsView: View {
                 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Source Selection
-                        if selectedSource == nil {
-                            sourceSelectionView
-                        } else if selectedSource == .favorites {
-                            favoritesSelectionView
-                        } else if selectedSource == .aiGenerated {
-                            aiGeneratedView
-                        } else if selectedSource == .library {
-                            libraryView
+                        // Mode Selection (Affirmations or Breathwork)
+                        if selectedMode == nil {
+                            modeSelectionView
+                        }
+                        // Affirmations Flow
+                        else if selectedMode == .affirmations {
+                            if selectedSource == nil {
+                                sourceSelectionView
+                            } else if selectedSource == .favorites {
+                                favoritesSelectionView
+                            } else if selectedSource == .aiGenerated {
+                                aiGeneratedView
+                            } else if selectedSource == .library {
+                                libraryView
+                            }
+                        }
+                        // Breathwork Flow
+                        else if selectedMode == .breathwork {
+                            breathworkSelectionView
                         }
                     }
                     .padding(.horizontal, 20)
@@ -114,7 +653,7 @@ struct StartAffirmationsView: View {
             VStack {
                 Spacer()
                 
-                if selectedSource != nil && canStart {
+                if selectedMode == .affirmations && selectedSource != nil && canStart {
                     Button(action: { isActive = true }) {
                         HStack(spacing: 12) {
                             Image(systemName: "play.fill")
@@ -149,60 +688,225 @@ struct StartAffirmationsView: View {
                 }
             )
         }
+        .fullScreenCover(isPresented: $showBreathwork) {
+            ImmersiveBreathworkView(
+                pattern: selectedBreathingPattern,
+                onComplete: { showBreathwork = false }
+            )
+        }
+    }
+    
+    private var headerTitle: String {
+        if selectedMode == nil {
+            return "Practice"
+        } else if selectedMode == .affirmations {
+            return "Affirmations"
+        } else {
+            return "Breathwork"
+        }
     }
     
     private var canStart: Bool {
-        if selectedSource == .favorites {
+        if selectedSource == .favorites || selectedSource == .library {
             return useRandom ? !filteredAffirmations.isEmpty : !selectedAffirmations.isEmpty
         }
         return false
     }
     
-    // MARK: - Source Selection View
-    private var sourceSelectionView: some View {
+    // MARK: - Mode Selection View
+    private var modeSelectionView: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Choose Source")
+            Text("Choose Practice")
                 .font(.museHeadline())
                 .foregroundColor(.museSoftWhite)
             
             VStack(spacing: 12) {
-                // Favorites Button
-                SourceButton(
-                    title: "Favorites",
-                    subtitle: "\(storage.savedAffirmations.count) saved",
-                    icon: "heart.fill",
+                // Affirmations Button
+                PracticeModeButton(
+                    title: "Affirmations",
+                    subtitle: "Repeat positive statements",
+                    icon: "text.quote",
                     color: .museGradientStart,
-                    isDisabled: storage.savedAffirmations.isEmpty
+                    isDisabled: false
                 ) {
                     withAnimation(.spring(response: 0.3)) {
-                        selectedSource = .favorites
+                        selectedMode = .affirmations
                     }
                 }
                 
-                // AI Generated Button
-                SourceButton(
-                    title: "AI Generated",
-                    subtitle: "Coming soon",
-                    icon: "sparkles",
+                // Breathwork Button
+                PracticeModeButton(
+                    title: "Breathwork",
+                    subtitle: "Guided breathing exercises",
+                    icon: "wind",
                     color: .museTeal,
-                    isDisabled: true,
-                    isComingSoon: true
+                    isDisabled: false
                 ) {
-                    // Coming soon
-                }
-                
-                // Library Button
-                SourceButton(
-                    title: "Library",
-                    subtitle: "Coming soon",
-                    icon: "books.vertical.fill",
-                    color: .museAccentBlue,
-                    isDisabled: true,
-                    isComingSoon: true
-                ) {
-                    // Coming soon
+                    withAnimation(.spring(response: 0.3)) {
+                        selectedMode = .breathwork
+                    }
                 }
             }
+        }
+    }
+    
+    // MARK: - Breathwork Selection View
+    private var breathworkSelectionView: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            // Back button
+            Button(action: {
+                withAnimation(.spring(response: 0.3)) {
+                    selectedMode = nil
+                }
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 14, weight: .semibold))
+                    Text("Back")
+                        .font(.museBodyMedium())
+                }
+                .foregroundColor(.museAccentBlue)
+            }
+            
+            VStack(spacing: 16) {
+                Image(systemName: "wind")
+                    .font(.system(size: 48))
+                    .foregroundColor(.museTeal)
+                
+                Text("Breathwork")
+                    .font(.museHeadline())
+                    .foregroundColor(.museSoftWhite)
+                
+                Text("Calm your mind with guided breathing exercises. Choose a pattern and duration to begin.")
+                    .font(.museBodyMedium())
+                    .foregroundColor(.museLightGray)
+                    .multilineTextAlignment(.center)
+                
+                // Breathwork options
+                VStack(spacing: 12) {
+                    BreathworkPatternButton(
+                        title: "Box Breathing",
+                        subtitle: "4-4-4-4 pattern • Stress relief",
+                        icon: "square",
+                        color: .museAccentBlue
+                    ) {
+                        selectedBreathingPattern = .boxBreathing
+                        showBreathwork = true
+                    }
+                    
+                    BreathworkPatternButton(
+                        title: "4-7-8 Relaxation",
+                        subtitle: "4-7-8 pattern • Sleep aid",
+                        icon: "moon.fill",
+                        color: .museTeal
+                    ) {
+                        selectedBreathingPattern = .relaxation478
+                        showBreathwork = true
+                    }
+                    
+                    BreathworkPatternButton(
+                        title: "4-6 Calming",
+                        subtitle: "4-6 pattern • Simple calm",
+                        icon: "leaf.fill",
+                        color: .green
+                    ) {
+                        selectedBreathingPattern = .calming46
+                        showBreathwork = true
+                    }
+                    
+                    BreathworkPatternButton(
+                        title: "Energizing Breath",
+                        subtitle: "2-1-4-1 pattern • Energy boost",
+                        icon: "bolt.fill",
+                        color: .orange
+                    ) {
+                        selectedBreathingPattern = .energizing
+                        showBreathwork = true
+                    }
+                }
+                .padding(.top, 20)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+        }
+    }
+    
+    // MARK: - Source Selection View (Affirmations)
+    private var sourceSelectionView: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            // Back button
+            Button(action: {
+                withAnimation(.spring(response: 0.3)) {
+                    selectedMode = nil
+                }
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 14, weight: .semibold))
+                    Text("Back")
+                        .font(.museBodyMedium())
+                }
+                .foregroundColor(.museAccentBlue)
+            }
+            
+            VStack(spacing: 16) {
+                Image(systemName: "text.quote")
+                    .font(.system(size: 48))
+                    .foregroundColor(.museGradientStart)
+                
+                Text("Affirmations")
+                    .font(.museHeadline())
+                    .foregroundColor(.museSoftWhite)
+                
+                Text("Reprogram your mind with positive statements. Choose a source to begin your practice.")
+                    .font(.museBodyMedium())
+                    .foregroundColor(.museLightGray)
+                    .multilineTextAlignment(.center)
+                
+                // Source options
+                VStack(spacing: 12) {
+                    // Favorites Button
+                    SourceButton(
+                        title: "Favorites",
+                        subtitle: "\(storage.savedAffirmations.count) saved affirmations",
+                        icon: "heart.fill",
+                        color: .museGradientStart,
+                        isDisabled: storage.savedAffirmations.isEmpty
+                    ) {
+                        withAnimation(.spring(response: 0.3)) {
+                            selectedSource = .favorites
+                        }
+                    }
+                    
+                    // All Affirmations Button
+                    SourceButton(
+                        title: "All",
+                        subtitle: "Browse all available affirmations",
+                        icon: "list.bullet",
+                        color: .museAccentBlue,
+                        isDisabled: false
+                    ) {
+                        withAnimation(.spring(response: 0.3)) {
+                            selectedSource = .library
+                        }
+                    }
+                    
+                    // AI Generated Button
+                    SourceButton(
+                        title: "AI Generated",
+                        subtitle: "Personalized affirmations",
+                        icon: "sparkles",
+                        color: .museTeal,
+                        isDisabled: true,
+                        isComingSoon: true
+                    ) {
+                        // Coming soon
+                    }
+                }
+                .padding(.top, 20)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
         }
     }
     
@@ -259,11 +963,17 @@ struct StartAffirmationsView: View {
                 .padding(16)
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(useRandom ? Color.museGradientStart.opacity(0.15) : Color.museDarkGray)
-                        .overlay(
+                        .fill(useRandom ? Color.museGradientStart.opacity(0.15) : Color.white.opacity(0.08))
+                        .background(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke(useRandom ? Color.museGradientStart : Color.museMediumGray.opacity(0.5), lineWidth: useRandom ? 2 : 1)
+                                .fill(.thinMaterial)
+                                .opacity(useRandom ? 0.3 : 0.5)
                         )
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(useRandom ? Color.museGradientStart : Color.clear, lineWidth: useRandom ? 2 : 0)
                 )
             }
             
@@ -437,12 +1147,16 @@ struct StartAffirmationsView: View {
         }
     }
     
-    // MARK: - Library View
+    // MARK: - Library View (All Affirmations)
     private var libraryView: some View {
-        VStack(spacing: 20) {
+        VStack(alignment: .leading, spacing: 20) {
+            // Back button
             Button(action: {
                 withAnimation(.spring(response: 0.3)) {
                     selectedSource = nil
+                    selectedAffirmations.removeAll()
+                    useRandom = false
+                    selectedCategory = nil
                 }
             }) {
                 HStack(spacing: 8) {
@@ -452,24 +1166,191 @@ struct StartAffirmationsView: View {
                         .font(.museBodyMedium())
                 }
                 .foregroundColor(.museAccentBlue)
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
             
-            VStack(spacing: 16) {
-                Image(systemName: "books.vertical.fill")
-                    .font(.system(size: 48))
-                    .foregroundColor(.museAccentBlue.opacity(0.5))
-                
-                Text("Affirmation Library")
+            // Random Option
+            Button(action: {
+                withAnimation(.spring(response: 0.3)) {
+                    useRandom.toggle()
+                    if useRandom {
+                        selectedAffirmations.removeAll()
+                    }
+                }
+            }) {
+                HStack {
+                    Image(systemName: "shuffle")
+                        .font(.system(size: 20))
+                        .foregroundColor(useRandom ? .museSoftWhite : .museAccentBlue)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Random")
+                            .font(.museHeadline())
+                            .foregroundColor(.museSoftWhite)
+                        Text("Cycle through all \(selectedCategory != nil ? "in category" : "available")")
+                            .font(.museCaption())
+                            .foregroundColor(.museLightGray)
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: useRandom ? "checkmark.circle.fill" : "circle")
+                        .font(.system(size: 24))
+                        .foregroundColor(useRandom ? .museSuccessGreen : .museLightGray)
+                }
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(useRandom ? Color.museAccentBlue.opacity(0.15) : Color.white.opacity(0.08))
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(.thinMaterial)
+                                .opacity(useRandom ? 0.3 : 0.5)
+                        )
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(useRandom ? Color.museAccentBlue : Color.clear, lineWidth: useRandom ? 2 : 0)
+                )
+            }
+            
+            // Categories Section
+            if !availableCategories.isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Filter by Category")
+                        .font(.museHeadline())
+                        .foregroundColor(.museSoftWhite)
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            // All option
+                            CategoryPill(
+                                title: "All",
+                                isSelected: selectedCategory == nil,
+                                color: .museAccentBlue
+                            ) {
+                                withAnimation(.spring(response: 0.3)) {
+                                    selectedCategory = nil
+                                }
+                            }
+                            
+                            ForEach(availableCategories, id: \.self) { category in
+                                CategoryPill(
+                                    title: category,
+                                    isSelected: selectedCategory == category,
+                                    color: .museAccentBlue
+                                ) {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        selectedCategory = category
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Affirmations List (only show if not using random)
+            if !useRandom {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Select Affirmations")
+                            .font(.museHeadline())
+                            .foregroundColor(.museSoftWhite)
+                        
+                        Spacer()
+                        
+                        if !filteredAffirmations.isEmpty {
+                            Button(action: {
+                                if selectedAffirmations.count == filteredAffirmations.count {
+                                    selectedAffirmations.removeAll()
+                                } else {
+                                    selectedAffirmations = Set(filteredAffirmations.map { $0.id })
+                                }
+                            }) {
+                                Text(selectedAffirmations.count == filteredAffirmations.count ? "Deselect All" : "Select All")
+                                    .font(.museCaption())
+                                    .foregroundColor(.museAccentBlue)
+                            }
+                        }
+                    }
+                    
+                    if filteredAffirmations.isEmpty {
+                        Text("No affirmations in this category")
+                            .font(.museBodyMedium())
+                            .foregroundColor(.museLightGray)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 40)
+                    } else {
+                        VStack(spacing: 10) {
+                            ForEach(filteredAffirmations) { affirmation in
+                                AffirmationSelectRow(
+                                    affirmation: affirmation,
+                                    isSelected: selectedAffirmations.contains(affirmation.id)
+                                ) {
+                                    toggleSelection(affirmation)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Music Selector
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Background Music")
                     .font(.museHeadline())
                     .foregroundColor(.museSoftWhite)
                 
-                Text("Coming soon! Browse and select from our curated collection of affirmations.")
-                    .font(.museBodyMedium())
-                    .foregroundColor(.museLightGray)
-                    .multilineTextAlignment(.center)
+                VStack(spacing: 10) {
+                    ForEach(BackgroundMusicTrack.allCases) { track in
+                        MusicTrackButton(
+                            track: track,
+                            isSelected: storage.selectedMusicTrack == track,
+                            onSelect: {
+                                storage.selectedMusicTrack = track
+                                BackgroundMusicManager.shared.selectedTrack = track
+                            },
+                            onPreview: {
+                                BackgroundMusicManager.shared.preview(track: track)
+                            }
+                        )
+                    }
+                }
             }
-            .padding(.vertical, 60)
+            
+            // Duration Selector
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Duration")
+                    .font(.museHeadline())
+                    .foregroundColor(.museSoftWhite)
+                
+                HStack(spacing: 10) {
+                    ForEach(AffirmationDuration.allCases, id: \.self) { durationOption in
+                        Button(action: { duration = durationOption }) {
+                            Text(durationOption.rawValue)
+                                .font(.museButtonMedium())
+                                .foregroundColor(duration == durationOption ? .museSoftWhite : .museLightGray)
+                                .padding(.horizontal, 18)
+                                .padding(.vertical, 12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(duration == durationOption ? Color.museAccentBlue : Color.museDarkGray)
+                                )
+                        }
+                    }
+                }
+            }
+        }
+        .onAppear {
+            // Load all affirmations when this view appears
+            if allAffirmations.isEmpty {
+                allAffirmations = ContentLoader.shared.loadAffirmations()
+            }
+        }
+        .onDisappear {
+            // Stop any music preview when leaving this view
+            BackgroundMusicManager.shared.stopPreview()
         }
     }
     
@@ -564,6 +1445,158 @@ struct MusicTrackButton: View {
     }
 }
 
+// MARK: - Practice Mode Button
+struct PracticeModeButton: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let color: Color
+    var isDisabled: Bool = false
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 16) {
+                Image(systemName: icon)
+                    .font(.system(size: 28))
+                    .foregroundColor(isDisabled ? .museLightGray : color)
+                    .frame(width: 60, height: 60)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(isDisabled ? Color.museMediumGray.opacity(0.3) : color.opacity(0.15))
+                    )
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(isDisabled ? .museLightGray : .museSoftWhite)
+                    
+                    Text(subtitle)
+                        .font(.museCaption())
+                        .foregroundColor(.museLightGray)
+                }
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.museLightGray)
+            }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.white.opacity(0.08))
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(.thinMaterial)
+                            .opacity(0.5)
+                    )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+        .disabled(isDisabled)
+        .opacity(isDisabled ? 0.7 : 1)
+    }
+}
+
+// MARK: - Breathwork Pattern Button
+struct BreathworkPatternButton: View {
+    let title: String
+    let subtitle: String
+    let icon: String
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                Image(systemName: icon)
+                    .font(.system(size: 22))
+                    .foregroundColor(color)
+                    .frame(width: 50, height: 50)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(color.opacity(0.15))
+                    )
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.museHeadline())
+                        .foregroundColor(.museSoftWhite)
+                    
+                    Text(subtitle)
+                        .font(.museCaption())
+                        .foregroundColor(.museLightGray)
+                }
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.museLightGray)
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color.white.opacity(0.08))
+                    .background(
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(.thinMaterial)
+                            .opacity(0.5)
+                    )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+    }
+}
+
+// MARK: - Breathwork Placeholder View
+struct BreathworkPlaceholderView: View {
+    let onDismiss: () -> Void
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
+    var body: some View {
+        ZStack {
+            MuseBackgroundView(selectedBackground: selectedBackground)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 24) {
+                Spacer()
+                
+                Image(systemName: "wind")
+                    .font(.system(size: 80))
+                    .foregroundColor(.museTeal.opacity(0.5))
+                
+                Text("Breathwork Experience")
+                    .font(.museDisplaySmall())
+                    .foregroundColor(.museSoftWhite)
+                
+                Text("Immersive breathwork sessions coming soon!")
+                    .font(.museBodyMedium())
+                    .foregroundColor(.museLightGray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+                
+                Spacer()
+                
+                Button(action: onDismiss) {
+                    Text("Close")
+                        .font(.museButtonLarge())
+                        .foregroundColor(.museSoftWhite)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(Color.museDarkGray)
+                        )
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 40)
+            }
+        }
+    }
+}
+
 // MARK: - Source Button
 struct SourceButton: View {
     let title: String
@@ -614,12 +1647,14 @@ struct SourceButton: View {
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.museDarkGray)
-                    .overlay(
+                    .fill(Color.white.opacity(0.08))
+                    .background(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.museMediumGray.opacity(0.3), lineWidth: 1)
+                            .fill(.thinMaterial)
+                            .opacity(0.5)
                     )
             )
+            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .disabled(isDisabled)
         .opacity(isDisabled ? 0.7 : 1)
@@ -642,12 +1677,14 @@ struct CategoryPill: View {
                 .padding(.vertical, 10)
                 .background(
                     Capsule()
-                        .fill(isSelected ? color : Color.museDarkGray)
+                        .fill(isSelected ? color : Color.white.opacity(0.08))
+                        .background(
+                            Capsule()
+                                .fill(.thinMaterial)
+                                .opacity(isSelected ? 0 : 0.5)
+                        )
                 )
-                .overlay(
-                    Capsule()
-                        .stroke(isSelected ? color : Color.museMediumGray.opacity(0.5), lineWidth: 1)
-                )
+                .clipShape(Capsule())
         }
     }
 }
@@ -682,11 +1719,17 @@ struct AffirmationSelectRow: View {
             .padding(14)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? Color.museSuccessGreen.opacity(0.1) : Color.museDarkGray)
-                    .overlay(
+                    .fill(isSelected ? Color.museSuccessGreen.opacity(0.1) : Color.white.opacity(0.08))
+                    .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(isSelected ? Color.museSuccessGreen.opacity(0.5) : Color.museMediumGray.opacity(0.3), lineWidth: 1)
+                            .fill(.thinMaterial)
+                            .opacity(isSelected ? 0.3 : 0.5)
                     )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isSelected ? Color.museSuccessGreen.opacity(0.5) : Color.clear, lineWidth: 1)
             )
         }
     }
@@ -733,25 +1776,47 @@ struct AffirmationSelectionCard: View {
 // MARK: - Countdown View
 struct CountdownView: View {
     @Binding var countdown: Int
+    let tipIndex: Int
     let onComplete: () -> Void
+    
     @State private var scale: CGFloat = 1.0
     @Environment(\.dismiss) private var dismiss
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
+    // Cycling tips for each session
+    private let tips = [
+        "Say the affirmations out loud or in your head. You choose.",
+        "Affirmations activate brain pathways related to self-processing.",
+        "Affirmations can buffer stress responses.",
+        "Self-affirmation activates the brain's reward centers."
+    ]
+    
+    private var currentTip: String {
+        tips[tipIndex % tips.count]
+    }
     
     var body: some View {
         ZStack {
             MuseBackgroundView(selectedBackground: selectedBackground)
                 .ignoresSafeArea()
             
-            VStack(spacing: 20) {
+            VStack(spacing: 24) {
+                Spacer()
+                
                 Text("\(countdown)")
                     .font(.system(size: 120, weight: .bold, design: .rounded))
                     .foregroundColor(.museSoftWhite)
                     .scaleEffect(scale)
                 
-                Text("Get ready...")
-                    .font(.museHeadline())
+                Spacer()
+                
+                // Tip text at the bottom
+                Text(currentTip)
+                    .font(.museBodyMedium())
                     .foregroundColor(.museLightGray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+                    .padding(.bottom, 60)
             }
             .onChange(of: countdown) { oldValue, newValue in
                 if newValue > 0 {
@@ -1125,12 +2190,12 @@ struct AffirmationDisplayView: View {
             lastShownAffirmationId = randomizedAffirmations[currentIndex].id
         }
         
-        // Fade out
-        withAnimation(.easeOut(duration: 0.4)) {
+        // Quick fade out
+        withAnimation(.easeOut(duration: 0.2)) {
             opacity = 0
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             // Check if stopped before continuing
             guard !isStopped else {
                 print("🛑 Fade transition cancelled, session stopped")
@@ -1145,19 +2210,12 @@ struct AffirmationDisplayView: View {
                 reshuffleWithoutRepeat()
             }
             
-            // Fade in
-            withAnimation(.easeIn(duration: 0.4)) {
-                opacity = 1.0
-            }
+            // Start speaking FIRST before fade in (voice starts immediately)
+            speakCurrentAffirmation()
             
-            // Start speaking the new affirmation
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                // Final check before speaking
-                guard !isStopped else {
-                    print("🛑 Speaking new affirmation cancelled, session stopped")
-                    return
-                }
-                speakCurrentAffirmation()
+            // Then fade in the text
+            withAnimation(.easeIn(duration: 0.2)) {
+                opacity = 1.0
             }
         }
     }
@@ -1189,11 +2247,8 @@ struct AffirmationDisplayView: View {
         // Set stopped flag FIRST to prevent any scheduled tasks from running
         isStopped = true
         
-        // Stop speech
+        // Stop speech but keep background music playing
         speechService.stopSpeaking()
-        
-        // Stop background music with fade out
-        musicManager.stop(fadeOutDuration: 1.5)
         
         // Invalidate timer
         timer?.invalidate()
