@@ -14,13 +14,15 @@ struct ImmersiveAffirmationView: View {
     // Track which tip to show (persisted across sessions)
     @AppStorage("affirmationTipIndex") private var tipIndex: Int = 0
     
+    @State private var sessionAffirmations: [Affirmation] = []
+    
     var body: some View {
         ZStack {
             // Affirmation View (Bottom Layer)
             // Initialize early (at 1) to allow fade in
             if !showCountdown || countdown <= 1 {
                 AffirmationDisplayView(
-                    affirmations: affirmations,
+                    affirmations: sessionAffirmations,
                     duration: duration,
                     onComplete: {
                         onComplete()
@@ -48,6 +50,15 @@ struct ImmersiveAffirmationView: View {
             }
         }
         .onAppear {
+            // Prepare affirmations (shuffle)
+            sessionAffirmations = affirmations.shuffled()
+            
+            // PREFETCH THE FIRST ONE IMMEDIATELY
+            if let first = sessionAffirmations.first {
+                print("🚀 ImmersiveAffirmationView: Prefetching first affirmation: \(first.text)")
+                SpeechService.shared.prefetch(first.text)
+            }
+            
             // Enable background audio for immersive session
             BackgroundMusicManager.shared.isInImmersiveMode = true
             // Play bell sound once (it will continue even when countdown ends)

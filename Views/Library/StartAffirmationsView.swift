@@ -1870,6 +1870,8 @@ struct AffirmationDisplayView: View {
     @State private var lastShownAffirmationId: UUID? = nil
     @State private var showVolumeSlider = false
     @State private var isStopped = false  // Flag to prevent scheduled tasks from running after stop
+    @State private var isFinishingUp = false // Flag to let current affirmation finish before stopping
+    @State private var isAnimatingGradient = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
@@ -1915,12 +1917,14 @@ struct AffirmationDisplayView: View {
                         RoundedRectangle(cornerRadius: 2)
                             .fill(
                                 LinearGradient(
-                                    colors: [Color.museGradientStart, Color.museGradientEnd],
+                                    colors: [.red, .orange, .yellow, .green, .cyan, .blue, .purple, .pink],
                                     startPoint: .leading,
                                     endPoint: .trailing
                                 )
                             )
+                            .hueRotation(.degrees(isAnimatingGradient ? 360 : 0))
                             .frame(width: geometry.size.width * min(1.0, Double(elapsedTime) / Double(duration.seconds)))
+                            .animation(.linear(duration: 1.0), value: elapsedTime) // Smooth movement
                     }
                 }
                 .frame(height: 4)
@@ -2101,10 +2105,17 @@ struct AffirmationDisplayView: View {
         
         // Reset stopped flag
         isStopped = false
+        isFinishingUp = false
+        
+        // Start rainbow animation
+        withAnimation(.linear(duration: 5.0).repeatForever(autoreverses: false)) {
+            isAnimatingGradient = true
+        }
         
         sessionStartTime = Date()
         completedAffirmations = []
-        randomizedAffirmations = affirmations.shuffled()
+        // Use affirmations as provided (parent view handles shuffling/ordering)
+        randomizedAffirmations = affirmations
         currentIndex = 0
         
         print("🚀 AffirmationDisplayView: First affirmation: \(randomizedAffirmations.first?.text.prefix(30) ?? "none")...")
@@ -2125,7 +2136,9 @@ struct AffirmationDisplayView: View {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             elapsedTime += 1
             if elapsedTime >= duration.seconds {
-                stop()
+                // Instead of stopping immediately, mark as finishing up
+                // This allows the current affirmation to complete (AI speech + user turn)
+                isFinishingUp = true
             }
         }
     }
@@ -2179,9 +2192,16 @@ struct AffirmationDisplayView: View {
     }
     
     private func transitionToNext() {
-        // Check if session was stopped
+        // Check if session was stopped or needs to finish
         guard !isStopped else {
             print("🛑 transitionToNext: Session stopped, not transitioning")
+            return
+        }
+        
+        // If time is up, end the session now that the verification cycle is complete
+        if isFinishingUp {
+            print("🛑 Time is up! Finishing session gracefully after affirmation complete.")
+            stop()
             return
         }
         
