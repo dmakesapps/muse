@@ -15,14 +15,10 @@ struct ImmersiveAffirmationView: View {
     @AppStorage("affirmationTipIndex") private var tipIndex: Int = 0
     
     var body: some View {
-        Group {
-            if showCountdown {
-                CountdownView(countdown: $countdown, tipIndex: tipIndex, onComplete: {
-                    showCountdown = false
-                    // Increment tip index for next session (cycle through 0-3)
-                    tipIndex = (tipIndex + 1) % 4
-                })
-            } else {
+        ZStack {
+            // Affirmation View (Bottom Layer)
+            // Initialize early (at 1) to allow fade in
+            if !showCountdown || countdown <= 1 {
                 AffirmationDisplayView(
                     affirmations: affirmations,
                     duration: duration,
@@ -30,6 +26,25 @@ struct ImmersiveAffirmationView: View {
                         onComplete()
                     }
                 )
+                // Fade in when countdown reaches 1
+                .opacity(countdown <= 1 ? 1 : 0) 
+                .animation(.easeInOut(duration: 1.0), value: countdown)
+            }
+            
+            // Countdown View (Top Layer)
+            if showCountdown {
+                CountdownView(countdown: $countdown, tipIndex: tipIndex, onComplete: {
+                    // This callback happens at 0
+                    // Give it a moment to finish fading out before removing
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        showCountdown = false
+                    }
+                    // Increment tip index for next session
+                    tipIndex = (tipIndex + 1) % 4
+                })
+                // Fade out when countdown reaches 1
+                .opacity(countdown <= 1 ? 0 : 1)
+                .animation(.easeInOut(duration: 1.0), value: countdown)
             }
         }
         .onAppear {

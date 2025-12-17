@@ -2,11 +2,6 @@ import Foundation
 
 /// Configuration for OpenAI API
 /// 
-/// IMPORTANT: For the API key, either:
-/// 1. Set OPENAI_API_KEY environment variable in Xcode scheme
-/// 2. Create OpenAIConfig.local.swift with localApiKey (gitignored)
-/// 3. Hardcode below (NOT recommended for public repos)
-///
 /// Get your key at: https://platform.openai.com/api-keys
 struct OpenAIConfig {
     // Uses: environment variable -> local file extension -> empty fallback

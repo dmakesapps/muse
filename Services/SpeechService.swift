@@ -64,12 +64,13 @@ class SpeechService: NSObject, ObservableObject {
     // MARK: - Speaking
     
     /// Speak the given text using OpenAI TTS
+    /// Speak the given text using OpenAI TTS
     func speak(_ text: String, completion: (() -> Void)? = nil) {
         print("🎙️ SpeechService: speak() called with text: \(text.prefix(50))...")
         
         // Normalize text for TTS - add period if no ending punctuation
-        // This makes the voice read it with proper sentence intonation
         let normalizedText = normalizeForSpeech(text)
+        print("🎙️ SpeechService: Normalized text for TTS: \(normalizedText)")
         
         // Generate unique ID for this speech request
         let speechId = UUID()
@@ -87,7 +88,7 @@ class SpeechService: NSObject, ObservableObject {
         onSpeechComplete = completion
         currentlyPlayingText = text // Keep original text for display
         
-        // Check cache first (use normalized text for cache key)
+        // Check cache first
         let cacheKey = generateCacheKey(for: normalizedText)
         if let cachedURL = cachedAudioURLs[cacheKey], FileManager.default.fileExists(atPath: cachedURL.path) {
             print("✅ SpeechService: Using cached audio for: \(text.prefix(30))...")
@@ -97,9 +98,24 @@ class SpeechService: NSObject, ObservableObject {
         
         print("🌐 SpeechService: No cache found, calling OpenAI API...")
         
-        // Generate new audio (use normalized text)
+        // Generate new audio
         Task { @MainActor in
             await generateAndPlay(text: normalizedText, cacheKey: cacheKey, speechId: speechId)
+        }
+    }
+    
+    /// Prefetch audio for upcoming affirmations
+    func prefetch(_ text: String) {
+        let normalizedText = normalizeForSpeech(text)
+        let cacheKey = generateCacheKey(for: normalizedText)
+        
+        // Only generate if not already cached
+        guard cachedAudioURLs[cacheKey] == nil || !FileManager.default.fileExists(atPath: cachedAudioURLs[cacheKey]!.path) else {
+            return
+        }
+        
+        Task {
+            try? await generateSpeech(for: normalizedText, cacheKey: cacheKey)
         }
     }
     

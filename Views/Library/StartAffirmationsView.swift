@@ -2112,6 +2112,11 @@ struct AffirmationDisplayView: View {
         // Start background music with fade in
         musicManager.play(fadeInDuration: 2.0)
         
+        // Prefetch upcoming affirmations (next 3) to prevent delays
+        for i in 1...min(3, randomizedAffirmations.count - 1) {
+            speechService.prefetch(randomizedAffirmations[i].text)
+        }
+        
         // Start speaking the first affirmation
         print("🚀 AffirmationDisplayView: Calling speakCurrentAffirmation()...")
         speakCurrentAffirmation()
@@ -2209,6 +2214,10 @@ struct AffirmationDisplayView: View {
             if currentIndex == 0 {
                 reshuffleWithoutRepeat()
             }
+            
+            // Prefetch the one AFTER this one to keep buffer full
+            let nextIndex = (currentIndex + 1) % randomizedAffirmations.count
+            speechService.prefetch(randomizedAffirmations[nextIndex].text)
             
             // Start speaking FIRST before fade in (voice starts immediately)
             speakCurrentAffirmation()
