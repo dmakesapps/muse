@@ -170,6 +170,7 @@ struct ImmersiveBreathworkView: View {
             updateBreathing()
         }
         .onAppear {
+            print("💨 ImmersiveBreathworkView appeared with pattern: \(pattern.rawValue)")
             // Enable background audio for immersive session
             BackgroundMusicManager.shared.isInImmersiveMode = true
             startBreathing()
@@ -308,28 +309,8 @@ struct ImmersiveBreathworkView: View {
         VStack(spacing: 20) {
             // Control buttons
             HStack(spacing: 40) {
-                // Haptic toggle
-                Button(action: {
-                    hapticEnabled.toggle()
-                    if hapticEnabled {
-                        let impact = UIImpactFeedbackGenerator(style: .light)
-                        impact.impactOccurred()
-                    }
-                }) {
-                    Image(systemName: hapticEnabled ? "iphone.radiowaves.left.and.right" : "iphone.slash")
-                        .font(.system(size: 20))
-                        .foregroundColor(.museSoftWhite)
-                        .frame(width: 50, height: 50)
-                        .background(
-                            Circle()
-                                .fill(Color.museDarkGray.opacity(0.6))
-                                .background(
-                                    Circle()
-                                        .fill(.ultraThinMaterial)
-                                )
-                                .clipShape(Circle())
-                        )
-                }
+                // Haptic button removed
+
                 
                 // Sound toggle
                 Button(action: {
@@ -790,6 +771,7 @@ struct StartAffirmationsView: View {
                         icon: "square",
                         color: .museAccentBlue
                     ) {
+                        print("💨 Selected Box Breathing")
                         selectedBreathingPattern = .boxBreathing
                         showBreathwork = true
                     }
@@ -800,6 +782,7 @@ struct StartAffirmationsView: View {
                         icon: "moon.fill",
                         color: .museTeal
                     ) {
+                        print("💨 Selected 4-7-8")
                         selectedBreathingPattern = .relaxation478
                         showBreathwork = true
                     }
@@ -810,6 +793,7 @@ struct StartAffirmationsView: View {
                         icon: "leaf.fill",
                         color: .green
                     ) {
+                        print("💨 Selected 4-6 Calming")
                         selectedBreathingPattern = .calming46
                         showBreathwork = true
                     }
@@ -820,6 +804,7 @@ struct StartAffirmationsView: View {
                         icon: "bolt.fill",
                         color: .orange
                     ) {
+                        print("💨 Selected Energizing")
                         selectedBreathingPattern = .energizing
                         showBreathwork = true
                     }
