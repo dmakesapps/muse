@@ -42,7 +42,7 @@ enum BreathingPattern: String, CaseIterable, Identifiable {
         }
     }
     
-    // Phase durations in seconds
+    // Phase durations in seconds [inhale, holdAfterInhale, exhale, holdAfterExhale]
     var phases: [BreathPhase] {
         switch self {
         case .boxBreathing:
@@ -57,7 +57,7 @@ enum BreathingPattern: String, CaseIterable, Identifiable {
                 BreathPhase(type: .inhale, duration: 4),
                 BreathPhase(type: .holdIn, duration: 7),
                 BreathPhase(type: .exhale, duration: 8),
-                BreathPhase(type: .holdOut, duration: 0)
+                BreathPhase(type: .holdOut, duration: 0) // No hold after exhale
             ]
         case .calming46:
             return [
@@ -85,9 +85,17 @@ enum BreathingPattern: String, CaseIterable, Identifiable {
 struct BreathPhase {
     enum PhaseType: String {
         case inhale = "Inhale"
-        case holdIn = "Hold"
+        case holdIn = "Hold In"
         case exhale = "Exhale"
-        case holdOut = "Rest"
+        case holdOut = "Hold Out"
+        
+        var localizedName: String {
+            switch self {
+            case .inhale: return "Inhale"
+            case .exhale: return "Exhale"
+            case .holdIn, .holdOut: return "Hold"
+            }
+        }
     }
     
     let type: PhaseType
@@ -97,6 +105,7 @@ struct BreathPhase {
 // MARK: - Immersive Breathwork View
 struct ImmersiveBreathworkView: View {
     let pattern: BreathingPattern
+    let totalDuration: TimeInterval
     let onComplete: () -> Void
     
     @Environment(\.dismiss) private var dismiss
@@ -109,13 +118,15 @@ struct ImmersiveBreathworkView: View {
     @State private var isPaused = false
     @State private var circleScale: CGFloat = 0.5
     @State private var hapticEnabled = true
+    @State private var countdown = 3
+    @State private var isCountingDown = true
+    @State private var timer: Timer?
+    @State private var lastUpdateTime: Date = Date()
     @State private var showControls = true
     @State private var soundEnabled = true
     @State private var audioPlayer: AVAudioPlayer?
-    @State private var countdown = 3
-    @State private var isCountingDown = true
     
-    private let timer = Timer.publish(every: 0.05, on: .main, in: .common).autoconnect()
+    @State private var phasePlayers: [BreathPhase.PhaseType: AVAudioPlayer] = [:]
     
     private var currentPhase: BreathPhase {
         let phases = pattern.phases.filter { $0.duration > 0 }
@@ -127,13 +138,35 @@ struct ImmersiveBreathworkView: View {
     }
     
     private var phaseText: String {
-        currentPhase.type.rawValue
+        currentPhase.type.localizedName
     }
     
     private var formattedTime: String {
         let minutes = Int(elapsedTime) / 60
         let seconds = Int(elapsedTime) % 60
         return String(format: "%02d:%02d", minutes, seconds)
+    }
+    
+    private func preloadSounds() {
+        let mappings: [BreathPhase.PhaseType: String] = [
+            .inhale: "gonginhale",
+            .exhale: "gongexhale",
+            .holdIn: "gonghold",
+            .holdOut: "gonghold"
+        ]
+        
+        for (phase, filename) in mappings {
+            if let url = Bundle.main.url(forResource: filename, withExtension: "mp3") {
+                do {
+                    let player = try AVAudioPlayer(contentsOf: url)
+                    player.prepareToPlay()
+                    player.volume = 1.0 // adjusted volume
+                    phasePlayers[phase] = player
+                } catch {
+                    print("Could not load sound \(filename): \(error)")
+                }
+            }
+        }
     }
     
     var body: some View {
@@ -150,7 +183,7 @@ struct ImmersiveBreathworkView: View {
                 
                 Spacer()
                 
-                // Breathing circle - always visible
+                // Breathing circle
                 breathingCircle
                 
                 Spacer()
@@ -167,94 +200,59 @@ struct ImmersiveBreathworkView: View {
                 showControls.toggle()
             }
         }
-        .onReceive(timer) { _ in
-            guard isRunning && !isPaused && !isCountingDown else { return }
-            updateBreathing()
-        }
+
         .onAppear {
             print("💨 ImmersiveBreathworkView appeared with pattern: \(pattern.rawValue)")
-            // Enable background audio for immersive session
             BackgroundMusicManager.shared.isInImmersiveMode = true
+            UIApplication.shared.isIdleTimerDisabled = true
+            preloadSounds()
             startCountdown()
         }
         .onDisappear {
-            // Disable background audio when leaving immersive session
             BackgroundMusicManager.shared.isInImmersiveMode = false
-            // Clean up audio
-            audioPlayer?.stop()
-            audioPlayer = nil
+            UIApplication.shared.isIdleTimerDisabled = false
+            // Stop all sounds
+            phasePlayers.values.forEach { $0.stop() }
+            timer?.invalidate()
+            timer = nil
         }
     }
     
     // MARK: - Top Info Bar
     private var topInfoBar: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 24) {
             // Inhale indicator
             VStack(spacing: 4) {
                 Image(systemName: "nose")
-                    .font(.system(size: 20))
+                    .font(.system(size: 24))
                     .foregroundColor(.museSoftWhite.opacity(0.8))
                 
                 HStack(spacing: 2) {
                     Image(systemName: "arrow.up")
-                        .font(.system(size: 8))
+                        .font(.system(size: 10))
                     Text("\(Int(pattern.phases.first { $0.type == .inhale }?.duration ?? 4))")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 14, weight: .medium))
                 }
                 .foregroundColor(.museSuccessGreen)
-            }
-            
-            // Hold after inhale indicator
-            if let holdInDuration = pattern.phases.first(where: { $0.type == .holdIn })?.duration, holdInDuration > 0 {
-                VStack(spacing: 4) {
-                    Image(systemName: "pause.fill")
-                        .font(.system(size: 18))
-                        .foregroundColor(.museSoftWhite.opacity(0.8))
-                    
-                    HStack(spacing: 2) {
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 8))
-                        Text("\(Int(holdInDuration))")
-                            .font(.system(size: 12, weight: .medium))
-                    }
-                    .foregroundColor(.museAccentBlue)
-                }
             }
             
             // Exhale indicator
             VStack(spacing: 4) {
                 Image(systemName: "mouth")
-                    .font(.system(size: 20))
+                    .font(.system(size: 24))
                     .foregroundColor(.museSoftWhite.opacity(0.8))
                 
                 HStack(spacing: 2) {
-                    Image(systemName: "arrow.down")
-                        .font(.system(size: 8))
+                    Image(systemName: "arrow.up")
+                        .font(.system(size: 10))
                     Text("\(Int(pattern.phases.first { $0.type == .exhale }?.duration ?? 4))")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 14, weight: .medium))
                 }
                 .foregroundColor(.museSuccessGreen)
             }
-            
-            // Hold after exhale indicator
-            if let holdOutDuration = pattern.phases.first(where: { $0.type == .holdOut })?.duration, holdOutDuration > 0 {
-                VStack(spacing: 4) {
-                    Image(systemName: "pause.fill")
-                        .font(.system(size: 18))
-                        .foregroundColor(.museSoftWhite.opacity(0.8))
-                    
-                    HStack(spacing: 2) {
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 8))
-                        Text("\(Int(holdOutDuration))")
-                            .font(.system(size: 12, weight: .medium))
-                    }
-                    .foregroundColor(.museAccentBlue)
-                }
-            }
         }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 14)
+        .padding(.horizontal, 32)
+        .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.museDarkGray.opacity(0.6))
@@ -266,52 +264,53 @@ struct ImmersiveBreathworkView: View {
     }
     
     // MARK: - Breathing Circle
-    private let circleSize: CGFloat = 280  // Outer circle size
-    
     private var breathingCircle: some View {
         ZStack {
             // Outer static circle (reference ring)
             Circle()
-                .stroke(Color.museSoftWhite.opacity(0.2), lineWidth: 2)
-                .frame(width: circleSize, height: circleSize)
+                .stroke(Color.museSoftWhite.opacity(0.15), lineWidth: 2)
+                .frame(width: 280, height: 280)
             
-            // Middle reference circle (subtle background)
+            // Middle reference circle
             Circle()
-                .fill(Color.museSoftWhite.opacity(0.05))
-                .frame(width: circleSize - 4, height: circleSize - 4)
+                .fill(Color.museSoftWhite.opacity(0.08))
+                .frame(width: 260, height: 260)
             
-            // Animated inner circle - base size equals outer circle so it fills completely at scale 1.0
+            // Animated inner circle
             Circle()
                 .fill(
                     RadialGradient(
                         colors: [
-                            Color.museSoftWhite.opacity(0.5),
-                            Color.museSoftWhite.opacity(0.25)
+                            Color.museSoftWhite.opacity(0.4),
+                            Color.museSoftWhite.opacity(0.2)
                         ],
                         center: .center,
                         startRadius: 0,
-                        endRadius: circleSize / 2
+                        endRadius: 100
                     )
                 )
-                .frame(width: circleSize, height: circleSize)
+                .frame(width: 200, height: 200)
                 .scaleEffect(circleScale)
             
-            // Center text - exactly centered
-            if isCountingDown {
-                Text("\(countdown)")
-                    .font(.system(size: 48, weight: .semibold)) // Slightly larger but same weight
-                    .foregroundColor(.museSoftWhite)
-                    .transition(.opacity)
-                    .id("countdown-\(countdown)")
-            } else {
-                Text(phaseText)
-                    .font(.system(size: 28, weight: .semibold))
-                    .foregroundColor(.museSoftWhite)
-                    .transition(.opacity)
-                    .id("phase-\(currentPhaseIndex)") // Animate between phases too
+            // Center text
+            VStack(spacing: 8) {
+                if isCountingDown {
+                    Text("\(countdown)")
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .foregroundColor(.museSoftWhite)
+                        .transition(.opacity)
+                } else {
+                    Text(phaseText)
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundColor(.museSoftWhite)
+                    
+                    // Countdown for current phase
+                    Text("\(Int(ceil(currentPhase.duration - (phaseProgress * currentPhase.duration))))")
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .foregroundColor(.museLightGray)
+                }
             }
         }
-        .frame(width: circleSize, height: circleSize)
     }
     
     // MARK: - Bottom Controls
@@ -319,25 +318,21 @@ struct ImmersiveBreathworkView: View {
         VStack(spacing: 20) {
             // Control buttons
             HStack(spacing: 40) {
-                // Haptic button removed
-
-                
-                // Sound toggle
+                // Haptic toggle
                 Button(action: {
-                    soundEnabled.toggle()
+                    hapticEnabled.toggle()
+                    if hapticEnabled {
+                        let impact = UIImpactFeedbackGenerator(style: .light)
+                        impact.impactOccurred()
+                    }
                 }) {
-                    Image(systemName: soundEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                    Image(systemName: hapticEnabled ? "iphone.radiowaves.left.and.right" : "iphone.slash")
                         .font(.system(size: 20))
                         .foregroundColor(.museSoftWhite)
                         .frame(width: 50, height: 50)
                         .background(
                             Circle()
-                                .fill(Color.museDarkGray.opacity(0.6))
-                                .background(
-                                    Circle()
-                                        .fill(.ultraThinMaterial)
-                                )
-                                .clipShape(Circle())
+                                .fill(Color.museDarkGray.opacity(0.8))
                         )
                 }
                 
@@ -355,12 +350,7 @@ struct ImmersiveBreathworkView: View {
                         .frame(width: 70, height: 70)
                         .background(
                             Circle()
-                                .fill(Color.museDarkGray.opacity(0.6))
-                                .background(
-                                    Circle()
-                                        .fill(.ultraThinMaterial)
-                                )
-                                .clipShape(Circle())
+                                .fill(Color.museDarkGray.opacity(0.8))
                         )
                 }
                 
@@ -375,12 +365,7 @@ struct ImmersiveBreathworkView: View {
                         .frame(width: 50, height: 50)
                         .background(
                             Circle()
-                                .fill(Color.museDarkGray.opacity(0.6))
-                                .background(
-                                    Circle()
-                                        .fill(.ultraThinMaterial)
-                                )
-                                .clipShape(Circle())
+                                .fill(Color.museDarkGray.opacity(0.8))
                         )
                 }
             }
@@ -393,12 +378,7 @@ struct ImmersiveBreathworkView: View {
                 .padding(.vertical, 10)
                 .background(
                     Capsule()
-                        .fill(Color.museDarkGray.opacity(0.6))
-                        .background(
-                            Capsule()
-                                .fill(.ultraThinMaterial)
-                        )
-                        .clipShape(Capsule())
+                        .fill(Color.museDarkGray.opacity(0.8))
                 )
         }
     }
@@ -408,6 +388,7 @@ struct ImmersiveBreathworkView: View {
         countdown = 3
         isCountingDown = true
         
+        // Simple one-off timer for countdown
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
             if countdown > 1 {
                 countdown -= 1
@@ -421,114 +402,145 @@ struct ImmersiveBreathworkView: View {
                 // Start breathing shortly after visual transition
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     startBreathing()
-                    // Play initial inhale sound manually since we're starting fresh
+                    startTimer()
+                    // Play initial inhale sound
                     playPhaseSound(for: .inhale)
                 }
             }
         }
     }
     
-    private let minScale: CGFloat = 0.3  // Very small when exhaled
-    private let maxScale: CGFloat = 1.0  // Full size when inhaled
+    private func startTimer() {
+        timer?.invalidate()
+        lastUpdateTime = Date()
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
+            guard isRunning && !isPaused && !isCountingDown else { 
+                lastUpdateTime = Date() // Keep updating time to avoid jumps on resume
+                return 
+            }
+            
+            let now = Date()
+            let delta = now.timeIntervalSince(lastUpdateTime)
+            lastUpdateTime = now
+            
+            updateBreathing(deltaTime: delta)
+        }
+    }
     
     private func startBreathing() {
         currentPhaseIndex = 0
         phaseProgress = 0
         withAnimation(.easeOut(duration: 0.5)) {
-            circleScale = minScale // Start small
+            circleScale = 0.5 // start small
         }
     }
     
-    private func updateBreathing() {
-        elapsedTime += 0.05
+    private func playPhaseSound(for phaseType: BreathPhase.PhaseType) {
+        guard soundEnabled else { return }
+        
+        if let player = phasePlayers[phaseType] {
+            player.currentTime = 0
+            player.play()
+        }
+    }
+    
+    private func updateBreathing(deltaTime: TimeInterval) {
+        elapsedTime += deltaTime
+        
+        // check for completion
+        if elapsedTime >= totalDuration {
+            isRunning = false
+            endBreathworkSessionWithPadding()
+            return
+        }
         
         let phaseDuration = currentPhase.duration
-        phaseProgress += 0.05 / phaseDuration
+        // Use deltaTime to advance progress
+        phaseProgress += deltaTime / phaseDuration
         
         if phaseProgress >= 1.0 {
             // Move to next phase
-            phaseProgress = 0
-            let previousPhaseIndex = currentPhaseIndex
+            phaseProgress -= 1.0 // Keep overflow for smoother timing
             currentPhaseIndex = (currentPhaseIndex + 1) % activePhases.count
-            
-            // Get the new phase type
-            let newPhaseType = activePhases[currentPhaseIndex].type
-            
-            // Play sound for new phase
-            if soundEnabled {
-                playPhaseSound(for: newPhaseType)
-            }
             
             // Haptic feedback on phase change
             if hapticEnabled {
                 let impact = UIImpactFeedbackGenerator(style: .medium)
                 impact.impactOccurred()
             }
+            
+            // Play sound for new phase
+            playPhaseSound(for: currentPhase.type)
+            
+            updateCircleScale(animated: true)
+        } else {
+            // Continuous scale update during inhale/exhale
+            updateCircleScaleContinuous()
         }
-        
-        // Update circle scale based on current phase
-        updateCircleScaleContinuous()
     }
     
-    private func playPhaseSound(for phaseType: BreathPhase.PhaseType) {
-        let soundName: String
-        switch phaseType {
+    private func endBreathworkSessionWithPadding() {
+        // Stop sounds immediately
+        phasePlayers.values.forEach { $0.stop() }
+        BackgroundMusicManager.shared.stop(fadeOutDuration: 1.0)
+        
+        // Wait 5 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+             // If in background, ensure music stays off
+            if UIApplication.shared.applicationState != .active {
+                BackgroundMusicManager.shared.stop()
+            }
+            onComplete()
+        }
+    }
+    
+    private func updateCircleScale(animated: Bool) {
+        let targetScale: CGFloat
+        
+        switch currentPhase.type {
         case .inhale:
-            soundName = "gonghold"
-        case .holdIn, .holdOut:
-            soundName = "gonginhale"
+            targetScale = 0.5 
+        case .holdIn:
+            targetScale = 1.4 
         case .exhale:
-            soundName = "gongexhale"
+            targetScale = 1.4 
+        case .holdOut:
+            targetScale = 0.5 
         }
         
-        guard let url = Bundle.main.url(forResource: soundName, withExtension: "mp3") else {
-            print("Sound file not found: \(soundName).mp3")
-            return
-        }
-        
-        do {
-            audioPlayer = try AVAudioPlayer(contentsOf: url)
-            audioPlayer?.volume = 0.7
-            audioPlayer?.play()
-        } catch {
-            print("Error playing sound: \(error.localizedDescription)")
+        if animated {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                circleScale = targetScale
+            }
+        } else {
+            circleScale = targetScale
         }
     }
     
     private func updateCircleScaleContinuous() {
-        let scaleRange = maxScale - minScale
-        
         switch currentPhase.type {
         case .inhale:
-            // Expand from minScale to maxScale
-            let newScale = minScale + (scaleRange * phaseProgress)
+            // Expand from 0.5 to 1.4
             withAnimation(.linear(duration: 0.05)) {
-                circleScale = newScale
-            }
-        case .holdIn:
-            // Stay at maxScale
-            if circleScale != maxScale {
-                withAnimation(.easeOut(duration: 0.1)) {
-                    circleScale = maxScale
-                }
+                circleScale = 0.5 + (0.9 * phaseProgress)
             }
         case .exhale:
-            // Contract from maxScale to minScale
-            let newScale = maxScale - (scaleRange * phaseProgress)
+            // Contract from 1.4 to 0.5
             withAnimation(.linear(duration: 0.05)) {
-                circleScale = newScale
+                circleScale = 1.4 - (0.9 * phaseProgress)
             }
+        case .holdIn:
+             withAnimation(.linear(duration: 0.05)) {
+                circleScale = 1.4
+             }
         case .holdOut:
-            // Stay at minScale
-            if circleScale != minScale {
-                withAnimation(.easeOut(duration: 0.1)) {
-                    circleScale = minScale
-                }
-            }
+             withAnimation(.linear(duration: 0.05)) {
+                circleScale = 0.5
+             }
         }
     }
 }
-
 // MARK: - Start Affirmations View
 struct StartAffirmationsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -543,6 +555,7 @@ struct StartAffirmationsView: View {
     @State private var activeBreathworkPattern: BreathingPattern? // Use item for sheet logic
     @State private var allAffirmations: [Affirmation] = []
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    @State private var showManifestView = false
     
     enum PracticeMode: String, CaseIterable {
         case affirmations = "Affirmations"
@@ -558,14 +571,14 @@ struct StartAffirmationsView: View {
     
     enum AffirmationDuration: String, CaseIterable {
         case oneMinute = "1 min"
-        case twoMinutes = "2 min"
+        case threeMinutes = "3 min"
         case fiveMinutes = "5 min"
         case tenMinutes = "10 min"
         
         var seconds: Int {
             switch self {
             case .oneMinute: return 60
-            case .twoMinutes: return 120
+            case .threeMinutes: return 180
             case .fiveMinutes: return 300
             case .tenMinutes: return 600
             }
@@ -694,6 +707,8 @@ struct StartAffirmationsView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 30)
                 }
+                
+
             }
         }
         .fullScreenCover(isPresented: $isActive) {
@@ -708,8 +723,12 @@ struct StartAffirmationsView: View {
         .fullScreenCover(item: $activeBreathworkPattern) { pattern in
             ImmersiveBreathworkView(
                 pattern: pattern,
+                totalDuration: TimeInterval(duration.seconds),
                 onComplete: { activeBreathworkPattern = nil }
             )
+        }
+        .fullScreenCover(isPresented: $showManifestView) {
+            ImmersiveManifestView()
         }
     }
     
@@ -763,6 +782,28 @@ struct StartAffirmationsView: View {
                         selectedMode = .breathwork
                     }
                 }
+                
+                // Manifest Button
+                PracticeModeButton(
+                    title: "Manifest",
+                    subtitle: "Visualize and attract your goals",
+                    icon: "sparkles",
+                    color: .purple,
+                    isDisabled: false
+                ) {
+                    showManifestView = true
+                }
+                
+                // Meditation Button
+                PracticeModeButton(
+                    title: "Meditation",
+                    subtitle: "Find clarity and inner peace",
+                    icon: "brain.head.profile",
+                    color: .blue,
+                    isDisabled: true
+                ) {
+                    // Coming soon
+                }
             }
         }
     }
@@ -798,6 +839,43 @@ struct StartAffirmationsView: View {
                     .font(.museBodyMedium())
                     .foregroundColor(.museLightGray)
                     .multilineTextAlignment(.center)
+                
+                // Duration Selection
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Duration")
+                        .font(.museBodyMedium())
+                        .foregroundColor(.museLightGray)
+                    
+                    HStack(spacing: 8) {
+                        ForEach([1, 3, 5, 10], id: \.self) { minutes in
+                            let isSelected = duration.seconds == minutes * 60
+                            Button(action: {
+                                switch minutes {
+                                case 1: duration = .oneMinute
+                                case 3: duration = .threeMinutes
+                                case 5: duration = .fiveMinutes
+                                case 10: duration = .tenMinutes
+                                default: duration = .oneMinute
+                                }
+                            }) {
+                                Text("\(minutes) min")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(isSelected ? .white : .museLightGray)
+                                    .padding(.vertical, 8)
+                                    .padding(.horizontal, 16)
+                                    .background(
+                                        Capsule()
+                                            .fill(isSelected ? Color.museAccentBlue : Color.museDarkGray.opacity(0.5))
+                                            .overlay(
+                                                Capsule()
+                                                    .stroke(isSelected ? Color.museSoftWhite : Color.clear, lineWidth: 1)
+                                            )
+                                    )
+                            }
+                        }
+                    }
+                }
+                .padding(.vertical, 8)
                 
                 // Breathwork options
                 VStack(spacing: 12) {
@@ -1873,6 +1951,7 @@ struct AffirmationDisplayView: View {
     
     @StateObject private var musicManager = BackgroundMusicManager.shared
     @StateObject private var speechService = SpeechService.shared
+
     @State private var randomizedAffirmations: [Affirmation] = []
     @State private var currentIndex = 0
     @State private var elapsedTime = 0
@@ -2221,7 +2300,7 @@ struct AffirmationDisplayView: View {
         // If time is up, end the session now that the verification cycle is complete
         if isFinishingUp {
             print("🛑 Time is up! Finishing session gracefully after affirmation complete.")
-            stop()
+            endSessionWithPadding()
             return
         }
         
@@ -2270,6 +2349,34 @@ struct AffirmationDisplayView: View {
     }
     
     // Reshuffle ensuring the last shown affirmation isn't first
+    private func endSessionWithPadding() {
+        // Stop sounds immediately
+        speechService.stopSpeaking()
+        musicManager.stop(fadeOutDuration: 1.0)
+        
+        // Wait 5 seconds of silence
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+            // If in background, ensure music stays off
+            if UIApplication.shared.applicationState != .active {
+                musicManager.stop()
+            }
+            
+            // Save session
+            let elapsed = Int(Date().timeIntervalSince(sessionStartTime))
+            if !completedAffirmations.isEmpty {
+                let session = AffirmationSession(
+                    date: Date(),
+                    duration: TimeInterval(elapsed),
+                    affirmationCount: completedAffirmations.count,
+                    affirmations: completedAffirmations
+                )
+                modelContext.insert(session)
+            }
+            
+            onComplete()
+        }
+    }
+    
     private func reshuffleWithoutRepeat() {
         guard affirmations.count > 1 else {
             randomizedAffirmations = affirmations

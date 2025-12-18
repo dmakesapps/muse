@@ -61,6 +61,9 @@ struct ImmersiveAffirmationView: View {
             
             // Enable background audio for immersive session
             BackgroundMusicManager.shared.isInImmersiveMode = true
+            // Disable idle timer to prevent screen sleep
+            UIApplication.shared.isIdleTimerDisabled = true
+            
             // Play bell sound once (it will continue even when countdown ends)
             playBellSound()
             startCountdown()
@@ -68,6 +71,9 @@ struct ImmersiveAffirmationView: View {
         .onDisappear {
             // Disable background audio when leaving immersive session
             BackgroundMusicManager.shared.isInImmersiveMode = false
+            // Re-enable idle timer
+            UIApplication.shared.isIdleTimerDisabled = false
+            
             // Stop speech but keep background music playing
             timer?.invalidate()
             SpeechService.shared.stopSpeaking()

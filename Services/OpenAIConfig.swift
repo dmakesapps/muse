@@ -20,7 +20,7 @@ struct OpenAIConfig {
     }
     
     // Default empty key - override in OpenAIConfig.local.swift
-    static var localApiKey: String { "" }
+    static var localApiKey: String = ""
     
     /// Check if a valid API key is configured
     static var isConfigured: Bool {

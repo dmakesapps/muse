@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		724C1B5C2EF3E62B0052D8AE /* SpeechRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B5B2EF3E62B0052D8AE /* SpeechRecognizer.swift */; };
+		724C1B5E2EF3E67B0052D8AE /* ManifestGenerationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */; };
+		724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */; };
+		724C1B622EF3ED370052D8AE /* ImmersiveManifestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B612EF3ED370052D8AE /* ImmersiveManifestView.swift */; };
 		72996E1F2EF2353D00795B97 /* gongexhale.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72996E1E2EF2353C00795B97 /* gongexhale.mp3 */; };
 		72996E212EF2354500795B97 /* gonginhale.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72996E202EF2354500795B97 /* gonginhale.mp3 */; };
 		72996E232EF2354E00795B97 /* gonghold.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72996E222EF2354E00795B97 /* gonghold.mp3 */; };
@@ -85,6 +89,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		724C1B5A2EF3BF150052D8AE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		724C1B5B2EF3E62B0052D8AE /* SpeechRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognizer.swift; sourceTree = "<group>"; };
+		724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestGenerationService.swift; sourceTree = "<group>"; };
+		724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = manifest_5min.m4a; sourceTree = "<group>"; };
+		724C1B612EF3ED370052D8AE /* ImmersiveManifestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveManifestView.swift; sourceTree = "<group>"; };
 		72996E1E2EF2353C00795B97 /* gongexhale.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = gongexhale.mp3; sourceTree = "<group>"; };
 		72996E202EF2354500795B97 /* gonginhale.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = gonginhale.mp3; sourceTree = "<group>"; };
 		72996E222EF2354E00795B97 /* gonghold.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = gonghold.mp3; sourceTree = "<group>"; };
@@ -191,6 +200,7 @@
 		72E262592EC68CF40080CF29 /* Muse */ = {
 			isa = PBXGroup;
 			children = (
+				724C1B5A2EF3BF150052D8AE /* Info.plist */,
 				72EFBB082EEE3E5C00C40084 /* Muse.entitlements */,
 				72E262E02EC68E040080CF29 /* PromiseKeeperApp.swift */,
 			);
@@ -210,6 +220,8 @@
 		72E2628C2EC68E040080CF29 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */,
+				724C1B5B2EF3E62B0052D8AE /* SpeechRecognizer.swift */,
 				72E262D02EC68E040080CF29 /* StorageService.swift */,
 				72E262DD2EC68E040080CF29 /* ProgressService.swift */,
 				AAAA00002EC6F00000000001 /* ContentLoader.swift */,
@@ -222,6 +234,7 @@
 		72E262932EC68E040080CF29 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				724C1B612EF3ED370052D8AE /* ImmersiveManifestView.swift */,
 				72E262902EC68E040080CF29 /* ContentView.swift */,
 				72E262DE2EC68E040080CF29 /* FeedView.swift */,
 				72E262A62EC68E040080CF29 /* Theme.swift */,
@@ -272,6 +285,7 @@
 				72996E202EF2354500795B97 /* gonginhale.mp3 */,
 				72996E222EF2354E00795B97 /* gonghold.mp3 */,
 				72996E242EF23F6200795B97 /* bell321.mp3 */,
+				724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */,
 				72B90C182EEFCDCA00A446A2 /* backgroundjungle2.jpg */,
 				72E73EB82EF0B8FE009D3CDB /* Gradient1.jpg */,
 				72E73EB92EF0B8FE009D3CDB /* Gradient2.jpg */,
@@ -427,6 +441,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */,
 				72996E252EF23F6200795B97 /* bell321.mp3 in Resources */,
 				72E262AA2EC68E040080CF29 /* Assets.xcassets in Resources */,
 				72996E212EF2354500795B97 /* gonginhale.mp3 in Resources */,
@@ -479,11 +494,14 @@
 				72E262DF2EC68E040080CF29 /* FeedView.swift in Sources */,
 				72E262A52EC68E040080CF29 /* Theme.swift in Sources */,
 				72E262C52EC68E040080CF29 /* MuseChatView.swift in Sources */,
+				724C1B5C2EF3E62B0052D8AE /* SpeechRecognizer.swift in Sources */,
 				72E262D72EC68E040080CF29 /* ChatBoxView.swift in Sources */,
 				72E262C72EC68E040080CF29 /* ProgressView.swift in Sources */,
 				72E262D32EC68E040080CF29 /* StartAffirmationsView.swift in Sources */,
+				724C1B622EF3ED370052D8AE /* ImmersiveManifestView.swift in Sources */,
 				72E262D52EC68E040080CF29 /* ImmersiveAffirmationView.swift in Sources */,
 				72E262C92EC68E040080CF29 /* Quote.swift in Sources */,
+				724C1B5E2EF3E67B0052D8AE /* ManifestGenerationService.swift in Sources */,
 				72E262CB2EC68E040080CF29 /* Affirmation.swift in Sources */,
 				72E262DA2EC68E040080CF29 /* AffirmationSession.swift in Sources */,
 				72E262D12EC68E040080CF29 /* StorageService.swift in Sources */,
@@ -671,6 +689,7 @@
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Muse/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Muse;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -701,6 +720,7 @@
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Muse/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Muse;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

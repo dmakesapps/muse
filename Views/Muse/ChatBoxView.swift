@@ -13,7 +13,7 @@ struct ChatBoxView: View {
     @State private var isTyping: Bool = false
     @State private var borderRotation: Double = 0 // For animated rainbow border
     @FocusState private var isInputFocused: Bool
-    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    @StateObject private var speechRecognizer = SpeechRecognizer.shared
     
     var body: some View {
         ZStack {
@@ -21,6 +21,7 @@ struct ChatBoxView: View {
             Color.museDeepNavy.ignoresSafeArea()
             
             VStack(spacing: 0) {
+                // ... (Existing content remains unchanged, just adding modifiers at the end of the ZStack)
                 // Messages area
                 ScrollViewReader { proxy in
                     ScrollView {
@@ -130,7 +131,7 @@ struct ChatBoxView: View {
                     
                     // RIGHT ACCESSORY (Mic / Send)
                     ZStack(alignment: .bottom) {
-                        if !messageText.isEmpty {
+                        if !messageText.isEmpty && !speechRecognizer.isRecording {
                             Button(action: sendMessage) {
                                 Image(systemName: "arrow.up.circle.fill")
                                     .font(.system(size: 32)) 
@@ -141,13 +142,16 @@ struct ChatBoxView: View {
                             .transition(.scale.combined(with: .opacity))
                             .padding(.bottom, 6)
                         } else {
-                            Button(action: {}) {
-                                Image(systemName: "mic.fill")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(.museLightGray)
+                            Button(action: {
+                                speechRecognizer.toggleRecording()
+                            }) {
+                                Image(systemName: speechRecognizer.isRecording ? "stop.circle.fill" : "mic.fill")
+                                    .font(.system(size: speechRecognizer.isRecording ? 28 : 20))
+                                    .foregroundColor(speechRecognizer.isRecording ? .red : .museLightGray)
+                                    .symbolEffect(.pulse, isActive: speechRecognizer.isRecording) // iOS 17+
                             }
                             .transition(.opacity)
-                            .padding(.bottom, 10)
+                            .padding(.bottom, speechRecognizer.isRecording ? 8 : 10)
                         }
                     }
                     .frame(width: 44, height: 44, alignment: .bottom)
@@ -200,6 +204,16 @@ struct ChatBoxView: View {
                 }
             )
         }
+        .onChange(of: speechRecognizer.transcript) { _, newTranscript in
+            if speechRecognizer.isRecording && !newTranscript.isEmpty {
+                messageText = newTranscript
+            }
+        }
+        .onDisappear {
+            if speechRecognizer.isRecording {
+                speechRecognizer.stopRecording()
+            }
+        }
     }
     
     private func setQuickAction(_ text: String) {
@@ -224,8 +238,8 @@ struct ChatBoxView: View {
         messageText = ""
         isTyping = true
         
-        // Call Claude Service
-        ClaudeService.shared.sendMessage(history: messages) { result in
+        // Call OpenRouter Chat Service (Gemini)
+        OpenRouterChatService.shared.sendMessage(history: messages) { result in
             DispatchQueue.main.async {
                 isTyping = false
                 switch result {
@@ -241,7 +255,7 @@ struct ChatBoxView: View {
                     }
                     
                 case .failure(let error):
-                    print("Error calling Claude: \(error.localizedDescription)")
+                    print("Error calling OpenRouter: \(error.localizedDescription)")
                     let errorMessage = ChatMessage(
                         text: "I'm having trouble connecting right now. Please try again.",
                         isUser: false,
@@ -409,30 +423,27 @@ struct TypingIndicator: View {
     }
 }
 
-// MARK: - Claude Service Configuration
-/// Configuration for Anthropic's Claude API
-struct ClaudeConfig {
-    // Replace with your Claude API key
-    static let apiKey = "YOUR_CLAUDE_API_KEY_HERE"
+// MARK: - OpenRouter/Gemini Configuration
+struct OpenRouterConfig {
+    static let apiKey = "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"
     
-    /// Check if a valid API key is configured
     static var isConfigured: Bool {
-        !apiKey.isEmpty && apiKey != "YOUR_CLAUDE_API_KEY_HERE"
+        !apiKey.isEmpty
     }
 }
 
-// MARK: - Claude Service
-class ClaudeService: ObservableObject {
-    static let shared = ClaudeService()
+// MARK: - OpenRouter Chat Service (Gemini)
+class OpenRouterChatService: ObservableObject {
+    static let shared = OpenRouterChatService()
     
-    // Use the latest 3.5 Haiku model (cheapest and fastest)
-    private let model = "claude-3-5-haiku-20241022"
-    private let endpoint = "https://api.anthropic.com/v1/messages"
+    // Using Google Gemini 2.0 Flash via OpenRouter for high speed and low cost (currently free)
+    private let model = "google/gemini-2.0-flash-001"
+    private let endpoint = "https://openrouter.ai/api/v1/chat/completions"
     
     // System prompt defines the persona
     private let systemPrompt = """
-    You are Muse, a warm, empathetic, and highly intelligent AI therapist. 
-    Your goal is to help the user navigate their thoughts and feelings with compassion and insight. 
+    You are Muse, a warm, empathetic, and highly intelligent AI therapist/companion.
+    Your goal is to help the user navigate their thoughts and feelings with compassion and insight.
     
     Key traits:
     - Listen deeply and validate the user's feelings first.
@@ -446,39 +457,56 @@ class ClaudeService: ObservableObject {
     
     private init() {}
     
-    /// Send a message to Claude and get a response
+    /// Send a message to OpenRouter (Gemini) and get a response
     func sendMessage(history: [ChatMessage], completion: @escaping (Result<String, Error>) -> Void) {
-        guard ClaudeConfig.isConfigured else {
-            completion(.failure(NSError(domain: "ClaudeService", code: 401, userInfo: [NSLocalizedDescriptionKey: "API Key not configured"])))
+        guard OpenRouterConfig.isConfigured else {
+            completion(.failure(NSError(domain: "OpenRouterChatService", code: 401, userInfo: [NSLocalizedDescriptionKey: "API Key not configured"])))
             return
         }
         
         guard let url = URL(string: endpoint) else {
-            completion(.failure(NSError(domain: "ClaudeService", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
+            completion(.failure(NSError(domain: "OpenRouterChatService", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
             return
         }
         
-        // Convert chat history to Claude's format
-        let apiMessages = history.map { msg -> [String: Any] in
+        // Prepare messages array
+        var apiMessages: [[String: String]] = []
+        
+        // 1. Add System Prompt with Dynamic Date
+        let currentDate = Date().formatted(date: .long, time: .shortened)
+        let dynamicSystemPrompt = """
+        \(systemPrompt)
+        
+        Current Date and Time: \(currentDate)
+        """
+        
+        apiMessages.append(["role": "system", "content": dynamicSystemPrompt])
+        
+        // 2. Add History
+        let historyMessages = history.map { msg -> [String: String] in
             return [
                 "role": msg.isUser ? "user" : "assistant",
                 "content": msg.text
             ]
         }
+        apiMessages.append(contentsOf: historyMessages)
         
         // Construct the request body
         let body: [String: Any] = [
             "model": model,
+            "messages": apiMessages,
             "max_tokens": 1024,
-            "system": systemPrompt,
-            "messages": apiMessages
+            "temperature": 0.7
         ]
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue(ClaudeConfig.apiKey, forHTTPHeaderField: "x-api-key")
-        request.addValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
+        request.addValue("Bearer \(OpenRouterConfig.apiKey)", forHTTPHeaderField: "Authorization")
+        
+        // OpenRouter specific headers for ranking/stats
+        request.addValue("Muse", forHTTPHeaderField: "HTTP-Referer")
+        request.addValue("Muse App", forHTTPHeaderField: "X-Title")
         
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
@@ -487,7 +515,7 @@ class ClaudeService: ObservableObject {
             return
         }
         
-        print("🟣 Muse Chat: Sending request to Claude...")
+        print("🟣 Muse Chat: Sending request to OpenRouter (Gemini 2.0)...")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
@@ -497,7 +525,7 @@ class ClaudeService: ObservableObject {
             }
             
             guard let data = data else {
-                completion(.failure(NSError(domain: "ClaudeService", code: 500, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
+                completion(.failure(NSError(domain: "OpenRouterChatService", code: 500, userInfo: [NSLocalizedDescriptionKey: "No data received"])))
                 return
             }
             
@@ -507,22 +535,23 @@ class ClaudeService: ObservableObject {
                     print("🔴 Muse Chat API Error: \(errorJson)")
                 }
                 
-                completion(.failure(NSError(domain: "ClaudeService", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "API Error: \(httpResponse.statusCode)"])))
+                completion(.failure(NSError(domain: "OpenRouterChatService", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "API Error: \(httpResponse.statusCode)"])))
                 return
             }
             
             // Parse response
             do {
                 if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                   let contentArray = json["content"] as? [[String: Any]],
-                   let firstBlock = contentArray.first,
-                   let text = firstBlock["text"] as? String {
+                   let choices = json["choices"] as? [[String: Any]],
+                   let firstChoice = choices.first,
+                   let message = firstChoice["message"] as? [String: Any],
+                   let content = message["content"] as? String {
                     
                     print("🟣 Muse Chat response received")
-                    completion(.success(text))
+                    completion(.success(content.trimmingCharacters(in: .whitespacesAndNewlines)))
                 } else {
                     print("🔴 Muse Chat: Failed to parse response structure")
-                    completion(.failure(NSError(domain: "ClaudeService", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
+                    completion(.failure(NSError(domain: "OpenRouterChatService", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
                 }
             } catch {
                 completion(.failure(error))
