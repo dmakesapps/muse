@@ -10,7 +10,8 @@
 		724C1B5C2EF3E62B0052D8AE /* SpeechRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B5B2EF3E62B0052D8AE /* SpeechRecognizer.swift */; };
 		724C1B5E2EF3E67B0052D8AE /* ManifestGenerationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */; };
 		724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */; };
-		724C1B622EF3ED370052D8AE /* ImmersiveManifestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B612EF3ED370052D8AE /* ImmersiveManifestView.swift */; };
+		724C1B662EF4D9360052D8AE /* ImmersiveManifestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B652EF4D9360052D8AE /* ImmersiveManifestView.swift */; };
+		724C1B682EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B672EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 */; };
 		72996E1F2EF2353D00795B97 /* gongexhale.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72996E1E2EF2353C00795B97 /* gongexhale.mp3 */; };
 		72996E212EF2354500795B97 /* gonginhale.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72996E202EF2354500795B97 /* gonginhale.mp3 */; };
 		72996E232EF2354E00795B97 /* gonghold.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72996E222EF2354E00795B97 /* gonghold.mp3 */; };
@@ -93,7 +94,8 @@
 		724C1B5B2EF3E62B0052D8AE /* SpeechRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognizer.swift; sourceTree = "<group>"; };
 		724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestGenerationService.swift; sourceTree = "<group>"; };
 		724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = manifest_5min.m4a; sourceTree = "<group>"; };
-		724C1B612EF3ED370052D8AE /* ImmersiveManifestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveManifestView.swift; sourceTree = "<group>"; };
+		724C1B652EF4D9360052D8AE /* ImmersiveManifestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveManifestView.swift; sourceTree = "<group>"; };
+		724C1B672EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "soul-of-the-earth_10min.mp3"; sourceTree = "<group>"; };
 		72996E1E2EF2353C00795B97 /* gongexhale.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = gongexhale.mp3; sourceTree = "<group>"; };
 		72996E202EF2354500795B97 /* gonginhale.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = gonginhale.mp3; sourceTree = "<group>"; };
 		72996E222EF2354E00795B97 /* gonghold.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = gonghold.mp3; sourceTree = "<group>"; };
@@ -234,7 +236,7 @@
 		72E262932EC68E040080CF29 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				724C1B612EF3ED370052D8AE /* ImmersiveManifestView.swift */,
+				724C1B652EF4D9360052D8AE /* ImmersiveManifestView.swift */,
 				72E262902EC68E040080CF29 /* ContentView.swift */,
 				72E262DE2EC68E040080CF29 /* FeedView.swift */,
 				72E262A62EC68E040080CF29 /* Theme.swift */,
@@ -276,6 +278,7 @@
 			children = (
 				AAAA00022EC6F00000000002 /* quotes.json */,
 				AAAA00042EC6F00000000003 /* affirmations.json */,
+				724C1B672EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 */,
 				72B90C142EEF62E600A446A2 /* KrishnaCmaj.mp3 */,
 				AAAA00062EC6F00000000005 /* DJTAYEbackground.mp3 */,
 				72E73EBC2EF0BE9F009D3CDB /* forestbirds.mp3 */,
@@ -443,6 +446,7 @@
 			files = (
 				724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */,
 				72996E252EF23F6200795B97 /* bell321.mp3 in Resources */,
+				724C1B682EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 in Resources */,
 				72E262AA2EC68E040080CF29 /* Assets.xcassets in Resources */,
 				72996E212EF2354500795B97 /* gonginhale.mp3 in Resources */,
 				AAAA00032EC6F00000000002 /* quotes.json in Resources */,
@@ -498,7 +502,7 @@
 				72E262D72EC68E040080CF29 /* ChatBoxView.swift in Sources */,
 				72E262C72EC68E040080CF29 /* ProgressView.swift in Sources */,
 				72E262D32EC68E040080CF29 /* StartAffirmationsView.swift in Sources */,
-				724C1B622EF3ED370052D8AE /* ImmersiveManifestView.swift in Sources */,
+				724C1B662EF4D9360052D8AE /* ImmersiveManifestView.swift in Sources */,
 				72E262D52EC68E040080CF29 /* ImmersiveAffirmationView.swift in Sources */,
 				72E262C92EC68E040080CF29 /* Quote.swift in Sources */,
 				724C1B5E2EF3E67B0052D8AE /* ManifestGenerationService.swift in Sources */,
