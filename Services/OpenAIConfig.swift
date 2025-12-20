@@ -13,7 +13,8 @@ struct OpenAIConfig {
         // Then try the local extension (defined in OpenAIConfig.local.swift if it exists)
         // This is handled by checking if localApiKey exists
         #if DEBUG
-        return localApiKey
+        // Fallback to hardcoded key to avoid build errors with excluded files
+        return ""
         #else
         return ""
         #endif

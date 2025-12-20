@@ -55,6 +55,8 @@ class SpeechRecognizer: NSObject, ObservableObject {
         }
     }
     
+    private var silenceTimer: Timer?
+    
     func startRecording() {
         // Cancel any existing task
         if recognitionTask != nil {
@@ -62,9 +64,15 @@ class SpeechRecognizer: NSObject, ObservableObject {
             recognitionTask = nil
         }
         
+        // Reset timer
+        silenceTimer?.invalidate()
+        
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
+            // Use playAndRecord to allow simultaneous recording and playback (background music).
+            // .duckOthers reduced volume of background music while listening, which is nice for voice interaction.
+            // .defaultToSpeaker ensures output doesn't switch to the localized earpiece.
+            try audioSession.setCategory(.playAndRecord, mode: .measurement, options: [.duckOthers, .defaultToSpeaker, .allowBluetooth])
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
             self.error = "Audio session failed setup"
@@ -100,6 +108,9 @@ class SpeechRecognizer: NSObject, ObservableObject {
             if let result = result {
                 DispatchQueue.main.async {
                     self.transcript = result.bestTranscription.formattedString
+                    
+                    // Reset silence timer on every new result
+                    self.resetSilenceTimer()
                 }
                 isFinal = result.isFinal
             }
@@ -110,6 +121,7 @@ class SpeechRecognizer: NSObject, ObservableObject {
                 
                 self.recognitionRequest = nil
                 self.recognitionTask = nil
+                self.silenceTimer?.invalidate() // Stop timer
                 
                 DispatchQueue.main.async {
                     self.isRecording = false
@@ -126,7 +138,13 @@ class SpeechRecognizer: NSObject, ObservableObject {
         print("🎤 SpeechRecognizer: Started recording")
     }
     
-
+    private func resetSilenceTimer() {
+        silenceTimer?.invalidate()
+        silenceTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { [weak self] _ in
+            print("🤫 SpeechRecognizer: Silence detected, stopping recording...")
+            self?.stopRecording()
+        }
+    }
     
     private func engineStart() {
         audioEngine.prepare()
@@ -143,8 +161,8 @@ class SpeechRecognizer: NSObject, ObservableObject {
         isRecording = false
         print("🛑 SpeechRecognizer: Stopped recording")
         
-        // Reset audio session to playback
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-        try? AVAudioSession.sharedInstance().setActive(false)
+        // Reset audio session to playback with mixing to restore full volume to background music
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
     }
 }

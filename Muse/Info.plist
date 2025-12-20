@@ -6,5 +6,9 @@
 	<array>
 		<string>audio</string>
 	</array>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Muse needs access to your microphone to listen to your responses.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Muse needs speech recognition to understand your words.</string>
 </dict>
 </plist>

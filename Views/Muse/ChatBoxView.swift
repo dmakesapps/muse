@@ -1,10 +1,27 @@
 import SwiftUI
 
 struct ChatMessage: Identifiable {
-    let id = UUID()
+    let id: UUID
     let text: String
     let isUser: Bool
     let timestamp: Date
+    
+    init(id: UUID = UUID(), text: String, isUser: Bool, timestamp: Date = Date()) {
+        self.id = id
+        self.text = text
+        self.isUser = isUser
+        self.timestamp = timestamp
+    }
+    
+    /// Convert to storable format
+    func toStored() -> StoredChatMessage {
+        StoredChatMessage(id: id, text: text, isUser: isUser, timestamp: timestamp)
+    }
+    
+    /// Create from stored format
+    static func from(_ stored: StoredChatMessage) -> ChatMessage {
+        ChatMessage(id: stored.id, text: stored.text, isUser: stored.isUser, timestamp: stored.timestamp)
+    }
 }
 
 struct ChatBoxView: View {
@@ -14,6 +31,7 @@ struct ChatBoxView: View {
     @State private var borderRotation: Double = 0 // For animated rainbow border
     @FocusState private var isInputFocused: Bool
     @StateObject private var speechRecognizer = SpeechRecognizer.shared
+    @StateObject private var chatStorage = ChatStorageService.shared
     
     var body: some View {
         ZStack {
@@ -21,14 +39,15 @@ struct ChatBoxView: View {
             Color.museDeepNavy.ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // ... (Existing content remains unchanged, just adding modifiers at the end of the ZStack)
+                // Header (Hidden generally, but we can add a speaker toggle top right if needed, or in the input bar)
+                
                 // Messages area
                 ScrollViewReader { proxy in
                     ScrollView {
                         VStack(spacing: 24) {
                             if !messages.isEmpty {
-                                // Add generous top padding
-                                Spacer().frame(height: 20)
+                                // Add generous top padding to clear the journal button
+                                Spacer().frame(height: 60)
                                 
                                 ForEach(messages) { message in
                                     ChatBubble(message: message)
@@ -41,6 +60,7 @@ struct ChatBoxView: View {
                                         Spacer()
                                     }
                                     .padding(.leading, 20)
+                                    .id("typing")
                                 }
                             }
                         }
@@ -94,19 +114,9 @@ struct ChatBoxView: View {
                 // The Animated Container
                 HStack(alignment: .bottom, spacing: 0) {
                     
-                    // LEFT ACCESSORY (Plus Button)
-                    ZStack(alignment: .bottom) {
-                        Button(action: {}) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.museLightGray)
-                                .frame(width: 32, height: 32)
-                                .background(Color.museMediumGray.opacity(0.3))
-                                .clipShape(Circle())
-                        }
-                        .padding(.bottom, 6)
-                    }
-                    .frame(width: 44, height: 44, alignment: .bottom)
+                    // LEFT SPACER (for layout balance)
+                    Spacer()
+                        .frame(width: 44, height: 44)
                     
                     // CENTER: Input Text Area
                     ZStack(alignment: .leading) {
@@ -190,23 +200,17 @@ struct ChatBoxView: View {
             .animation(.spring(response: 0.5, dampingFraction: 0.7), value: isInputFocused)
             .animation(.spring(response: 0.5, dampingFraction: 0.7), value: messages.isEmpty)
             // Gradient background only when active/bottom
-            .background(
-                Group {
-                    if !messages.isEmpty || isInputFocused {
-                        LinearGradient(
-                            colors: [Color.museDeepNavy.opacity(0), Color.museDeepNavy],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                        .frame(height: 100)
-                        .ignoresSafeArea()
-                    }
-                }
-            )
+
         }
         .onChange(of: speechRecognizer.transcript) { _, newTranscript in
             if speechRecognizer.isRecording && !newTranscript.isEmpty {
                 messageText = newTranscript
+            }
+        }
+        .onChange(of: speechRecognizer.isRecording) { _, isRecording in
+            // Auto-send when recording stops and we have text
+            if !isRecording && !messageText.isEmpty {
+                sendMessage()
             }
         }
         .onDisappear {
@@ -214,7 +218,27 @@ struct ChatBoxView: View {
                 speechRecognizer.stopRecording()
             }
         }
+        .onAppear {
+            loadCurrentSession()
+        }
+        // Listen for session changes (e.g. "New Chat" from history)
+        .onChange(of: chatStorage.currentSession?.id) { _, _ in
+            loadCurrentSession()
+        }
     }
+    
+    private func loadCurrentSession() {
+        if let session = chatStorage.currentSession {
+            withAnimation {
+                messages = session.messages.map { ChatMessage.from($0) }
+            }
+        } else {
+            withAnimation {
+                messages = []
+            }
+        }
+    }
+
     
     private func setQuickAction(_ text: String) {
         messageText = text
@@ -234,12 +258,15 @@ struct ChatBoxView: View {
             messages.append(userMessage)
         }
         
+        // Save user message to storage
+        chatStorage.addMessage(userMessage.toStored())
+        
         // Clear input
         messageText = ""
         isTyping = true
         
-        // Call OpenRouter Chat Service (Gemini)
-        OpenRouterChatService.shared.sendMessage(history: messages) { result in
+        // Call OpenRouter Chat Service (Gemini) with context from past conversations
+        OpenRouterChatService.shared.sendMessage(history: messages, pastContext: chatStorage.getContextForAI()) { result in
             DispatchQueue.main.async {
                 isTyping = false
                 switch result {
@@ -254,16 +281,31 @@ struct ChatBoxView: View {
                         messages.append(aiMessage)
                     }
                     
+                    // Save AI message to storage
+                    chatStorage.addMessage(aiMessage.toStored())
+                    
                 case .failure(let error):
                     print("Error calling OpenRouter: \(error.localizedDescription)")
+                    
+                    var errorText = "I'm having trouble connecting right now."
+                    // Provide more specific feedback for common errors
+                    if error.localizedDescription.contains("401") || error.localizedDescription.contains("User not found") {
+                        errorText += "\n(Error: Invalid API Key - User not found)"
+                    } else if error.localizedDescription.contains("429") {
+                        errorText += "\n(Error: Model is currently busy/rate-limited. Please try again in a moment.)"
+                    } else {
+                        errorText += "\n(\(error.localizedDescription))"
+                    }
+                    
                     let errorMessage = ChatMessage(
-                        text: "I'm having trouble connecting right now. Please try again.",
+                        text: errorText,
                         isUser: false,
                         timestamp: Date()
                     )
                     withAnimation {
                         messages.append(errorMessage)
                     }
+                    // Note: We intentionally don't save error messages to storage
                 }
             }
         }
@@ -425,7 +467,7 @@ struct TypingIndicator: View {
 
 // MARK: - OpenRouter/Gemini Configuration
 struct OpenRouterConfig {
-    static let apiKey = "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"
+    static let apiKey = "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"
     
     static var isConfigured: Bool {
         !apiKey.isEmpty
@@ -436,7 +478,7 @@ struct OpenRouterConfig {
 class OpenRouterChatService: ObservableObject {
     static let shared = OpenRouterChatService()
     
-    // Using Google Gemini 2.0 Flash via OpenRouter for high speed and low cost (currently free)
+    // Using Google Gemini 2.0 Flash (001) as requested
     private let model = "google/gemini-2.0-flash-001"
     private let endpoint = "https://openrouter.ai/api/v1/chat/completions"
     
@@ -458,7 +500,11 @@ class OpenRouterChatService: ObservableObject {
     private init() {}
     
     /// Send a message to OpenRouter (Gemini) and get a response
-    func sendMessage(history: [ChatMessage], completion: @escaping (Result<String, Error>) -> Void) {
+    /// - Parameters:
+    ///   - history: Current conversation history
+    ///   - pastContext: Optional context from previous conversations for memory
+    ///   - completion: Callback with the result
+    func sendMessage(history: [ChatMessage], pastContext: String = "", completion: @escaping (Result<String, Error>) -> Void) {
         guard OpenRouterConfig.isConfigured else {
             completion(.failure(NSError(domain: "OpenRouterChatService", code: 401, userInfo: [NSLocalizedDescriptionKey: "API Key not configured"])))
             return
@@ -469,34 +515,90 @@ class OpenRouterChatService: ObservableObject {
             return
         }
         
-        // Prepare messages array
-        var apiMessages: [[String: String]] = []
-        
-        // 1. Add System Prompt with Dynamic Date
+        // 1. Build Dynamic System Prompt with past context
         let currentDate = Date().formatted(date: .long, time: .shortened)
-        let dynamicSystemPrompt = """
+        var dynamicSystemPrompt = """
         \(systemPrompt)
         
         Current Date and Time: \(currentDate)
         """
         
-        apiMessages.append(["role": "system", "content": dynamicSystemPrompt])
-        
-        // 2. Add History
-        let historyMessages = history.map { msg -> [String: String] in
-            return [
-                "role": msg.isUser ? "user" : "assistant",
-                "content": msg.text
-            ]
+        // Add past conversation context if available
+        if !pastContext.isEmpty {
+            dynamicSystemPrompt += """
+            
+            
+            \(pastContext)
+            
+            Use the above memories to provide more personalized and contextual support. Reference past conversations naturally when relevant.
+            """
         }
-        apiMessages.append(contentsOf: historyMessages)
+        
+        // 2. Flatten History & Sanitize
+        // Strategy: Prepend System Prompt to the VERY FIRST User message to guarantee compatibility.
+        // Some providers/models fail with "system" roles or consecutive user messages.
+        
+        var apiMessages: [[String: String]] = []
+        
+        var effectiveHistory = history
+        
+        // Setup initial content with system prompt
+        let initialContent = """
+        SYSTEM INSTRUCTION:
+        \(dynamicSystemPrompt)
+        
+        USER MESSAGE:
+        """
+        
+        // If history is empty, create a dummy user message to hold the system prompt (though usually not empty)
+        if effectiveHistory.isEmpty {
+           apiMessages.append(["role": "user", "content": initialContent])
+        } else {
+            // Prepend system prompt to the first message if it's a user message
+            if var firstMsg = effectiveHistory.first, firstMsg.isUser {
+                let combinedText = initialContent + "\n" + firstMsg.text
+                // We construct a new dict for the API
+                apiMessages.append(["role": "user", "content": combinedText])
+                // Skip the first one in loop
+                effectiveHistory.removeFirst()
+            } else {
+                // First message is assistant? Unusual but possible. Just add system as user message before it.
+                apiMessages.append(["role": "user", "content": initialContent])
+            }
+            
+            // Append the rest
+            for msg in effectiveHistory {
+                apiMessages.append([
+                    "role": msg.isUser ? "user" : "assistant",
+                    "content": msg.text
+                ])
+            }
+        }
+        
+        // 3. Final Sanitize: Merge consecutive same-role messages
+        if !apiMessages.isEmpty {
+            var sanitized: [[String: String]] = []
+            var currentMsg = apiMessages[0]
+            
+            for i in 1..<apiMessages.count {
+                let nextMsg = apiMessages[i]
+                if currentMsg["role"] == nextMsg["role"] {
+                    // Merge content
+                    let newContent = (currentMsg["content"] ?? "") + "\n\n" + (nextMsg["content"] ?? "")
+                    currentMsg["content"] = newContent
+                } else {
+                    sanitized.append(currentMsg)
+                    currentMsg = nextMsg
+                }
+            }
+            sanitized.append(currentMsg)
+            apiMessages = sanitized
+        }
         
         // Construct the request body
         let body: [String: Any] = [
             "model": model,
-            "messages": apiMessages,
-            "max_tokens": 1024,
-            "temperature": 0.7
+            "messages": apiMessages
         ]
         
         var request = URLRequest(url: url)
@@ -508,14 +610,19 @@ class OpenRouterChatService: ObservableObject {
         request.addValue("Muse", forHTTPHeaderField: "HTTP-Referer")
         request.addValue("Muse App", forHTTPHeaderField: "X-Title")
         
+        print("🟣 Muse Chat: Sending request to \(model)...")
+        
+        // CRITICAL: Set the request body! (This was missing before)
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
+            if let bodyString = String(data: request.httpBody!, encoding: .utf8) {
+                print("📝 Request Body: \(bodyString)")
+            }
         } catch {
+            print("🔴 Failed to serialize request body: \(error)")
             completion(.failure(error))
             return
         }
-        
-        print("🟣 Muse Chat: Sending request to OpenRouter (Gemini 2.0)...")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
@@ -529,13 +636,33 @@ class OpenRouterChatService: ObservableObject {
                 return
             }
             
+            // Log raw response for debugging
+            if let rawString = String(data: data, encoding: .utf8) {
+                print("🟣 Raw Response: \(rawString)")
+            }
+            
             // Check for HTTP errors
             if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
-                if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                    print("🔴 Muse Chat API Error: \(errorJson)")
+                // Try to parse error body for better description
+                var errorDescription = "API Error: \(httpResponse.statusCode)"
+                
+                // Attempt to parse JSON error first
+                if let errorJson = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let errorObj = errorJson["error"] as? [String: Any],
+                   let message = errorObj["message"] as? String {
+                    errorDescription += " - \(message)"
+                } else {
+                    // Fallback to raw string if JSON parsing fails (avoids "JSON parsing failed" error)
+                    if let rawString = String(data: data, encoding: .utf8), !rawString.isEmpty {
+                         // Truncate to avoid huge HTML dumps
+                         let truncated = String(rawString.prefix(200))
+                         errorDescription += " (Raw: \(truncated))"
+                    } else {
+                         errorDescription += " (Unknown error body)"
+                    }
                 }
                 
-                completion(.failure(NSError(domain: "OpenRouterChatService", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "API Error: \(httpResponse.statusCode)"])))
+                completion(.failure(NSError(domain: "OpenRouterChatService", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: errorDescription])))
                 return
             }
             
@@ -551,10 +678,14 @@ class OpenRouterChatService: ObservableObject {
                     completion(.success(content.trimmingCharacters(in: .whitespacesAndNewlines)))
                 } else {
                     print("🔴 Muse Chat: Failed to parse response structure")
+                     if let rawString = String(data: data, encoding: .utf8) {
+                        print("Raw Data was: \(rawString)")
+                     }
                     completion(.failure(NSError(domain: "OpenRouterChatService", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
                 }
             } catch {
-                completion(.failure(error))
+                print("JSON Parse Error: \(error)")
+                completion(.failure(error)) // Use the actual serialization error
             }
         }.resume()
     }

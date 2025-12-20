@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		72305A042EF7122F003A8399 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72305A032EF7122F003A8399 /* JournalView.swift */; };
+		72305A062EF717AB003A8399 /* ChatStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72305A052EF717AB003A8399 /* ChatStorageService.swift */; };
+		72305A082EF717BA003A8399 /* ChatHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72305A072EF717BA003A8399 /* ChatHistoryView.swift */; };
 		724C1B5C2EF3E62B0052D8AE /* SpeechRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B5B2EF3E62B0052D8AE /* SpeechRecognizer.swift */; };
 		724C1B5E2EF3E67B0052D8AE /* ManifestGenerationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */; };
 		724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */; };
@@ -90,6 +93,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		72305A032EF7122F003A8399 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
+		72305A052EF717AB003A8399 /* ChatStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStorageService.swift; sourceTree = "<group>"; };
+		72305A072EF717BA003A8399 /* ChatHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryView.swift; sourceTree = "<group>"; };
 		724C1B5A2EF3BF150052D8AE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		724C1B5B2EF3E62B0052D8AE /* SpeechRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognizer.swift; sourceTree = "<group>"; };
 		724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestGenerationService.swift; sourceTree = "<group>"; };
@@ -222,6 +228,7 @@
 		72E2628C2EC68E040080CF29 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				72305A052EF717AB003A8399 /* ChatStorageService.swift */,
 				724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */,
 				724C1B5B2EF3E62B0052D8AE /* SpeechRecognizer.swift */,
 				72E262D02EC68E040080CF29 /* StorageService.swift */,
@@ -236,6 +243,8 @@
 		72E262932EC68E040080CF29 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				72305A072EF717BA003A8399 /* ChatHistoryView.swift */,
+				72305A032EF7122F003A8399 /* JournalView.swift */,
 				724C1B652EF4D9360052D8AE /* ImmersiveManifestView.swift */,
 				72E262902EC68E040080CF29 /* ContentView.swift */,
 				72E262DE2EC68E040080CF29 /* FeedView.swift */,
@@ -499,6 +508,7 @@
 				72E262A52EC68E040080CF29 /* Theme.swift in Sources */,
 				72E262C52EC68E040080CF29 /* MuseChatView.swift in Sources */,
 				724C1B5C2EF3E62B0052D8AE /* SpeechRecognizer.swift in Sources */,
+				72305A082EF717BA003A8399 /* ChatHistoryView.swift in Sources */,
 				72E262D72EC68E040080CF29 /* ChatBoxView.swift in Sources */,
 				72E262C72EC68E040080CF29 /* ProgressView.swift in Sources */,
 				72E262D32EC68E040080CF29 /* StartAffirmationsView.swift in Sources */,
@@ -508,9 +518,11 @@
 				724C1B5E2EF3E67B0052D8AE /* ManifestGenerationService.swift in Sources */,
 				72E262CB2EC68E040080CF29 /* Affirmation.swift in Sources */,
 				72E262DA2EC68E040080CF29 /* AffirmationSession.swift in Sources */,
+				72305A062EF717AB003A8399 /* ChatStorageService.swift in Sources */,
 				72E262D12EC68E040080CF29 /* StorageService.swift in Sources */,
 				72E262DC2EC68E040080CF29 /* ProgressService.swift in Sources */,
 				AAAA00012EC6F00000000001 /* ContentLoader.swift in Sources */,
+				72305A042EF7122F003A8399 /* JournalView.swift in Sources */,
 				CCCC00012EEE500000000001 /* SpeechService.swift in Sources */,
 				CCCC00032EEE500000000002 /* OpenAIConfig.swift in Sources */,
 			);
