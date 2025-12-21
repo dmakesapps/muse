@@ -467,7 +467,14 @@ struct TypingIndicator: View {
 
 // MARK: - OpenRouter/Gemini Configuration
 struct OpenRouterConfig {
-    static let apiKey = "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"
+    static var apiKey: String {
+        #if canImport(LocalSecrets)
+        return LocalSecrets.openRouterKey
+        #else
+        // Fallback - you need to create Services/LocalSecrets.swift
+        return ""
+        #endif
+    }
     
     static var isConfigured: Bool {
         !apiKey.isEmpty

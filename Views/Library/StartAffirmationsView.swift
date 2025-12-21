@@ -556,10 +556,12 @@ struct StartAffirmationsView: View {
     @State private var allAffirmations: [Affirmation] = []
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     @State private var showManifestView = false
+    @State private var activeFrequency: FrequencyItem? = nil // For frequencies immersive view
     
     enum PracticeMode: String, CaseIterable {
         case affirmations = "Affirmations"
         case breathwork = "Breathwork"
+        case frequencies = "Frequencies"
     }
 
     
@@ -671,6 +673,10 @@ struct StartAffirmationsView: View {
                         else if selectedMode == .breathwork {
                             breathworkSelectionView
                         }
+                        // Frequencies Flow
+                        else if selectedMode == .frequencies {
+                            frequenciesSelectionView
+                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 100)
@@ -730,6 +736,12 @@ struct StartAffirmationsView: View {
         .fullScreenCover(isPresented: $showManifestView) {
             ImmersiveManifestView()
         }
+        .fullScreenCover(item: $activeFrequency) { frequency in
+            ImmersiveFrequenciesView(
+                frequency: frequency,
+                onComplete: { activeFrequency = nil }
+            )
+        }
     }
     
     private var headerTitle: String {
@@ -737,6 +749,8 @@ struct StartAffirmationsView: View {
             return "Practice"
         } else if selectedMode == .affirmations {
             return "Affirmations"
+        } else if selectedMode == .frequencies {
+            return "Frequencies"
         } else {
             return "Breathwork"
         }
@@ -780,6 +794,19 @@ struct StartAffirmationsView: View {
                 ) {
                     withAnimation(.spring(response: 0.3)) {
                         selectedMode = .breathwork
+                    }
+                }
+                
+                // Frequencies Button
+                PracticeModeButton(
+                    title: "Frequencies",
+                    subtitle: "Healing sound vibrations",
+                    icon: "waveform.path",
+                    color: Color(red: 0.6, green: 0.4, blue: 0.8),
+                    isDisabled: false
+                ) {
+                    withAnimation(.spring(response: 0.3)) {
+                        selectedMode = .frequencies
                     }
                 }
                 
@@ -913,6 +940,56 @@ struct StartAffirmationsView: View {
                         color: .orange
                     ) {
                         activeBreathworkPattern = .energizing
+                    }
+                }
+                .padding(.top, 20)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 20)
+        }
+    }
+    
+    // MARK: - Frequencies Selection View
+    private var frequenciesSelectionView: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            // Back button
+            Button(action: {
+                withAnimation(.spring(response: 0.3)) {
+                    selectedMode = nil
+                }
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 14, weight: .semibold))
+                    Text("Back")
+                        .font(.museBodyMedium())
+                }
+                .foregroundColor(.museAccentBlue)
+            }
+            
+            VStack(spacing: 16) {
+                Image(systemName: "waveform.path")
+                    .font(.system(size: 48))
+                    .foregroundColor(Color(red: 0.6, green: 0.4, blue: 0.8))
+                
+                Text("Frequencies")
+                    .font(.museHeadline())
+                    .foregroundColor(.museSoftWhite)
+                
+                Text("Healing sound vibrations to balance mind and body. Choose a frequency to begin your session.")
+                    .font(.museBodyMedium())
+                    .foregroundColor(.museLightGray)
+                    .multilineTextAlignment(.center)
+                
+                // Frequency options
+                VStack(spacing: 12) {
+                    ForEach(FrequencyItem.allFrequencies) { frequency in
+                        FrequencyButton(
+                            frequency: frequency,
+                            action: {
+                                activeFrequency = frequency
+                            }
+                        )
                     }
                 }
                 .padding(.top, 20)
@@ -1638,6 +1715,60 @@ struct BreathworkPatternButton: View {
         .contentShape(Rectangle()) // Ensure entire area is clickable
         .onTapGesture(perform: action)
         .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+// MARK: - Frequency Button
+struct FrequencyButton: View {
+    let frequency: FrequencyItem
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                // Icon with colored background
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(frequency.color.opacity(0.2))
+                    
+                    Image(systemName: frequency.icon)
+                        .font(.system(size: 22))
+                        .foregroundColor(frequency.color)
+                }
+                .frame(width: 50, height: 50)
+                
+                // Text content
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(frequency.name)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.museSoftWhite)
+                    
+                    Text(frequency.subtitle)
+                        .font(.system(size: 12))
+                        .foregroundColor(.museLightGray)
+                        .lineLimit(2)
+                }
+                
+                Spacer()
+                
+                // Chevron
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.museLightGray)
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color.white.opacity(0.08))
+                    .background(
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(.thinMaterial)
+                            .opacity(0.5)
+                    )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 

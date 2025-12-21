@@ -15,6 +15,15 @@
 		724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */; };
 		724C1B662EF4D9360052D8AE /* ImmersiveManifestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B652EF4D9360052D8AE /* ImmersiveManifestView.swift */; };
 		724C1B682EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B672EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 */; };
+		726A39512EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394C2EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 */; };
+		726A39522EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A39492EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 */; };
+		726A39532EF795AA00BF8F8E /* 741hz-throat-chakra-balancing-fostering-honest-expressions-157686.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394F2EF795AA00BF8F8E /* 741hz-throat-chakra-balancing-fostering-honest-expressions-157686.mp3 */; };
+		726A39542EF795AA00BF8F8E /* 174-hz-pain-release.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A39482EF795AA00BF8F8E /* 174-hz-pain-release.mp3 */; };
+		726A39552EF795AA00BF8F8E /* 417-hz-sacral-chakra-156264.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394B2EF795AA00BF8F8E /* 417-hz-sacral-chakra-156264.mp3 */; };
+		726A39562EF795AA00BF8F8E /* 639-hz-heart-chakra-156267.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394E2EF795AA00BF8F8E /* 639-hz-heart-chakra-156267.mp3 */; };
+		726A39572EF795AA00BF8F8E /* 852hz-third-eye-awakening-unleashing-intuition-clairvoyance-157687.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A39502EF795AA00BF8F8E /* 852hz-third-eye-awakening-unleashing-intuition-clairvoyance-157687.mp3 */; };
+		726A39582EF795AA00BF8F8E /* 396-hz-root-chakra-156263.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394A2EF795AA00BF8F8E /* 396-hz-root-chakra-156263.mp3 */; };
+		726A39592EF795AA00BF8F8E /* 528-hz-solar-plexus-156266.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394D2EF795AA00BF8F8E /* 528-hz-solar-plexus-156266.mp3 */; };
 		72996E1F2EF2353D00795B97 /* gongexhale.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72996E1E2EF2353C00795B97 /* gongexhale.mp3 */; };
 		72996E212EF2354500795B97 /* gonginhale.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72996E202EF2354500795B97 /* gonginhale.mp3 */; };
 		72996E232EF2354E00795B97 /* gonghold.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72996E222EF2354E00795B97 /* gonghold.mp3 */; };
@@ -52,6 +61,9 @@
 		BBBB00092EC7000000000005 /* MuseWidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BBBB00082EC7000000000005 /* MuseWidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CCCC00012EEE500000000001 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCC00002EEE500000000001 /* SpeechService.swift */; };
 		CCCC00032EEE500000000002 /* OpenAIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCC00022EEE500000000002 /* OpenAIConfig.swift */; };
+		DDDD00012EF6000000000001 /* FrequencyItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD00002EF6000000000001 /* FrequencyItem.swift */; };
+		DDDD00032EF6000000000002 /* ImmersiveFrequenciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */; };
+		EEEE00012EF7000000000001 /* LocalSecrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE00002EF7000000000001 /* LocalSecrets.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,6 +114,15 @@
 		724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = manifest_5min.m4a; sourceTree = "<group>"; };
 		724C1B652EF4D9360052D8AE /* ImmersiveManifestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveManifestView.swift; sourceTree = "<group>"; };
 		724C1B672EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "soul-of-the-earth_10min.mp3"; sourceTree = "<group>"; };
+		726A39482EF795AA00BF8F8E /* 174-hz-pain-release.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "174-hz-pain-release.mp3"; sourceTree = "<group>"; };
+		726A39492EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "285-hz-tissue-and-organ-healing-156262.mp3"; sourceTree = "<group>"; };
+		726A394A2EF795AA00BF8F8E /* 396-hz-root-chakra-156263.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "396-hz-root-chakra-156263.mp3"; sourceTree = "<group>"; };
+		726A394B2EF795AA00BF8F8E /* 417-hz-sacral-chakra-156264.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "417-hz-sacral-chakra-156264.mp3"; sourceTree = "<group>"; };
+		726A394C2EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "432-hz-tune-in-with-nature-156265.mp3"; sourceTree = "<group>"; };
+		726A394D2EF795AA00BF8F8E /* 528-hz-solar-plexus-156266.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "528-hz-solar-plexus-156266.mp3"; sourceTree = "<group>"; };
+		726A394E2EF795AA00BF8F8E /* 639-hz-heart-chakra-156267.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "639-hz-heart-chakra-156267.mp3"; sourceTree = "<group>"; };
+		726A394F2EF795AA00BF8F8E /* 741hz-throat-chakra-balancing-fostering-honest-expressions-157686.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "741hz-throat-chakra-balancing-fostering-honest-expressions-157686.mp3"; sourceTree = "<group>"; };
+		726A39502EF795AA00BF8F8E /* 852hz-third-eye-awakening-unleashing-intuition-clairvoyance-157687.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "852hz-third-eye-awakening-unleashing-intuition-clairvoyance-157687.mp3"; sourceTree = "<group>"; };
 		72996E1E2EF2353C00795B97 /* gongexhale.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = gongexhale.mp3; sourceTree = "<group>"; };
 		72996E202EF2354500795B97 /* gonginhale.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = gonginhale.mp3; sourceTree = "<group>"; };
 		72996E222EF2354E00795B97 /* gonghold.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = gonghold.mp3; sourceTree = "<group>"; };
@@ -145,6 +166,9 @@
 		BBBB000E2EC700000000000A /* MuseWidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MuseWidgetsExtension.entitlements; sourceTree = "<group>"; };
 		CCCC00002EEE500000000001 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 		CCCC00022EEE500000000002 /* OpenAIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIConfig.swift; sourceTree = "<group>"; };
+		DDDD00002EF6000000000001 /* FrequencyItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequencyItem.swift; sourceTree = "<group>"; };
+		DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveFrequenciesView.swift; sourceTree = "<group>"; };
+		EEEE00002EF7000000000001 /* LocalSecrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSecrets.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -221,6 +245,7 @@
 				72E262C82EC68E040080CF29 /* Quote.swift */,
 				72E262CA2EC68E040080CF29 /* Affirmation.swift */,
 				72E262DB2EC68E040080CF29 /* AffirmationSession.swift */,
+				DDDD00002EF6000000000001 /* FrequencyItem.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -236,6 +261,7 @@
 				AAAA00002EC6F00000000001 /* ContentLoader.swift */,
 				CCCC00002EEE500000000001 /* SpeechService.swift */,
 				CCCC00022EEE500000000002 /* OpenAIConfig.swift */,
+				EEEE00002EF7000000000001 /* LocalSecrets.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -261,6 +287,7 @@
 			children = (
 				72E262D22EC68E040080CF29 /* StartAffirmationsView.swift */,
 				72E262D42EC68E040080CF29 /* ImmersiveAffirmationView.swift */,
+				DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -285,6 +312,15 @@
 		AAAA00062EC6F00000000004 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				726A39482EF795AA00BF8F8E /* 174-hz-pain-release.mp3 */,
+				726A39492EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 */,
+				726A394A2EF795AA00BF8F8E /* 396-hz-root-chakra-156263.mp3 */,
+				726A394B2EF795AA00BF8F8E /* 417-hz-sacral-chakra-156264.mp3 */,
+				726A394C2EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 */,
+				726A394D2EF795AA00BF8F8E /* 528-hz-solar-plexus-156266.mp3 */,
+				726A394E2EF795AA00BF8F8E /* 639-hz-heart-chakra-156267.mp3 */,
+				726A394F2EF795AA00BF8F8E /* 741hz-throat-chakra-balancing-fostering-honest-expressions-157686.mp3 */,
+				726A39502EF795AA00BF8F8E /* 852hz-third-eye-awakening-unleashing-intuition-clairvoyance-157687.mp3 */,
 				AAAA00022EC6F00000000002 /* quotes.json */,
 				AAAA00042EC6F00000000003 /* affirmations.json */,
 				724C1B672EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 */,
@@ -467,6 +503,15 @@
 				72996E232EF2354E00795B97 /* gonghold.mp3 in Resources */,
 				72E73EC02EF0BE9F009D3CDB /* rain.mp3 in Resources */,
 				72E73EC12EF0BE9F009D3CDB /* river.mp3 in Resources */,
+				726A39512EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 in Resources */,
+				726A39522EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 in Resources */,
+				726A39532EF795AA00BF8F8E /* 741hz-throat-chakra-balancing-fostering-honest-expressions-157686.mp3 in Resources */,
+				726A39542EF795AA00BF8F8E /* 174-hz-pain-release.mp3 in Resources */,
+				726A39552EF795AA00BF8F8E /* 417-hz-sacral-chakra-156264.mp3 in Resources */,
+				726A39562EF795AA00BF8F8E /* 639-hz-heart-chakra-156267.mp3 in Resources */,
+				726A39572EF795AA00BF8F8E /* 852hz-third-eye-awakening-unleashing-intuition-clairvoyance-157687.mp3 in Resources */,
+				726A39582EF795AA00BF8F8E /* 396-hz-root-chakra-156263.mp3 in Resources */,
+				726A39592EF795AA00BF8F8E /* 528-hz-solar-plexus-156266.mp3 in Resources */,
 				72B90C192EEFCDCA00A446A2 /* backgroundjungle2.jpg in Resources */,
 				72E73EBA2EF0B8FE009D3CDB /* Gradient2.jpg in Resources */,
 				72E73EBB2EF0B8FE009D3CDB /* Gradient1.jpg in Resources */,
@@ -525,6 +570,9 @@
 				72305A042EF7122F003A8399 /* JournalView.swift in Sources */,
 				CCCC00012EEE500000000001 /* SpeechService.swift in Sources */,
 				CCCC00032EEE500000000002 /* OpenAIConfig.swift in Sources */,
+				DDDD00012EF6000000000001 /* FrequencyItem.swift in Sources */,
+				DDDD00032EF6000000000002 /* ImmersiveFrequenciesView.swift in Sources */,
+				EEEE00012EF7000000000001 /* LocalSecrets.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
