@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		720DF7282EF88AAF00EB49D2 /* APIKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720DF7272EF88AAF00EB49D2 /* APIKeys.swift */; };
+		720DF72A2EF88DF800EB49D2 /* AIAffirmationsChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720DF7292EF88DF800EB49D2 /* AIAffirmationsChatView.swift */; };
 		72305A042EF7122F003A8399 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72305A032EF7122F003A8399 /* JournalView.swift */; };
 		72305A062EF717AB003A8399 /* ChatStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72305A052EF717AB003A8399 /* ChatStorageService.swift */; };
 		72305A082EF717BA003A8399 /* ChatHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72305A072EF717BA003A8399 /* ChatHistoryView.swift */; };
@@ -105,6 +107,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		720DF7272EF88AAF00EB49D2 /* APIKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKeys.swift; sourceTree = "<group>"; };
+		720DF7292EF88DF800EB49D2 /* AIAffirmationsChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAffirmationsChatView.swift; sourceTree = "<group>"; };
 		72305A032EF7122F003A8399 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
 		72305A052EF717AB003A8399 /* ChatStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStorageService.swift; sourceTree = "<group>"; };
 		72305A072EF717BA003A8399 /* ChatHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryView.swift; sourceTree = "<group>"; };
@@ -253,6 +257,7 @@
 		72E2628C2EC68E040080CF29 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				720DF7272EF88AAF00EB49D2 /* APIKeys.swift */,
 				72305A052EF717AB003A8399 /* ChatStorageService.swift */,
 				724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */,
 				724C1B5B2EF3E62B0052D8AE /* SpeechRecognizer.swift */,
@@ -285,6 +290,7 @@
 		72E262F02EC68E040080CF29 /* Library */ = {
 			isa = PBXGroup;
 			children = (
+				720DF7292EF88DF800EB49D2 /* AIAffirmationsChatView.swift */,
 				72E262D22EC68E040080CF29 /* StartAffirmationsView.swift */,
 				72E262D42EC68E040080CF29 /* ImmersiveAffirmationView.swift */,
 				DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */,
@@ -559,12 +565,14 @@
 				72E262D32EC68E040080CF29 /* StartAffirmationsView.swift in Sources */,
 				724C1B662EF4D9360052D8AE /* ImmersiveManifestView.swift in Sources */,
 				72E262D52EC68E040080CF29 /* ImmersiveAffirmationView.swift in Sources */,
+				720DF7282EF88AAF00EB49D2 /* APIKeys.swift in Sources */,
 				72E262C92EC68E040080CF29 /* Quote.swift in Sources */,
 				724C1B5E2EF3E67B0052D8AE /* ManifestGenerationService.swift in Sources */,
 				72E262CB2EC68E040080CF29 /* Affirmation.swift in Sources */,
 				72E262DA2EC68E040080CF29 /* AffirmationSession.swift in Sources */,
 				72305A062EF717AB003A8399 /* ChatStorageService.swift in Sources */,
 				72E262D12EC68E040080CF29 /* StorageService.swift in Sources */,
+				720DF72A2EF88DF800EB49D2 /* AIAffirmationsChatView.swift in Sources */,
 				72E262DC2EC68E040080CF29 /* ProgressService.swift in Sources */,
 				AAAA00012EC6F00000000001 /* ContentLoader.swift in Sources */,
 				72305A042EF7122F003A8399 /* JournalView.swift in Sources */,

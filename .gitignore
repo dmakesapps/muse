@@ -1,3 +1,4 @@
 # API Keys - NEVER commit these
 Services/OpenAIConfig.local.swift
 Services/LocalSecrets.swift
+Services/APIKeys.swift

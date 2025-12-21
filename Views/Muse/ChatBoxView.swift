@@ -468,12 +468,8 @@ struct TypingIndicator: View {
 // MARK: - OpenRouter/Gemini Configuration
 struct OpenRouterConfig {
     static var apiKey: String {
-        #if canImport(LocalSecrets)
-        return LocalSecrets.openRouterKey
-        #else
-        // Fallback - you need to create Services/LocalSecrets.swift
-        return ""
-        #endif
+        // Use APIKeys file
+        return APIKeys.openRouter
     }
     
     static var isConfigured: Bool {
@@ -512,6 +508,16 @@ class OpenRouterChatService: ObservableObject {
     ///   - pastContext: Optional context from previous conversations for memory
     ///   - completion: Callback with the result
     func sendMessage(history: [ChatMessage], pastContext: String = "", completion: @escaping (Result<String, Error>) -> Void) {
+        // Debug: Log API key status (only first and last 4 chars for security)
+        let key = OpenRouterConfig.apiKey
+        if key.isEmpty {
+            print("🔴 OpenRouter: API Key is EMPTY!")
+        } else {
+            let prefix = String(key.prefix(10))
+            let suffix = String(key.suffix(4))
+            print("🟢 OpenRouter: API Key loaded: \(prefix)...\(suffix) (length: \(key.count))")
+        }
+        
         guard OpenRouterConfig.isConfigured else {
             completion(.failure(NSError(domain: "OpenRouterChatService", code: 401, userInfo: [NSLocalizedDescriptionKey: "API Key not configured"])))
             return

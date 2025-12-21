@@ -557,6 +557,7 @@ struct StartAffirmationsView: View {
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     @State private var showManifestView = false
     @State private var activeFrequency: FrequencyItem? = nil // For frequencies immersive view
+    @State private var showAIChat = false // For AI-generated affirmations chat
     
     enum PracticeMode: String, CaseIterable {
         case affirmations = "Affirmations"
@@ -589,10 +590,14 @@ struct StartAffirmationsView: View {
     
     // Get the current affirmation pool based on selected source
     private var currentAffirmationPool: [Affirmation] {
-        if selectedSource == .library {
+        switch selectedSource {
+        case .library:
             return allAffirmations
+        case .aiGenerated:
+            return storage.aiGeneratedAffirmations
+        case .favorites, .none:
+            return storage.savedAffirmations
         }
-        return storage.savedAffirmations
     }
     
     // Get unique categories from current affirmation pool
@@ -1062,13 +1067,15 @@ struct StartAffirmationsView: View {
                     // AI Generated Button
                     SourceButton(
                         title: "AI Generated",
-                        subtitle: "Personalized affirmations",
+                        subtitle: "Create personalized affirmations",
                         icon: "sparkles",
                         color: .museTeal,
-                        isDisabled: true,
-                        isComingSoon: true
+                        isDisabled: false,
+                        isComingSoon: false
                     ) {
-                        // Coming soon
+                        withAnimation(.spring(response: 0.3)) {
+                            selectedSource = .aiGenerated
+                        }
                     }
                 }
                 .padding(.top, 20)
@@ -1281,7 +1288,8 @@ struct StartAffirmationsView: View {
     
     // MARK: - AI Generated View
     private var aiGeneratedView: some View {
-        VStack(spacing: 20) {
+        VStack(alignment: .leading, spacing: 20) {
+            // Back button
             Button(action: {
                 withAnimation(.spring(response: 0.3)) {
                     selectedSource = nil
@@ -1294,24 +1302,122 @@ struct StartAffirmationsView: View {
                         .font(.museBodyMedium())
                 }
                 .foregroundColor(.museAccentBlue)
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
             
+            // Header
             VStack(spacing: 16) {
                 Image(systemName: "sparkles")
                     .font(.system(size: 48))
-                    .foregroundColor(.museTeal.opacity(0.5))
+                    .foregroundColor(.museTeal)
                 
                 Text("AI Generated Affirmations")
                     .font(.museHeadline())
                     .foregroundColor(.museSoftWhite)
                 
-                Text("Coming soon! AI will create personalized affirmations based on your goals and preferences.")
+                Text("Answer a few questions and I'll create personalized affirmations just for you.")
                     .font(.museBodyMedium())
                     .foregroundColor(.museLightGray)
                     .multilineTextAlignment(.center)
             }
-            .padding(.vertical, 60)
+            .frame(maxWidth: .infinity)
+            
+            // Previously Generated Section
+            if !storage.aiGeneratedAffirmations.isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Previously Generated")
+                            .font(.museHeadline())
+                            .foregroundColor(.museSoftWhite)
+                        
+                        Spacer()
+                        
+                        Text("\(storage.aiGeneratedAffirmations.count) saved")
+                            .font(.museCaption())
+                            .foregroundColor(.museLightGray)
+                    }
+                    
+                    // Quick use button for saved AI affirmations
+                    Button(action: {
+                        // Use saved AI affirmations
+                        selectedAffirmations = Set(storage.aiGeneratedAffirmations.map { $0.id })
+                        useRandom = true
+                        isActive = true
+                    }) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 14))
+                            Text("Use Saved Affirmations")
+                                .font(.museButtonMedium())
+                        }
+                        .foregroundColor(.museSoftWhite)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.museTeal.opacity(0.3))
+                        )
+                    }
+                }
+                .padding(.top, 10)
+            }
+            
+            // Duration Selector
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Session Duration")
+                    .font(.museHeadline())
+                    .foregroundColor(.museSoftWhite)
+                
+                HStack(spacing: 10) {
+                    ForEach(AffirmationDuration.allCases, id: \.self) { durationOption in
+                        Button(action: { duration = durationOption }) {
+                            Text(durationOption.rawValue)
+                                .font(.museButtonMedium())
+                                .foregroundColor(duration == durationOption ? .museSoftWhite : .museLightGray)
+                                .padding(.horizontal, 18)
+                                .padding(.vertical, 12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(duration == durationOption ? Color.museTeal : Color.museDarkGray)
+                                )
+                        }
+                    }
+                }
+            }
+            .padding(.top, 20)
+            
+            // Create New Button
+            Button(action: {
+                showAIChat = true
+            }) {
+                HStack(spacing: 12) {
+                    Image(systemName: "wand.and.stars")
+                        .font(.system(size: 18, weight: .semibold))
+                    Text("Create New Affirmations")
+                        .font(.museButtonLarge())
+                }
+                .foregroundColor(.museSoftWhite)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 18)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.museDarkGray.opacity(0.6))
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(.ultraThinMaterial)
+                        )
+                        .pulsingRainbowBorder()
+                )
+            }
+            .padding(.top, 20)
+        }
+        .fullScreenCover(isPresented: $showAIChat) {
+            AIAffirmationsChatView(
+                duration: duration,
+                onComplete: {
+                    showAIChat = false
+                    selectedSource = nil
+                }
+            )
         }
     }
     

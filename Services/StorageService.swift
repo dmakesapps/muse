@@ -47,6 +47,9 @@ class StorageService: ObservableObject {
     
     @Published var savedAffirmations: [Affirmation] = []
     
+    /// AI-Generated affirmations from guided chat sessions
+    @Published var aiGeneratedAffirmations: [Affirmation] = []
+    
     @Published var selectedMusicTrack: BackgroundMusicTrack = .forest {
         didSet {
             saveMusicTrackPreference()
@@ -55,6 +58,7 @@ class StorageService: ObservableObject {
     
     private let quotesKey = "savedQuotes"
     private let affirmationsKey = "savedAffirmations"
+    private let aiAffirmationsKey = "aiGeneratedAffirmations"
     private let musicTrackKey = "selectedMusicTrack"
     
     // App Group UserDefaults for widget sharing
@@ -172,10 +176,50 @@ class StorageService: ObservableObject {
         }
     }
     
+    // MARK: - AI Generated Affirmations
+    
+    /// Save multiple AI-generated affirmations at once
+    func saveAIGeneratedAffirmations(_ affirmations: [Affirmation]) {
+        for affirmation in affirmations {
+            // Check by content (text) to prevent duplicates
+            if !aiGeneratedAffirmations.contains(where: { $0.text == affirmation.text }) {
+                aiGeneratedAffirmations.append(affirmation)
+            }
+        }
+        persistAIAffirmations()
+    }
+    
+    /// Remove an AI-generated affirmation
+    func removeAIAffirmation(_ affirmation: Affirmation) {
+        aiGeneratedAffirmations.removeAll(where: { $0.text == affirmation.text })
+        persistAIAffirmations()
+    }
+    
+    /// Clear all AI-generated affirmations
+    func clearAIAffirmations() {
+        aiGeneratedAffirmations.removeAll()
+        persistAIAffirmations()
+    }
+    
+    private func persistAIAffirmations() {
+        if let encoded = try? JSONEncoder().encode(aiGeneratedAffirmations) {
+            UserDefaults.standard.set(encoded, forKey: aiAffirmationsKey)
+            print("✅ Saved \(aiGeneratedAffirmations.count) AI-generated affirmations")
+        }
+    }
+    
+    private func loadAIAffirmations() {
+        if let data = UserDefaults.standard.data(forKey: aiAffirmationsKey),
+           let decoded = try? JSONDecoder().decode([Affirmation].self, from: data) {
+            aiGeneratedAffirmations = decoded
+        }
+    }
+    
     // MARK: - Load All
     private func loadSavedItems() {
         loadQuotes()
         loadAffirmations()
+        loadAIAffirmations()
     }
 }
 

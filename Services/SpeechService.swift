@@ -7,7 +7,10 @@ class SpeechService: NSObject, ObservableObject {
     static let shared = SpeechService()
     
     // MARK: - Configuration
-    private let apiKey = OpenAIConfig.apiKey
+    // API key is stored in APIKeys.swift (gitignored for security)
+    private var apiKey: String {
+        return APIKeys.openAI
+    }
     private let apiEndpoint = "https://api.openai.com/v1/audio/speech"
     
     /// Available voices: alloy, echo, fable, onyx, nova, shimmer
@@ -63,7 +66,6 @@ class SpeechService: NSObject, ObservableObject {
     
     // MARK: - Speaking
     
-    /// Speak the given text using OpenAI TTS
     /// Speak the given text using OpenAI TTS
     func speak(_ text: String, completion: (() -> Void)? = nil) {
         print("🎙️ SpeechService: speak() called with text: \(text.prefix(50))...")
@@ -166,12 +168,33 @@ class SpeechService: NSObject, ObservableObject {
             
             isGenerating = false
             self.error = error.localizedDescription
-            isSpeaking = false
-            currentlyPlayingText = nil
             
-            let callback = onSpeechComplete
-            onSpeechComplete = nil
-            callback?()
+            // FALLBACK: Use iOS native speech synthesis
+            print("🔄 SpeechService: Falling back to iOS native speech...")
+            speakWithNativeSynthesis(text, speechId: speechId)
+        }
+    }
+    
+    /// Fallback: Use iOS native speech synthesis when OpenAI fails
+    private func speakWithNativeSynthesis(_ text: String, speechId: UUID) {
+        let synthesizer = AVSpeechSynthesizer()
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        utterance.rate = 0.5 // Slower for affirmations
+        utterance.pitchMultiplier = 1.0
+        utterance.volume = 1.0
+        
+        // Use a simple completion handler via notification
+        isSpeaking = true
+        synthesizer.speak(utterance)
+        
+        // Estimate duration and complete after
+        let wordCount = text.split(separator: " ").count
+        let estimatedDuration = Double(wordCount) * 0.4 + 1.0  // ~0.4 sec per word + buffer
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + estimatedDuration) { [weak self] in
+            guard self?.currentSpeechId == speechId else { return }
+            self?.finishSpeech()
         }
     }
     
