@@ -47,6 +47,10 @@ class StorageService: ObservableObject {
     
     @Published var savedAffirmations: [Affirmation] = []
     
+    // MARK: - Streak Tracking
+    @Published var streakDays: Int = 1 // Default to 1 for new users
+    @Published var lastActiveDate: Date = Date()
+    
     /// AI-Generated affirmations from guided chat sessions
     @Published var aiGeneratedAffirmations: [Affirmation] = []
     

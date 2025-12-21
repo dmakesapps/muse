@@ -1,7 +1,10 @@
 import SwiftUI
 import UIKit
+import SwiftData
 
 struct FeedView: View {
+    @Environment(\.modelContext) private var modelContext
+    @StateObject private var progressService = ProgressService()
     @StateObject private var storage = StorageService.shared
     @State private var selectedCategory: ContentCategory = .affirmation
     @State private var currentIndex: Int = 0
@@ -12,6 +15,7 @@ struct FeedView: View {
     @State private var selectedTagFilter: String? = nil  // Filter by specific tag
     @State private var showCategoryPicker = false
     @State private var showBackgroundPicker = false
+    @State private var showHamburgerMenu = false  // Custom hamburger menu popup
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     
     let backgroundOptions = ["backgroundjungle2", "Gradient1", "Gradient2", "SolidDark"]
@@ -137,6 +141,19 @@ struct FeedView: View {
                     //.ignoresSafeArea() // Already handled by parent GeometryReader
                     // Force ScrollView to recreate when category, filter, or orientation changes
                     .id("\(selectedCategory.rawValue)-\(selectedTagFilter ?? "all")-\(geometry.size.width)-\(geometry.size.height)")
+                    // Add fade mask for seamless scrolling
+                    .mask(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: .clear, location: 0.0),   // Top fade out
+                                .init(color: .black, location: 0.15),  // Start visible content
+                                .init(color: .black, location: 0.85),  // End visible content
+                                .init(color: .clear, location: 1.0)    // Bottom fade out
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
                 }
                 
                 }
@@ -147,126 +164,141 @@ struct FeedView: View {
             GeometryReader { proxy in // Use proxy to check orientation only
                 let isLandscape = proxy.size.width > proxy.size.height
                 
-                VStack {
-                    // Top bar
-                    HStack {
-                        // Profile button
-                        GlassIconButton(icon: "person", action: onProfileTap)
-                        
-                        Spacer()
-                        
-                        // Category selector
-                        if !isLandscape {
-                            HStack(spacing: 0) {
-                                Button {
-                                    withAnimation(.spring(response: 0.3)) {
-                                        selectedCategory = .affirmation
-                                    }
-                                } label: {
-                                    Text("Affirmations")
-                                        .font(.system(size: 15, weight: selectedCategory == .affirmation ? .semibold : .regular))
-                                        .foregroundColor(selectedCategory == .affirmation ? .museSoftWhite : .museLightGray)
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 10)
+                ZStack {
+                    VStack {
+                        // Top bar - Category tabs centered, hamburger overlaid
+                        ZStack {
+                            // Left: Streak/Profile Button
+                            if !isLandscape {
+                                HStack {
+                                    StreakFireButton(streak: progressService.currentStreak, action: onProfileTap)
+                                    Spacer()
                                 }
-                                
-                                Button {
-                                    withAnimation(.spring(response: 0.3)) {
-                                        selectedCategory = .quote
-                                    }
-                                } label: {
-                                    Text("Quotes")
-                                        .font(.system(size: 15, weight: selectedCategory == .quote ? .semibold : .regular))
-                                        .foregroundColor(selectedCategory == .quote ? .museSoftWhite : .museLightGray)
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 10)
-                                }
-                            }
-                            .background(
-                                Capsule()
-                                    .fill(Color.museDarkGray.opacity(0.6))
-                                    .pulsingRainbowBorder()
-                            )
-                        }
-                        
-                        Spacer()
-                        
-                        // Message button
-                        GlassIconButton(icon: "message", action: onMessageTap)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                    
-                    Spacer()
-                    
-                    // Share and Heart buttons - centered
-                    // HIDDEN IN LANDSCAPE
-                    if !isLandscape {
-                        HStack(spacing: 32) {
-                            Button(action: {
-                                if currentIndex < filteredContent.count {
-                                    shareContent(filteredContent[currentIndex])
-                                }
-                            }) {
-                                Image(systemName: "square.and.arrow.up")
-                                    .font(.system(size: 22))
-                                    .foregroundColor(.museSoftWhite)
+                                .padding(.horizontal, 16)
                             }
                             
-                            Button(action: {
-                                if currentIndex < filteredContent.count {
-                                    let item = filteredContent[currentIndex]
-                                    // Toggle save state
-                                    if item.isSaved(storage: storage) {
-                                        // Remove from saved
-                                        if let affirmation = item.affirmation {
-                                            storage.removeAffirmation(affirmation)
-                                        } else if let quote = item.quote {
-                                            storage.removeQuote(quote)
+                            // Category selector (truly centered)
+                            if !isLandscape {
+                                HStack(spacing: 0) {
+                                    Button {
+                                        withAnimation(.spring(response: 0.3)) {
+                                            selectedCategory = .affirmation
                                         }
-                                    } else {
-                                        // Add to saved
-                                        if let affirmation = item.affirmation {
-                                            storage.saveAffirmation(affirmation)
-                                        } else if let quote = item.quote {
-                                            storage.saveQuote(quote)
+                                    } label: {
+                                        Text("Affirmations")
+                                            .font(.system(size: 15, weight: selectedCategory == .affirmation ? .semibold : .regular))
+                                            .foregroundColor(selectedCategory == .affirmation ? .museSoftWhite : .museLightGray)
+                                            .padding(.horizontal, 14)
+                                            .padding(.vertical, 10)
+                                    }
+                                    
+                                    Button {
+                                        withAnimation(.spring(response: 0.3)) {
+                                            selectedCategory = .quote
                                         }
+                                    } label: {
+                                        Text("Quotes")
+                                            .font(.system(size: 15, weight: selectedCategory == .quote ? .semibold : .regular))
+                                            .foregroundColor(selectedCategory == .quote ? .museSoftWhite : .museLightGray)
+                                            .padding(.horizontal, 14)
+                                            .padding(.vertical, 10)
                                     }
                                 }
-                            }) {
-                                Image(systemName: currentIndex < filteredContent.count && filteredContent[currentIndex].isSaved(storage: storage) ? "heart.fill" : "heart")
-                                    .font(.system(size: 22))
-                                    .foregroundColor(currentIndex < filteredContent.count && filteredContent[currentIndex].isSaved(storage: storage) ? .red : .museSoftWhite)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.museDarkGray.opacity(0.6))
+                                        .pulsingRainbowBorder()
+                                )
+                            }
+                            
+                            // Hamburger menu button (absolute right position)
+                            if !isLandscape {
+                                HStack {
+                                    Spacer()
+                                    // LiquidMenu will be placed as an overlay on the root ZStack
+                                    // to ensure it doesn't affect layout
+                                    Color.clear
+                                        .frame(width: 50, height: 50) 
+                                }
+                                .padding(.horizontal, 16)
                             }
                         }
-                        .padding(.bottom, 30)
-                    }
-                    
-                    // Bottom buttons
-                    HStack {
-                        // Mix button
-                        if !isLandscape {
-                            GlassIconButton(icon: "square.grid.2x2", action: { showMixPopup = true })
-                        }
+                        .padding(.top, 10)
+                        // Ensure menu stays on top of content
+                        .zIndex(100) 
                         
                         Spacer()
-                        
-                        // Practice button (center) - Glowing Start button style
+                    
+                        // Share and Heart buttons - centered
                         // HIDDEN IN LANDSCAPE
                         if !isLandscape {
-                            GlowingStartButton(action: { showPracticePopup = true })
+                            HStack(spacing: 32) {
+                                Button(action: {
+                                    if currentIndex < filteredContent.count {
+                                        shareContent(filteredContent[currentIndex])
+                                    }
+                                }) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.system(size: 22))
+                                        .foregroundColor(.museSoftWhite)
+                                }
+                                
+                                Button(action: {
+                                    if currentIndex < filteredContent.count {
+                                        let item = filteredContent[currentIndex]
+                                        // Toggle save state
+                                        if item.isSaved(storage: storage) {
+                                            // Remove from saved
+                                            if let affirmation = item.affirmation {
+                                                storage.removeAffirmation(affirmation)
+                                            } else if let quote = item.quote {
+                                                storage.removeQuote(quote)
+                                            }
+                                        } else {
+                                            // Add to saved
+                                            if let affirmation = item.affirmation {
+                                                storage.saveAffirmation(affirmation)
+                                            } else if let quote = item.quote {
+                                                storage.saveQuote(quote)
+                                            }
+                                        }
+                                    }
+                                }) {
+                                    Image(systemName: currentIndex < filteredContent.count && filteredContent[currentIndex].isSaved(storage: storage) ? "heart.fill" : "heart")
+                                        .font(.system(size: 22))
+                                        .foregroundColor(currentIndex < filteredContent.count && filteredContent[currentIndex].isSaved(storage: storage) ? .red : .museSoftWhite)
+                                }
+                            }
+                            .padding(.bottom, 30)
                         }
                         
-                        Spacer()
-                        
-                        // Paintbrush button
+                        // Bottom - Only the Start button (centered)
                         if !isLandscape {
-                            GlassIconButton(icon: "paintbrush", action: { showBackgroundPicker = true })
+                            LiquidStartButton(action: { showPracticePopup = true })
+                                .padding(.bottom, 20)
                         }
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 10) // Standard padding
+                    
+                    // Old Hamburger/Popup Removed - LiquidMenu handles it
+                    
+                    // Liquid Menu Overlay (Top-Right)
+                    // Placed here to be independent of layout flow (absolute position effect)
+                    if !isLandscape {
+                        VStack {
+                            HStack {
+                                Spacer()
+                                LiquidMenu(
+                                    isOpen: $showHamburgerMenu,
+                                    onChat: onMessageTap,
+                                    onCategory: { showMixPopup = true },
+                                    onBackground: { showBackgroundPicker = true }
+                                )
+                                .padding(.trailing, 16)
+                                .padding(.top, 16) // Adjust for top bar padding
+                            }
+                            Spacer()
+                        }
+                    }
                 }
             }
         }
@@ -293,6 +325,7 @@ struct FeedView: View {
                 .presentationDragIndicator(.visible)
         }
         .onAppear {
+            progressService.setModelContext(modelContext)
             // Load content from JSON files
             if quotes.isEmpty {
                 quotes = ContentLoader.shared.loadQuotes().shuffled()
@@ -546,6 +579,131 @@ struct ContentCard: View {
 }
 
 
+
+// MARK: - Liquid Menu Component
+// MARK: - Liquid Menu Component
+struct LiquidMenu: View {
+    @Binding var isOpen: Bool
+    // Actions
+    let onChat: () -> Void
+    let onCategory: () -> Void
+    let onBackground: () -> Void
+    
+    // Animation properties
+    @Namespace private var animation
+    
+    // Config
+    private let buttonSize: CGFloat = 50
+    private let spacing: CGFloat = 16
+    
+    var body: some View {
+        ZStack(alignment: .top) {
+            // Options Stack (Behind the toggle button)
+            ZStack {
+                // Item 3: Background (Bottom-most)
+                LiquidMenuItem(icon: "paintbrush.fill", index: 3, isOpen: isOpen) {
+                    onBackground()
+                    withAnimation { isOpen = false }
+                }
+                
+                // Item 2: Categories
+                LiquidMenuItem(icon: "square.grid.2x2.fill", index: 2, isOpen: isOpen) {
+                    onCategory()
+                    withAnimation { isOpen = false }
+                }
+                
+                // Item 1: Chat (Top-most)
+                LiquidMenuItem(icon: "message.fill", index: 1, isOpen: isOpen) {
+                    onChat()
+                    withAnimation { isOpen = false }
+                }
+            }
+            .zIndex(0)
+            
+            // Main Toggle Button (Always on top)
+            Button(action: {
+                // Using a "bouncy" spring to feel like popping a bubble
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                    isOpen.toggle()
+                }
+            }) {
+                ZStack {
+                    // Glass Background - NOW A CAPSULE (Pill Shape)
+                    Capsule()
+                        .fill(Color.black.opacity(0.3))
+                        .background(.ultraThinMaterial)
+                        .clipShape(Capsule())
+                        .frame(width: 60, height: 40) // Pill dimensions
+                        .shadow(color: .black.opacity(0.2), radius: 5, y: 5)
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.white.opacity(0.15), lineWidth: 1) // Fine outline like left button
+                        )
+                    
+                    // Icon
+                    Image(systemName: isOpen ? "xmark" : "line.3.horizontal")
+                        .font(.system(size: 18, weight: .medium)) // Slightly smaller to fit in 40pt height perfectly
+                        .foregroundColor(.white)
+                        .contentTransition(.symbolEffect(.replace))
+                        .rotationEffect(.degrees(isOpen ? 90 : 0))
+                }
+            }
+            .zIndex(1)
+        }
+        // Ensure the expanded menu doesn't capture touches outside the buttons
+        // Adjusted frame calculation for the new mix of shapes
+        .frame(width: 60, height: isOpen ? (50 * 4) + (spacing * 3) : 40, alignment: .top)
+    }
+}
+
+struct LiquidMenuItem: View {
+    let icon: String
+    let index: Int
+    let isOpen: Bool
+    let action: () -> Void
+    
+    // Spacing constants
+    private let buttonSize: CGFloat = 50
+    private let spacing: CGFloat = 16
+    
+    var offset: CGFloat {
+        if !isOpen { return 0 }
+        return CGFloat(index) * (buttonSize + spacing)
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                Circle()
+                    .fill(Color.black.opacity(0.3)) // Dark glass
+                    .background(.ultraThinMaterial)
+                    .clipShape(Circle())
+                    .frame(width: 50, height: 50)
+                    .overlay(
+                        Circle().stroke(Color.white.opacity(0.15), lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 3)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 18))
+                    .foregroundColor(.museSoftWhite)
+            }
+        }
+        .offset(y: offset)
+        // Physics-simulating spring animation
+        // "Heavy" liquid feel: items drop with a slight delay and bounce
+        .animation(
+            .spring(response: 0.5, dampingFraction: 0.6)
+            .delay(isOpen ? Double(index) * 0.05 : 0),
+            value: isOpen
+        )
+        // Fade in/out
+        .opacity(isOpen ? 1 : 0)
+        // Scale up/down for "pop" effect
+        .scaleEffect(isOpen ? 1 : 0.5)
+        .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isOpen)
+    }
+}
 
 // MARK: - Reusable Glass Icon Button
 struct GlassIconButton: View {
@@ -1974,6 +2132,140 @@ struct MusicPickerView: View {
     }
 }
 
+
+struct LiquidStartButton: View {
+    let action: () -> Void
+    @State private var isPressed = false
+    @State private var rotation: Double = 0
+    
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                // 1. Alive Aura (Background Glow) - Kept the cool effect but subtler
+                Circle()
+                    .fill(
+                        AngularGradient(
+                            gradient: Gradient(colors: [
+                                .museGradientStart.opacity(0.0),
+                                .museGradientStart.opacity(0.15),
+                                .museTeal.opacity(0.15),
+                                .museGradientStart.opacity(0.0)
+                            ]),
+                            center: .center
+                        )
+                    )
+                    .frame(width: 160, height: 160) // Larger aura
+                    .rotationEffect(.degrees(rotation))
+                    .blur(radius: 20) // Softer blur
+                
+                // 2. The Button Core (Glass)
+                ZStack {
+                    // Dark Glass Background
+                    Circle()
+                        .fill(Color.black.opacity(0.3))
+                        .background(.ultraThinMaterial)
+                        .clipShape(Circle())
+                    
+                    // Rotating "Liquid Light" Glow - The "cool effect" blended in
+                    Circle()
+                        .strokeBorder(
+                            AngularGradient(
+                                gradient: Gradient(colors: [
+                                    .white.opacity(0.2),
+                                    .white.opacity(0.5),
+                                    .museGradientStart.opacity(0.8), // The "flash" of color
+                                    .white.opacity(0.5),
+                                    .white.opacity(0.2)
+                                ]),
+                                center: .center
+                            ),
+                            lineWidth: 3
+                        )
+                        .rotationEffect(.degrees(rotation))
+                        .blur(radius: 4) // Soft glow behind the sharp line
+                    
+                    // SOLID WHITE OUTLINE (The "Screenshot" look - Crisp & Clean)
+                    Circle()
+                        .stroke(Color.white.opacity(0.9), lineWidth: 1.5)
+                    
+                    // Inner Highlight (Depth)
+                    Circle()
+                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                        .padding(4)
+                }
+                .frame(width: 100, height: 100) // Significantly Larger
+                .shadow(color: Color.black.opacity(0.4), radius: 15, x: 0, y: 8)
+                
+                // 3. Text
+                Text("Start")
+                    .font(.system(size: 20, weight: .semibold, design: .rounded)) // Larger, clearer text
+                    .foregroundColor(.white)
+                    // Clean, bright text
+                    .shadow(color: .white.opacity(0.5), radius: 10, x: 0, y: 0)
+            }
+            .scaleEffect(isPressed ? 0.94 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPressed)
+        }
+        .buttonStyle(LiquidButtonStyle(isPressed: $isPressed))
+        .onAppear {
+            withAnimation(.linear(duration: 10).repeatForever(autoreverses: false)) { // Very slow, majestic rotation
+                rotation = 360
+            }
+        }
+    }
+}
+
+// Custom button style to track press state
+struct LiquidButtonStyle: ButtonStyle {
+    @Binding var isPressed: Bool
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .onChange(of: configuration.isPressed) { newValue in
+                isPressed = newValue
+            }
+    }
+}
+
+
+struct StreakFireButton: View {
+    let streak: Int
+    let action: () -> Void
+    
+    @State private var isAnimating = false
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                // Animated Flame - Slow, calming breath
+                Image(systemName: "flame.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(.white) // White clean look
+                    // Removing aggressive bounce symbolEffect
+                    .opacity(isAnimating ? 1.0 : 0.7) // Gentle fade
+                    .scaleEffect(isAnimating ? 1.05 : 0.95) // Subtle breathing size
+                    .animation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true), value: isAnimating)
+                
+                Text("\(streak)")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundColor(.museSoftWhite)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                Capsule()
+                    .fill(Color.black.opacity(0.3))
+                    .overlay(
+                        Capsule()
+                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                    )
+            )
+        }
+        .onAppear {
+            isAnimating = true
+        }
+    }
+}
 
 #Preview {
     FeedView(
