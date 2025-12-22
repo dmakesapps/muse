@@ -415,173 +415,11 @@ struct AnyContentItem: Identifiable {
 }
 
 // MARK: - Top Bar View
-struct TopBarView: View {
-    @Binding var selectedCategory: FeedView.ContentCategory
-    let onProfileTap: () -> Void
-    let onMessageTap: () -> Void
-    
-    var body: some View {
-        HStack(spacing: 16) {
-            // Left: Profile button
-            Button(action: onProfileTap) {
-                Image(systemName: "person.circle")
-                    .font(.system(size: 20))
-                    .foregroundColor(.museSoftWhite)
-            }
-            
-            Spacer()
-            
-            // Center: Category selector
-            HStack(spacing: 0) {
-                // Affirmations button
-                Button {
-                    withAnimation(.spring(response: 0.3)) {
-                        selectedCategory = .affirmation
-                    }
-                } label: {
-                    Text("Affirmations")
-                        .font(.system(size: 15, weight: selectedCategory == .affirmation ? .semibold : .regular))
-                        .foregroundColor(selectedCategory == .affirmation ? .museSoftWhite : .museLightGray)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                }
-                
-                // Quotes button
-                Button {
-                    withAnimation(.spring(response: 0.3)) {
-                        selectedCategory = .quote
-                    }
-                } label: {
-                    Text("Quotes")
-                        .font(.system(size: 15, weight: selectedCategory == .quote ? .semibold : .regular))
-                        .foregroundColor(selectedCategory == .quote ? .museSoftWhite : .museLightGray)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                }
-            }
-            .background(
-                Capsule()
-                    .fill(Color.museDarkGray.opacity(0.6))
-            )
-            
-            Spacer()
-                        // Add new affirmation or other actions
-            Button(action: {
-                print("Add button tapped")
-            }) {
-                Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 24))
-                    .foregroundColor(.museSoftWhite)
-            }
-            
-            Spacer()
-            
-            // Right: Message button
-            Button(action: onMessageTap) {
-                Image(systemName: "message")
-                    .font(.system(size: 20))
-                    .foregroundColor(.museSoftWhite)
-            }
-        }
-        .padding(.top, 10) // Fixed safe area padding
-        .padding(.horizontal, 20)
-        .onAppear {
-            // Start background music if enabled
-            BackgroundMusicManager.shared.startIfNeeded()
-        }
-    }
-}
+// TopBarView removed - unused
 
-// MARK: - Content Card
-struct ContentCard: View {
-    let item: AnyContentItem
-    let currentIndex: Int
-    let allContent: [AnyContentItem]
-    let storage: StorageService
-    let onSave: () -> Void
-    let onShare: () -> Void
-    let isSaved: Bool
-    
-    @State private var saved: Bool
-    
-    // Calculate font size based on word count
-    private var fontSize: CGFloat {
-        let wordCount = item.text.split(separator: " ").count
-        switch wordCount {
-        case 0...5:
-            return 32
-        case 6...10:
-            return 28
-        case 11...15:
-            return 24
-        case 16...20:
-            return 22
-        default:
-            return 20
-        }
-    }
-    
-    // Fixed screen dimensions - calculated ONCE, shared across ALL instances
-    private static let screenWidth = UIScreen.main.bounds.width
-    private static let screenHeight = UIScreen.main.bounds.height
-    private static let containerWidth = screenWidth - 64 // 32 padding on each side
-    
-    // Fixed Y position for text - calculated from screen center
-    // Position text at 40% from top (above the action buttons)
-    private static let textYPosition = screenHeight * 0.4
-    
-    init(item: AnyContentItem, currentIndex: Int, allContent: [AnyContentItem], storage: StorageService, onSave: @escaping () -> Void, onShare: @escaping () -> Void, isSaved: Bool) {
-        self.item = item
-        self.currentIndex = currentIndex
-        self.allContent = allContent
-        self.storage = storage
-        self.onSave = onSave
-        self.onShare = onShare
-        self.isSaved = isSaved
-        _saved = State(initialValue: isSaved)
-    }
-    
-    var body: some View {
-        ZStack {
-            // Background
-            Color.museDeepNavy
-                .ignoresSafeArea()
-            
-            // Text content - ABSOLUTE POSITIONING
-            // Using .position() with fixed screen coordinates ensures identical placement
-            VStack(spacing: 16) {
-                Text(item.text)
-                    .font(.system(size: fontSize, weight: .medium, design: .serif))
-                    .foregroundColor(.museSoftWhite)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(8)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: Self.containerWidth)
-                
-                if let author = item.author {
-                    Text("— \(author)")
-                        .font(.system(size: fontSize * 0.65, weight: .regular, design: .serif))
-                        .foregroundColor(.museLightGray)
-                        .padding(.top, 8)
-                }
-            }
-            .frame(width: Self.containerWidth)
-            // ABSOLUTE POSITION: Center horizontally, fixed Y from top
-            // Position uses coordinate space where (0,0) is top-left
-            .position(
-                x: Self.screenWidth / 2,  // Always center horizontally
-                y: Self.textYPosition     // Always same Y position
-            )
-        }
-        .onChange(of: isSaved) { oldValue, newValue in
-            saved = newValue
-        }
-    }
-}
+// ContentCard removed - unused
 
 
-
-// MARK: - Liquid Menu Component
 // MARK: - Liquid Menu Component
 struct LiquidMenu: View {
     @Binding var isOpen: Bool
@@ -706,34 +544,7 @@ struct LiquidMenuItem: View {
     }
 }
 
-// MARK: - Reusable Glass Icon Button
-struct GlassIconButton: View {
-    let icon: String
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.system(size: 20, weight: .medium))
-                .foregroundColor(.white.opacity(0.9))
-                .frame(width: 50, height: 50)
-                .background(
-                    Circle()
-                        .fill(.ultraThinMaterial)
-                        .blendMode(.overlay) // Adds a nice blend with the background
-                )
-                .background(
-                    Circle()
-                        .fill(Color.black.opacity(0.2)) // Slight darkening for contrast
-                )
-                .overlay(
-                    Circle()
-                        .stroke(Color.white.opacity(0.3), lineWidth: 1) // Frosted border
-                )
-                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-        }
-    }
-}
+// GlassIconButton removed - unused
 
 // MARK: - Mix Popup View (Redesigned)
 struct MixPopupView: View {
@@ -1845,7 +1656,6 @@ struct PracticePopupView: View {
     }
 }
 
-// MARK: - Category Picker View
 // MARK: - Category Picker View
 struct CategoryPickerView: View {
     @Environment(\.dismiss) private var dismiss

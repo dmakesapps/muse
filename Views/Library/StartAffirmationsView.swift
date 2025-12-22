@@ -1878,52 +1878,7 @@ struct FrequencyButton: View {
     }
 }
 
-// MARK: - Breathwork Placeholder View
-struct BreathworkPlaceholderView: View {
-    let onDismiss: () -> Void
-    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
-    
-    var body: some View {
-        ZStack {
-            MuseBackgroundView(selectedBackground: selectedBackground)
-                .ignoresSafeArea()
-            
-            VStack(spacing: 24) {
-                Spacer()
-                
-                Image(systemName: "wind")
-                    .font(.system(size: 80))
-                    .foregroundColor(.museTeal.opacity(0.5))
-                
-                Text("Breathwork Experience")
-                    .font(.museDisplaySmall())
-                    .foregroundColor(.museSoftWhite)
-                
-                Text("Immersive breathwork sessions coming soon!")
-                    .font(.museBodyMedium())
-                    .foregroundColor(.museLightGray)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-                
-                Spacer()
-                
-                Button(action: onDismiss) {
-                    Text("Close")
-                        .font(.museButtonLarge())
-                        .foregroundColor(.museSoftWhite)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 14)
-                                .fill(Color.museDarkGray)
-                        )
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 40)
-            }
-        }
-    }
-}
+// BreathworkPlaceholderView removed - unused
 
 // MARK: - Source Button
 struct SourceButton: View {
@@ -2063,43 +2018,7 @@ struct AffirmationSelectRow: View {
     }
 }
 
-// MARK: - Affirmation Selection Card (for horizontal scroll)
-struct AffirmationSelectionCard: View {
-    let affirmation: Affirmation
-    let isSelected: Bool
-    let onTap: () -> Void
-    
-    var body: some View {
-        Button(action: onTap) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                        .font(.system(size: 20))
-                        .foregroundColor(isSelected ? .museSuccessGreen : .museLightGray)
-                    
-                    Spacer()
-                }
-                
-                Text(affirmation.text)
-                    .font(.museBodySmall())
-                    .foregroundColor(.museSoftWhite)
-                    .lineLimit(3)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(16)
-            .frame(width: 200)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(isSelected ? Color.museAccentBlue.opacity(0.2) : Color.museMediumGray.opacity(0.3))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(isSelected ? Color.museAccentBlue : Color.museMediumGray, lineWidth: isSelected ? 2 : 1)
-                    )
-            )
-        }
-    }
-}
+// AffirmationSelectionCard removed - unused
 
 // MARK: - Countdown View
 struct CountdownView: View {

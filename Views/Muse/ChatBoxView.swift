@@ -313,34 +313,7 @@ struct ChatBoxView: View {
 }
 
 
-
-struct QuickActionPill: View {
-    let icon: String
-    let text: String
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                Image(systemName: icon)
-                    .font(.system(size: 12))
-                Text(text)
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .foregroundColor(.white)
-            .background(
-                Capsule()
-                    .fill(Color.white.opacity(0.1))
-                    .overlay(
-                        Capsule()
-                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                    )
-            )
-        }
-    }
-}
+// QuickActionPill removed - unused
 
 // MARK: - Chat Bubble
 struct ChatBubble: View {
