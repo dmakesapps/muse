@@ -12,7 +12,7 @@ struct FeedView: View {
     let onMessageTap: () -> Void
     @State private var showMixPopup = false
     @State private var showPracticePopup = false
-    @State private var selectedTagFilter: String? = nil  // Filter by specific tag
+    @State private var selectedTagFilter: Set<String> = []  // Filter by specific tags
     @State private var showCategoryPicker = false
     @State private var showBackgroundPicker = false
     @State private var showHamburgerMenu = false  // Custom hamburger menu popup
@@ -50,8 +50,8 @@ struct FeedView: View {
         }
         
         // Apply tag filter if selected
-        if let tagFilter = selectedTagFilter {
-            items = items.filter { $0.category == tagFilter }
+        if !selectedTagFilter.isEmpty {
+            items = items.filter { selectedTagFilter.contains($0.category) }
         }
         
         return items
@@ -102,7 +102,7 @@ struct FeedView: View {
                                                     .shadow(color: item.tagColor.opacity(0.3), radius: 8, x: 0, y: 4)
                                                     .overlay(
                                                         Capsule()
-                                                            .stroke(selectedTagFilter == item.category ? Color.white : Color.clear, lineWidth: 2)
+                                                            .stroke(selectedTagFilter.contains(item.category) ? Color.white : Color.clear, lineWidth: 2)
                                                     )
                                             )
                                             .onLongPressGesture {
@@ -140,7 +140,7 @@ struct FeedView: View {
                     ))
                     //.ignoresSafeArea() // Already handled by parent GeometryReader
                     // Force ScrollView to recreate when category, filter, or orientation changes
-                    .id("\(selectedCategory.rawValue)-\(selectedTagFilter ?? "all")-\(geometry.size.width)-\(geometry.size.height)")
+                    .id("\(selectedCategory.rawValue)-\(selectedTagFilter.sorted().joined(separator: ","))-\(geometry.size.width)-\(geometry.size.height)")
                     // Add fade mask for seamless scrolling
                     .mask(
                         LinearGradient(
@@ -183,6 +183,7 @@ struct FeedView: View {
                                     Button {
                                         withAnimation(.spring(response: 0.3)) {
                                             selectedCategory = .affirmation
+                                            selectedTagFilter.removeAll()
                                         }
                                     } label: {
                                         Text("Affirmations")
@@ -195,6 +196,7 @@ struct FeedView: View {
                                     Button {
                                         withAnimation(.spring(response: 0.3)) {
                                             selectedCategory = .quote
+                                            selectedTagFilter.removeAll()
                                         }
                                     } label: {
                                         Text("Quotes")
@@ -311,11 +313,10 @@ struct FeedView: View {
         .sheet(isPresented: $showCategoryPicker) {
             CategoryPickerView(
                 categories: availableCategories,
-                selectedCategory: $selectedTagFilter,
+                selectedCategories: $selectedTagFilter,
                 contentType: selectedCategory
             )
-            .presentationDetents([.medium, .large])
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.large]) // Start at top / full screen
             .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showBackgroundPicker) {
@@ -734,64 +735,62 @@ struct GlassIconButton: View {
     }
 }
 
-// MARK: - Mix Popup View
+// MARK: - Mix Popup View (Redesigned)
 struct MixPopupView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var storage = StorageService.shared
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
+    // Bottom Tab State
+    enum ContentTab {
+        case affirmation
+        case quote
+    }
+    @State private var selectedTab: ContentTab = .affirmation
+    
+    // Helper States
     @State private var showFavorites = false
     @State private var showMyAffirmations = false
     @State private var selectedCategory: String? = nil
     
-    // Count of user-created affirmations
+    // Data
+    private var affirmationCategories: [String] {
+        ContentLoader.shared.getAffirmationCategories()
+    }
+    
+    private var quoteCategories: [String] {
+        ContentLoader.shared.getQuoteCategories()
+    }
+    
+    // Computed Properties for Cleaner View Body
     private var userCreatedCount: Int {
         storage.savedAffirmations.filter { $0.category == "Created By You" }.count
     }
     
-    // Get all unique categories from affirmations
-    private var allCategories: [String] {
-        ContentLoader.shared.getAffirmationCategories()
+    private var favoritesCount: Int {
+        selectedTab == .affirmation ? storage.savedAffirmations.count : storage.savedQuotes.count
     }
     
-    // Get icon for category
+    private var displayedCategories: [String] {
+        selectedTab == .affirmation ? affirmationCategories : quoteCategories
+    }
+    
+    // Icon Helper
     private func iconForCategory(_ category: String) -> String {
         switch category.lowercased() {
-        case "self-love", "self-worth", "self-care", "self-acceptance":
-            return "heart.fill"
-        case "confidence":
-            return "star.fill"
-        case "inner peace", "peace":
-            return "leaf.fill"
-        case "gratitude":
-            return "hands.clap.fill"
-        case "strength", "resilience":
-            return "bolt.fill"
-        case "love", "relationships":
-            return "heart.circle.fill"
-        case "growth", "transformation":
-            return "arrow.up.right.circle.fill"
-        case "mental health", "anxiety relief", "healing":
-            return "brain.head.profile"
-        case "abundance", "manifestation", "success":
-            return "sparkles"
-        case "courage":
-            return "flame.fill"
-        case "trust", "faith":
-            return "hand.raised.fill"
-        case "forgiveness", "acceptance":
-            return "hands.sparkles.fill"
-        case "positivity":
-            return "sun.max.fill"
-        case "boundaries":
-            return "shield.fill"
-        case "compassion":
-            return "hand.wave.fill"
-        case "health":
-            return "heart.text.square.fill"
-        case "christianity", "faith":
-            return "book.closed.fill"
-        default:
-            return "sparkle"
+        case "self-love", "self-worth", "self-care", "self-acceptance": return "heart.fill"
+        case "confidence", "wisdom": return "star.fill"
+        case "inner peace", "peace", "calm": return "leaf.fill"
+        case "gratitude": return "hands.clap.fill"
+        case "strength", "resilience", "motivation": return "bolt.fill"
+        case "love", "relationships": return "heart.circle.fill"
+        case "growth", "transformation", "purpose": return "arrow.up.right.circle.fill"
+        case "mental health", "healing", "wellness": return "brain.head.profile"
+        case "abundance", "success": return "sparkles"
+        case "courage": return "flame.fill"
+        case "faith", "hope": return "hand.raised.fill"
+        case "positivity", "happiness": return "sun.max.fill"
+        default: return "sparkle"
         }
     }
     
@@ -802,126 +801,147 @@ struct MixPopupView: View {
                 MuseBackgroundView(selectedBackground: selectedBackground)
                     .ignoresSafeArea()
                 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
-                        // Header
-                        HStack {
-                            Button(action: { dismiss() }) {
-                                Image(systemName: "xmark")
-                                    .font(.system(size: 16, weight: .medium))
-                                    .foregroundColor(.museSoftWhite)
-                                    .frame(width: 32, height: 32)
-                                    .background(
-                                        Circle()
-                                            .fill(Color.museDarkGray)
-                                    )
-                            }
-                            
-                            Spacer()
-                            
-                            Button(action: {}) {
-                                Text("Unlock all")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(.museSoftWhite)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 8)
-                                    .background(
-                                        Capsule()
-                                            .fill(Color.museDarkGray)
-                                            .rainbowBorder()
-                                    )
-                            }
+                VStack(spacing: 0) {
+                    // 1. Header
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                                .frame(width: 32, height: 32)
+                                .background(Color.white.opacity(0.1))
+                                .clipShape(Circle())
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 20)
                         
-                        // Title
-                        Text("What do you want to focus on?")
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(.museSoftWhite)
-                            .padding(.horizontal, 20)
+                        Spacer()
                         
-                        // Make your own mix button
+                        Text("Explore")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        
+                        Spacer()
+                        
+                        // Unlock All Button
                         Button(action: {}) {
-                            Text("Make your own mix")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(.museSoftWhite)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.museMediumGray.opacity(0.5), lineWidth: 1.5)
-                                )
-                        }
-                        .padding(.horizontal, 20)
-                        
-                        // Categories Grid
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                            MixCategoryCard(
-                                title: "General",
-                                icon: "globe",
-                                isLocked: false,
-                                action: {}
-                            )
-                            .rainbowBorder()
-                            
-                            MixCategoryCard(
-                                title: "Reframe Thoughts (AI)",
-                                icon: "brain.head.profile",
-                                isLocked: true,
-                                action: {}
-                            )
-                            .rainbowBorder()
-                            
-                            MixCategoryCard(
-                                title: "Favorites",
-                                icon: "heart.fill",
-                                isLocked: false,
-                                count: storage.savedAffirmations.count + storage.savedQuotes.count,
-                                action: { showFavorites = true }
-                            )
-                            .rainbowBorder()
-                            
-                            MixCategoryCard(
-                                title: "My own affirmations",
-                                icon: "pencil",
-                                isLocked: false,
-                                count: userCreatedCount,
-                                action: { showMyAffirmations = true }
-                            )
-                            .rainbowBorder()
-                        }
-                        .padding(.horizontal, 20)
-                        
-                        // Categories section
-                        Text("Categories")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(.museSoftWhite)
-                            .padding(.horizontal, 20)
-                            .padding(.top, 8)
-                        
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                            ForEach(allCategories, id: \.self) { category in
-                                MixCategoryCard(
-                                    title: category,
-                                    icon: iconForCategory(category),
-                                    isLocked: false,
-                                    action: { selectedCategory = category }
-                                )
-                                .rainbowBorder()
+                            HStack(spacing: 4) {
+                                Image(systemName: "lock.fill")
+                                    .font(.system(size: 10))
+                                Text("Unlock all")
+                                    .font(.system(size: 12, weight: .semibold))
                             }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(Color.black.opacity(0.3))
+                                    .overlay(Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1))
+                            )
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 100)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .padding(.bottom, 20)
+                    
+                    // 2. Scrollable Grid
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 24) {
+                            
+                            // Section: Tools & Favorites
+                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                                
+                                // Favorites (Always Visible)
+                                MixCategoryCard(
+                                    title: "Favorites",
+                                    icon: "heart.fill",
+                                    isLocked: false,
+                                    count: favoritesCount,
+                                    action: { showFavorites = true }
+                                )
+                                
+                                if selectedTab == .affirmation {
+                                    // Affirmation Specific Tools
+                                    MixCategoryCard(
+                                        title: "My own affirmations",
+                                        icon: "pencil",
+                                        isLocked: false,
+                                        count: userCreatedCount,
+                                        action: { showMyAffirmations = true }
+                                    )
+                                    
+                                    MixCategoryCard(
+                                        title: "Reframe Thoughts",
+                                        icon: "brain.head.profile",
+                                        isLocked: true, // Locked as per user request/screenshot
+                                        action: {}
+                                    )
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            
+                            // Section: Categories Toggle (Replaces simple divider)
+                            HStack(spacing: 0) {
+                                // Affirmations Tab
+                                Button(action: { withAnimation(.smooth) { selectedTab = .affirmation } }) {
+                                    HStack {
+                                        Image(systemName: "sparkles")
+                                            .font(.system(size: 16))
+                                        Text("Affirmations")
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .fixedSize()
+                                    }
+                                    .foregroundColor(selectedTab == .affirmation ? .white : .museLightGray)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(selectedTab == .affirmation ? Color.white.opacity(0.15) : Color.clear)
+                                    )
+                                }
+                                
+                                // Quotes Tab
+                                Button(action: { withAnimation(.smooth) { selectedTab = .quote } }) {
+                                    HStack {
+                                        Image(systemName: "quote.bubble")
+                                            .font(.system(size: 16))
+                                        Text("Quotes")
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .fixedSize()
+                                    }
+                                    .foregroundColor(selectedTab == .quote ? .white : .museLightGray)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(selectedTab == .quote ? Color.white.opacity(0.15) : Color.clear)
+                                    )
+                                }
+                            }
+                            .padding(4)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.black.opacity(0.3))
+                            )
+                            .padding(.horizontal, 20)
+                            
+                            // Section: Categories Grid
+                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                                ForEach(displayedCategories, id: \.self) { category in
+                                    MixCategoryCard(
+                                        title: category,
+                                        icon: iconForCategory(category),
+                                        isLocked: false,
+                                        action: { selectedCategory = category }
+                                    )
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.bottom, 100)
+                        }
                     }
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    EmptyView()
-                }
-            }
+            .navigationBarHidden(true)
             .sheet(isPresented: $showFavorites) {
                 FavoritesView()
             }
@@ -1401,6 +1421,7 @@ struct GlowingStartButton: View {
 }
 
 // MARK: - Mix Category Card
+// MARK: - Mix Category Card
 struct MixCategoryCard: View {
     let title: String
     let icon: String
@@ -1411,37 +1432,47 @@ struct MixCategoryCard: View {
     var body: some View {
         Button(action: action) {
             VStack(spacing: 12) {
+                // Icon Bubble
                 ZStack {
                     Circle()
-                        .fill(Color.museDarkGray)
-                        .frame(width: 60, height: 60)
+                        .fill(Color.white.opacity(0.1))
+                        .frame(width: 50, height: 50)
                     
                     Image(systemName: icon)
-                        .font(.system(size: 24))
-                        .foregroundColor(.museSoftWhite)
+                        .font(.system(size: 22))
+                        .foregroundColor(.white)
                 }
                 
-                Text(title)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.museSoftWhite)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                
-                if isLocked {
-                    Image(systemName: "lock.fill")
-                        .font(.system(size: 10))
-                        .foregroundColor(.museLightGray)
-                } else if count > 0 {
-                    Text("\(count) saved")
-                        .font(.system(size: 10))
-                        .foregroundColor(.museLightGray)
+                VStack(spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.9)
+                    
+                    if isLocked {
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 10))
+                            .foregroundColor(.museLightGray)
+                    } else if count > 0 {
+                        Text("\(count) items")
+                            .font(.system(size: 11))
+                            .foregroundColor(.museLightGray)
+                    }
                 }
             }
+            .padding(.vertical, 24)
+            .padding(.horizontal, 16)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
+            .aspectRatio(1.0, contentMode: .fit) // Square aspect ratio
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.museDarkGray.opacity(0.5))
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color.black.opacity(0.4))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                    )
             )
         }
     }
@@ -1815,15 +1846,16 @@ struct PracticePopupView: View {
 }
 
 // MARK: - Category Picker View
+// MARK: - Category Picker View
 struct CategoryPickerView: View {
     @Environment(\.dismiss) private var dismiss
     let categories: [String]
-    @Binding var selectedCategory: String?
+    @Binding var selectedCategories: Set<String>
     let contentType: FeedView.ContentCategory
     
     var body: some View {
         NavigationStack {
-            ZStack {
+            ZStack(alignment: .top) {
                 Color.museDeepNavy
                     .ignoresSafeArea()
                 
@@ -1849,45 +1881,23 @@ struct CategoryPickerView: View {
                         
                         Spacer()
                         
-                        // Clear filter button
-                        if selectedCategory != nil {
-                            Button(action: {
-                                selectedCategory = nil
-                                dismiss()
-                            }) {
+                        // Clear button
+                        if !selectedCategories.isEmpty {
+                            Button(action: { selectedCategories.removeAll() }) {
                                 Text("Clear")
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(.museAccentBlue)
                             }
                         } else {
-                            Color.clear
-                                .frame(width: 40)
+                            Color.clear.frame(width: 40)
                         }
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 20)
                     .padding(.bottom, 16)
                     
-                    // Current filter indicator
-                    if let current = selectedCategory {
-                        HStack {
-                            Text("Currently showing:")
-                                .font(.system(size: 13))
-                                .foregroundColor(.museLightGray)
-                            
-                            Text(current)
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(contentType == .affirmation ? .museGradientStart : .museTeal)
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 16)
-                    }
-                    
-                    // Show all option
-                    Button(action: {
-                        selectedCategory = nil
-                        dismiss()
-                    }) {
+                    // Show All Button
+                    Button(action: { selectedCategories.removeAll() }) {
                         HStack {
                             Image(systemName: "square.grid.2x2")
                                 .font(.system(size: 18))
@@ -1899,51 +1909,46 @@ struct CategoryPickerView: View {
                             
                             Spacer()
                             
-                            if selectedCategory == nil {
-                                Image(systemName: "checkmark")
-                                    .font(.system(size: 14, weight: .semibold))
+                            if selectedCategories.isEmpty {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 20))
                                     .foregroundColor(.museAccentBlue)
+                            } else {
+                                Image(systemName: "circle")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(.museLightGray)
                             }
                         }
                         .padding(.horizontal, 20)
                         .padding(.vertical, 14)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(selectedCategory == nil ? Color.museAccentBlue.opacity(0.2) : Color.museDarkGray.opacity(0.5))
+                                .fill(selectedCategories.isEmpty ? Color.museAccentBlue.opacity(0.2) : Color.museDarkGray.opacity(0.5))
                                 .rainbowBorder()
                         )
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 12)
                     
+                    Divider()
+                        .background(Color.white.opacity(0.1))
+                        .padding(.bottom, 12)
+                    
                     // Categories list
                     ScrollView {
                         LazyVStack(spacing: 8) {
                             ForEach(categories, id: \.self) { category in
-                                Button(action: {
-                                    selectedCategory = category
-                                    dismiss()
-                                }) {
-                                    HStack {
-                                        Text(category)
-                                            .font(.system(size: 15, weight: .medium))
-                                            .foregroundColor(.museSoftWhite)
-                                        
-                                        Spacer()
-                                        
-                                        if selectedCategory == category {
-                                            Image(systemName: "checkmark")
-                                                .font(.system(size: 14, weight: .semibold))
-                                                .foregroundColor(.museAccentBlue)
+                                CategoryRow(
+                                    category: category,
+                                    isSelected: selectedCategories.contains(category),
+                                    action: {
+                                        if selectedCategories.contains(category) {
+                                            selectedCategories.remove(category)
+                                        } else {
+                                            selectedCategories.insert(category)
                                         }
                                     }
-                                    .padding(.horizontal, 20)
-                                    .padding(.vertical, 14)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(selectedCategory == category ? Color.museAccentBlue.opacity(0.2) : Color.museDarkGray.opacity(0.5))
-                                    )
-                                }
+                                )
                             }
                         }
                         .padding(.horizontal, 20)
@@ -1954,6 +1959,36 @@ struct CategoryPickerView: View {
         }
     }
 }
+
+// Subview to reduce compiler complexity
+private struct CategoryRow: View {
+    let category: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Text(category)
+                    .font(.system(size: 16))
+                    .foregroundColor(.museSoftWhite)
+                
+                Spacer()
+                
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 20))
+                    .foregroundColor(isSelected ? .museAccentBlue : .museLightGray.opacity(0.5))
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? Color.museAccentBlue.opacity(0.15) : Color.museDarkGray.opacity(0.3))
+            )
+        }
+    }
+}
+
 // MARK: - Reusable Background View
 struct MuseBackgroundView: View {
     let selectedBackground: String
