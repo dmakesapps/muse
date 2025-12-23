@@ -4,7 +4,7 @@ import Charts
 
 struct ProgressView: View {
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var progressService = ProgressService()
+    @StateObject private var progressService = ProgressService.shared
     
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     
@@ -188,19 +188,11 @@ struct DailyTask: Identifiable {
 struct WeeklyProgressRow: View {
     @ObservedObject var progressService: ProgressService
     
-    // We want the last 7 days ending today
-    // M T W T F S S is typical, but let's show relative "Last 7 Days" or fixed M-S?
-    // Let's do fixed M-S window relative to today's week.
-    // Actually, "Last 7 Days" is safer for data logic.
-    
-    // Let's deduce data for the current week (Sun-Sat or Mon-Sun)
-    // For simplicity, let's show the last 7 days of activity where the last one is Today.
-    
     var calendar: Calendar { Calendar.current }
     
+    // Use the published weeklyData property so we react to changes
     var weekData: [(date: Date, count: Int)] {
-        // Get last 6 days + today
-        return progressService.getSessionsForLastDays(6)
+        progressService.weeklyData
     }
     
     var body: some View {

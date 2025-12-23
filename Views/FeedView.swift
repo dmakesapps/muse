@@ -4,7 +4,7 @@ import SwiftData
 
 struct FeedView: View {
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var progressService = ProgressService()
+    @StateObject private var progressService = ProgressService.shared
     @StateObject private var storage = StorageService.shared
     @State private var selectedCategory: ContentCategory = .affirmation
     @State private var currentIndex: Int = 0

@@ -481,16 +481,11 @@ struct ImmersiveBreathworkView: View {
     }
     
     private func endBreathworkSessionWithPadding() {
-        // Stop sounds immediately
+        // Stop breathwork sounds but keep background music playing
         phasePlayers.values.forEach { $0.stop() }
-        BackgroundMusicManager.shared.stop(fadeOutDuration: 1.0)
         
-        // Wait 5 seconds
+        // Wait 5 seconds before completing (moment of silence)
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-             // If in background, ensure music stays off
-            if UIApplication.shared.applicationState != .active {
-                BackgroundMusicManager.shared.stop()
-            }
             onComplete()
         }
     }
@@ -2506,29 +2501,33 @@ struct AffirmationDisplayView: View {
     
     // Reshuffle ensuring the last shown affirmation isn't first
     private func endSessionWithPadding() {
-        // Stop sounds immediately
+        // Stop speech but keep background music playing
         speechService.stopSpeaking()
-        musicManager.stop(fadeOutDuration: 1.0)
         
-        // Wait 5 seconds of silence
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-            // If in background, ensure music stays off
-            if UIApplication.shared.applicationState != .active {
-                musicManager.stop()
-            }
+        // Save session IMMEDIATELY (before the delay) to avoid context issues
+        let elapsed = Int(Date().timeIntervalSince(sessionStartTime))
+        if !completedAffirmations.isEmpty {
+            let session = AffirmationSession(
+                date: Date(),
+                duration: TimeInterval(elapsed),
+                affirmationCount: completedAffirmations.count,
+                affirmations: completedAffirmations
+            )
+            modelContext.insert(session)
             
-            // Save session
-            let elapsed = Int(Date().timeIntervalSince(sessionStartTime))
-            if !completedAffirmations.isEmpty {
-                let session = AffirmationSession(
-                    date: Date(),
-                    duration: TimeInterval(elapsed),
-                    affirmationCount: completedAffirmations.count,
-                    affirmations: completedAffirmations
-                )
-                modelContext.insert(session)
+            do {
+                try modelContext.save()
+                // Refresh the shared ProgressService so all UI updates
+                ProgressService.shared.setModelContext(modelContext)
+                print("✅ Session saved: \(elapsed)s, \(completedAffirmations.count) affirmations")
+            } catch {
+                print("❌ Error saving session: \(error)")
             }
-            
+        }
+        
+        // Wait 5 seconds of silence before completing (view dismissal)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [self] in
+            guard !isStopped else { return } // Check if already stopped
             onComplete()
         }
     }
@@ -2585,8 +2584,11 @@ struct AffirmationDisplayView: View {
         
         do {
             try modelContext.save()
+            // Refresh the shared ProgressService so all UI updates
+            ProgressService.shared.setModelContext(modelContext)
+            print("✅ Session saved: \(Int(sessionDuration))s, \(affirmationCount) affirmations")
         } catch {
-            print("Error saving session: \(error)")
+            print("❌ Error saving session: \(error)")
         }
         
         onComplete()
