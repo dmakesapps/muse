@@ -248,8 +248,10 @@ struct ChatBoxView: View {
     private func sendMessage() {
         guard !messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         
+        let userMessageText = messageText
+        
         let userMessage = ChatMessage(
-            text: messageText,
+            text: userMessageText,
             isUser: true,
             timestamp: Date()
         )
@@ -265,8 +267,27 @@ struct ChatBoxView: View {
         messageText = ""
         isTyping = true
         
-        // Call OpenRouter Chat Service (Gemini) with context from past conversations
-        OpenRouterChatService.shared.sendMessage(history: messages, pastContext: chatStorage.getContextForAI()) { result in
+        // Build system prompt and check for crisis on MainActor (before async call)
+        let agentService = MuseAgentService.shared
+        let pastContext = chatStorage.getContextForAI()
+        let systemPrompt = agentService.buildCompleteSystemPrompt(pastContext: pastContext)
+        
+        // Check for crisis and get prefix if needed
+        var crisisPrefix = ""
+        if agentService.detectCrisis(in: userMessageText) {
+            crisisPrefix = agentService.getCrisisResponse()
+            print("🚨 Crisis detected - prepending resources")
+        }
+        
+        // Detect feature intent (for potential deep linking)
+        let featureIntent = agentService.detectFeatureIntent(in: userMessageText)
+        
+        // Call OpenRouter Chat Service (Gemini) with pre-built prompt
+        OpenRouterChatService.shared.sendMessage(
+            history: messages,
+            systemPrompt: systemPrompt,
+            crisisPrefix: crisisPrefix
+        ) { result in
             DispatchQueue.main.async {
                 isTyping = false
                 switch result {
@@ -283,6 +304,17 @@ struct ChatBoxView: View {
                     
                     // Save AI message to storage
                     chatStorage.addMessage(aiMessage.toStored())
+                    
+                    // If feature intent was detected with high confidence, post navigation notification
+                    if let intent = featureIntent, intent.confidence >= 0.7 {
+                        // Give user a moment to read the response before potential navigation prompt
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            NotificationCenter.default.post(
+                                name: .navigateToFeature,
+                                object: intent.feature.rawValue
+                            )
+                        }
+                    }
                     
                 case .failure(let error):
                     print("Error calling OpenRouter: \(error.localizedDescription)")
@@ -458,29 +490,20 @@ class OpenRouterChatService: ObservableObject {
     private let model = "google/gemini-2.0-flash-001"
     private let endpoint = "https://openrouter.ai/api/v1/chat/completions"
     
-    // System prompt defines the persona
-    private let systemPrompt = """
-    You are Muse, a warm, empathetic, and highly intelligent AI therapist/companion.
-    Your goal is to help the user navigate their thoughts and feelings with compassion and insight.
-    
-    Key traits:
-    - Listen deeply and validate the user's feelings first.
-    - Ask thoughtful, clarifying questions to explore deeper meaning.
-    - Offer gentle guidance rather than strict "advice" or potential diagnosis.
-    - Maintain a conversational, human-like tone. Avoid robotic lists or generic platitudes.
-    - If the user discusses self-harm or severe crisis, gently encourage professional help while remaining supportive.
-    
-    Your responses should be concise but meaningful.
-    """
-    
     private init() {}
     
     /// Send a message to OpenRouter (Gemini) and get a response
     /// - Parameters:
     ///   - history: Current conversation history
-    ///   - pastContext: Optional context from previous conversations for memory
+    ///   - systemPrompt: The complete system prompt (built on MainActor)
+    ///   - crisisPrefix: Crisis resources to prepend if detected (empty string if not)
     ///   - completion: Callback with the result
-    func sendMessage(history: [ChatMessage], pastContext: String = "", completion: @escaping (Result<String, Error>) -> Void) {
+    func sendMessage(
+        history: [ChatMessage],
+        systemPrompt: String,
+        crisisPrefix: String = "",
+        completion: @escaping (Result<String, Error>) -> Void
+    ) {
         // Debug: Log API key status (only first and last 4 chars for security)
         let key = OpenRouterConfig.apiKey
         if key.isEmpty {
@@ -501,24 +524,8 @@ class OpenRouterChatService: ObservableObject {
             return
         }
         
-        // 1. Build Dynamic System Prompt with past context
-        let currentDate = Date().formatted(date: .long, time: .shortened)
-        var dynamicSystemPrompt = """
-        \(systemPrompt)
-        
-        Current Date and Time: \(currentDate)
-        """
-        
-        // Add past conversation context if available
-        if !pastContext.isEmpty {
-            dynamicSystemPrompt += """
-            
-            
-            \(pastContext)
-            
-            Use the above memories to provide more personalized and contextual support. Reference past conversations naturally when relevant.
-            """
-        }
+        // Use the provided systemPrompt (already built on MainActor)
+        let dynamicSystemPrompt = systemPrompt
         
         // 2. Flatten History & Sanitize
         // Strategy: Prepend System Prompt to the VERY FIRST User message to guarantee compatibility.
@@ -610,7 +617,7 @@ class OpenRouterChatService: ObservableObject {
             return
         }
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        URLSession.shared.dataTask(with: request) { [crisisPrefix] data, response, error in
             if let error = error {
                 print("🔴 Muse Chat Error: \(error.localizedDescription)")
                 completion(.failure(error))
@@ -661,7 +668,11 @@ class OpenRouterChatService: ObservableObject {
                    let content = message["content"] as? String {
                     
                     print("🟣 Muse Chat response received")
-                    completion(.success(content.trimmingCharacters(in: .whitespacesAndNewlines)))
+                    
+                    // Prepend crisis resources if crisis was detected
+                    let finalResponse = crisisPrefix + content.trimmingCharacters(in: .whitespacesAndNewlines)
+                    
+                    completion(.success(finalResponse))
                 } else {
                     print("🔴 Muse Chat: Failed to parse response structure")
                      if let rawString = String(data: data, encoding: .utf8) {

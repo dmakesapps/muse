@@ -69,6 +69,8 @@
 		DDDD00012EF6000000000001 /* FrequencyItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD00002EF6000000000001 /* FrequencyItem.swift */; };
 		DDDD00032EF6000000000002 /* ImmersiveFrequenciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */; };
 		EEEE00012EF7000000000001 /* LocalSecrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE00002EF7000000000001 /* LocalSecrets.swift */; };
+		AAAA11112EFA000000000001 /* MuseAgentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA11102EFA000000000001 /* MuseAgentService.swift */; };
+		AAAA11132EFA000000000002 /* MuseUserProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA11122EFA000000000002 /* MuseUserProfileService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -179,6 +181,8 @@
 		DDDD00002EF6000000000001 /* FrequencyItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequencyItem.swift; sourceTree = "<group>"; };
 		DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveFrequenciesView.swift; sourceTree = "<group>"; };
 		EEEE00002EF7000000000001 /* LocalSecrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSecrets.swift; sourceTree = "<group>"; };
+		AAAA11102EFA000000000001 /* MuseAgentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseAgentService.swift; sourceTree = "<group>"; };
+		AAAA11122EFA000000000002 /* MuseUserProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseUserProfileService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -273,6 +277,8 @@
 				CCCC00002EEE500000000001 /* SpeechService.swift */,
 				CCCC00022EEE500000000002 /* OpenAIConfig.swift */,
 				EEEE00002EF7000000000001 /* LocalSecrets.swift */,
+				AAAA11102EFA000000000001 /* MuseAgentService.swift */,
+				AAAA11122EFA000000000002 /* MuseUserProfileService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -599,6 +605,8 @@
 				FFFF00052EF9000000000005 /* JournalView.swift in Sources */,
 				FFFF00062EF9000000000006 /* ChatHistoryView.swift in Sources */,
 				FFFF00072EF9000000000007 /* ImmersiveManifestView.swift in Sources */,
+				AAAA11112EFA000000000001 /* MuseAgentService.swift in Sources */,
+				AAAA11132EFA000000000002 /* MuseUserProfileService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

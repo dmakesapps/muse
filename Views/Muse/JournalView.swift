@@ -790,7 +790,11 @@ struct JournalView: View {
         
         let dummyHistory: [ChatMessage] = [] 
         
-        OpenRouterChatService.shared.sendMessage(history: dummyHistory, pastContext: systemContext) { result in
+        OpenRouterChatService.shared.sendMessage(
+            history: dummyHistory,
+            systemPrompt: systemContext,
+            crisisPrefix: ""
+        ) { result in
             DispatchQueue.main.async {
                 withAnimation {
                     isSendingResponse = false
