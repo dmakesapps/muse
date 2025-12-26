@@ -125,6 +125,8 @@ struct ImmersiveBreathworkView: View {
     @State private var showControls = true
     @State private var soundEnabled = true
     @State private var audioPlayer: AVAudioPlayer?
+    @State private var showVolumeSlider = false
+    @StateObject private var musicManager = BackgroundMusicManager.shared
     
     @State private var phasePlayers: [BreathPhase.PhaseType: AVAudioPlayer] = [:]
     
@@ -193,11 +195,22 @@ struct ImmersiveBreathworkView: View {
                     .padding(.bottom, 40)
                     .opacity(showControls ? 1 : 0)
             }
+            
+            // Volume slider overlay
+            if showVolumeSlider {
+                volumeSliderOverlay
+            }
         }
         .contentShape(Rectangle()) // Make entire area tappable
         .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                showControls.toggle()
+            if showVolumeSlider {
+                withAnimation(.spring(response: 0.3)) {
+                    showVolumeSlider = false
+                }
+            } else {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showControls.toggle()
+                }
             }
         }
 
@@ -234,6 +247,23 @@ struct ImmersiveBreathworkView: View {
                         .font(.system(size: 14, weight: .medium))
                 }
                 .foregroundColor(.museSuccessGreen)
+            }
+            
+            // Hold indicator (if pattern has hold phases)
+            if pattern.phases.contains(where: { $0.type == .holdIn || $0.type == .holdOut }) {
+                VStack(spacing: 4) {
+                    Image(systemName: "pause.circle")
+                        .font(.system(size: 24))
+                        .foregroundColor(.museSoftWhite.opacity(0.8))
+                    
+                    HStack(spacing: 2) {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: 10))
+                        Text("\(Int(pattern.phases.first { $0.type == .holdIn || $0.type == .holdOut }?.duration ?? 0))")
+                            .font(.system(size: 14, weight: .medium))
+                    }
+                    .foregroundColor(.museSuccessGreen)
+                }
             }
             
             // Exhale indicator
@@ -316,41 +346,43 @@ struct ImmersiveBreathworkView: View {
     // MARK: - Bottom Controls
     private var bottomControls: some View {
         VStack(spacing: 20) {
-            // Control buttons
+            // Control buttons - match AffirmationDisplayView style
             HStack(spacing: 40) {
-                // Haptic toggle
-                Button(action: {
-                    hapticEnabled.toggle()
-                    if hapticEnabled {
-                        let impact = UIImpactFeedbackGenerator(style: .light)
-                        impact.impactOccurred()
+                // Volume button
+                Button(action: { 
+                    withAnimation(.spring(response: 0.3)) {
+                        showVolumeSlider.toggle()
                     }
                 }) {
-                    Image(systemName: hapticEnabled ? "iphone.radiowaves.left.and.right" : "iphone.slash")
-                        .font(.system(size: 20))
+                    Image(systemName: musicManager.volume > 0 ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                        .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.museSoftWhite)
                         .frame(width: 50, height: 50)
                         .background(
                             Circle()
                                 .fill(Color.museDarkGray.opacity(0.8))
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.museMediumGray.opacity(0.6), lineWidth: 1)
+                                )
                         )
                 }
                 
                 // Pause/Play button
                 Button(action: {
                     isPaused.toggle()
-                    if !isPaused && hapticEnabled {
-                        let impact = UIImpactFeedbackGenerator(style: .medium)
-                        impact.impactOccurred()
-                    }
                 }) {
                     Image(systemName: isPaused ? "play.fill" : "pause.fill")
-                        .font(.system(size: 24))
+                        .font(.system(size: 24, weight: .semibold))
                         .foregroundColor(.museSoftWhite)
                         .frame(width: 70, height: 70)
                         .background(
                             Circle()
                                 .fill(Color.museDarkGray.opacity(0.8))
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.museMediumGray.opacity(0.6), lineWidth: 1)
+                                )
                         )
                 }
                 
@@ -360,12 +392,16 @@ struct ImmersiveBreathworkView: View {
                     onComplete()
                 }) {
                     Image(systemName: "xmark")
-                        .font(.system(size: 20))
+                        .font(.system(size: 20, weight: .semibold))
                         .foregroundColor(.museSoftWhite)
                         .frame(width: 50, height: 50)
                         .background(
                             Circle()
                                 .fill(Color.museDarkGray.opacity(0.8))
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.museMediumGray.opacity(0.6), lineWidth: 1)
+                                )
                         )
                 }
             }
@@ -381,6 +417,42 @@ struct ImmersiveBreathworkView: View {
                         .fill(Color.museDarkGray.opacity(0.8))
                 )
         }
+    }
+    
+    // MARK: - Volume Slider Overlay
+    private var volumeSliderOverlay: some View {
+        VStack {
+            Spacer()
+            
+            HStack(spacing: 16) {
+                Image(systemName: "speaker.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(.museLightGray)
+                
+                Slider(value: Binding(
+                    get: { Double(musicManager.volume) },
+                    set: { musicManager.setVolume(Float($0)) }
+                ), in: 0...1)
+                .accentColor(.museGradientStart)
+                
+                Image(systemName: "speaker.wave.3.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(.museLightGray)
+            }
+            .padding(.horizontal, 30)
+            .padding(.vertical, 20)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.museDarkGray.opacity(0.95))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.museMediumGray.opacity(0.5), lineWidth: 1)
+                    )
+            )
+            .padding(.horizontal, 40)
+            .padding(.bottom, 180)
+        }
+        .transition(.opacity.combined(with: .move(edge: .bottom)))
     }
     
     // MARK: - Breathing Logic
@@ -553,6 +625,8 @@ struct StartAffirmationsView: View {
     @State private var showManifestView = false
     @State private var activeFrequency: FrequencyItem? = nil // For frequencies immersive view
     @State private var showAIChat = false // For AI-generated affirmations chat
+    @State private var searchText: String = "" // Search affirmations by text or category
+    @State private var isAffirmationsListCollapsed: Bool = false // Collapse/expand affirmations list
     
     enum PracticeMode: String, CaseIterable {
         case affirmations = "Affirmations"
@@ -601,12 +675,25 @@ struct StartAffirmationsView: View {
         return Array(Set(categories)).sorted()
     }
     
-    // Filter affirmations by selected category
+    // Filter affirmations by selected category and search text
     private var filteredAffirmations: [Affirmation] {
+        var result = currentAffirmationPool
+        
+        // Filter by category if selected
         if let category = selectedCategory {
-            return currentAffirmationPool.filter { $0.category == category }
+            result = result.filter { $0.category == category }
         }
-        return currentAffirmationPool
+        
+        // Filter by search text (searches both affirmation text and category name)
+        if !searchText.isEmpty {
+            let lowercasedSearch = searchText.lowercased()
+            result = result.filter { affirmation in
+                affirmation.text.lowercased().contains(lowercasedSearch) ||
+                affirmation.category.lowercased().contains(lowercasedSearch)
+            }
+        }
+        
+        return result
     }
     
     // Get the affirmations to use for the session
@@ -1090,6 +1177,8 @@ struct StartAffirmationsView: View {
                     selectedAffirmations.removeAll()
                     useRandom = false
                     selectedCategory = nil
+                    searchText = ""
+                    isAffirmationsListCollapsed = false
                 }
             }) {
                 HStack(spacing: 8) {
@@ -1147,6 +1236,37 @@ struct StartAffirmationsView: View {
                 )
             }
             
+            // Search Bar
+            HStack(spacing: 12) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 16))
+                    .foregroundColor(.museLightGray)
+                
+                TextField("Search affirmations or categories...", text: $searchText)
+                    .font(.museBodyMedium())
+                    .foregroundColor(.museSoftWhite)
+                    .autocorrectionDisabled()
+                
+                if !searchText.isEmpty {
+                    Button(action: { searchText = "" }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(.museLightGray)
+                    }
+                }
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.white.opacity(0.08))
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(.thinMaterial)
+                            .opacity(0.5)
+                    )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            
             // Categories Section
             if !availableCategories.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
@@ -1187,13 +1307,31 @@ struct StartAffirmationsView: View {
             if !useRandom {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
-                        Text("Select Affirmations")
-                            .font(.museHeadline())
-                            .foregroundColor(.museSoftWhite)
+                        Button(action: {
+                            withAnimation(.spring(response: 0.3)) {
+                                isAffirmationsListCollapsed.toggle()
+                            }
+                        }) {
+                            HStack(spacing: 8) {
+                                Text("Select Affirmations")
+                                    .font(.museHeadline())
+                                    .foregroundColor(.museSoftWhite)
+                                
+                                Image(systemName: isAffirmationsListCollapsed ? "chevron.right" : "chevron.down")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(.museLightGray)
+                                
+                                if !filteredAffirmations.isEmpty {
+                                    Text("(\(filteredAffirmations.count))")
+                                        .font(.museCaption())
+                                        .foregroundColor(.museLightGray)
+                                }
+                            }
+                        }
                         
                         Spacer()
                         
-                        if !filteredAffirmations.isEmpty {
+                        if !filteredAffirmations.isEmpty && !isAffirmationsListCollapsed {
                             Button(action: {
                                 if selectedAffirmations.count == filteredAffirmations.count {
                                     selectedAffirmations.removeAll()
@@ -1208,24 +1346,30 @@ struct StartAffirmationsView: View {
                         }
                     }
                     
-                    if filteredAffirmations.isEmpty {
-                        Text("No affirmations in this category")
-                            .font(.museBodyMedium())
-                            .foregroundColor(.museLightGray)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 40)
-                    } else {
-                        VStack(spacing: 10) {
-                            ForEach(filteredAffirmations) { affirmation in
-                                AffirmationSelectRow(
-                                    affirmation: affirmation,
-                                    isSelected: selectedAffirmations.contains(affirmation.id)
-                                ) {
-                                    toggleSelection(affirmation)
+                    // Use opacity-based animation for smooth collapse (avoids animating 900+ views)
+                    Group {
+                        if filteredAffirmations.isEmpty {
+                            Text(searchText.isEmpty ? "No affirmations in this category" : "No affirmations match your search")
+                                .font(.museBodyMedium())
+                                .foregroundColor(.museLightGray)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 40)
+                        } else {
+                            VStack(spacing: 10) {
+                                ForEach(filteredAffirmations) { affirmation in
+                                    AffirmationSelectRow(
+                                        affirmation: affirmation,
+                                        isSelected: selectedAffirmations.contains(affirmation.id)
+                                    ) {
+                                        toggleSelection(affirmation)
+                                    }
                                 }
                             }
                         }
                     }
+                    .frame(maxHeight: isAffirmationsListCollapsed ? 0 : nil)
+                    .opacity(isAffirmationsListCollapsed ? 0 : 1)
+                    .clipped()
                 }
             }
             
@@ -1268,7 +1412,17 @@ struct StartAffirmationsView: View {
                                 .padding(.vertical, 12)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .fill(duration == durationOption ? Color.museAccentBlue : Color.museDarkGray)
+                                        .fill(duration == durationOption ? Color.museAccentBlue.opacity(0.8) : Color.white.opacity(0.08))
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(.thinMaterial)
+                                                .opacity(0.5)
+                                        )
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(duration == durationOption ? Color.museAccentBlue : Color.clear, lineWidth: 1)
                                 )
                         }
                     }
@@ -1372,7 +1526,17 @@ struct StartAffirmationsView: View {
                                 .padding(.vertical, 12)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .fill(duration == durationOption ? Color.museTeal : Color.museDarkGray)
+                                        .fill(duration == durationOption ? Color.museTeal.opacity(0.8) : Color.white.opacity(0.08))
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(.thinMaterial)
+                                                .opacity(0.5)
+                                        )
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(duration == durationOption ? Color.museTeal : Color.clear, lineWidth: 1)
                                 )
                         }
                     }
@@ -1426,6 +1590,8 @@ struct StartAffirmationsView: View {
                     selectedAffirmations.removeAll()
                     useRandom = false
                     selectedCategory = nil
+                    searchText = ""
+                    isAffirmationsListCollapsed = false
                 }
             }) {
                 HStack(spacing: 8) {
@@ -1483,6 +1649,37 @@ struct StartAffirmationsView: View {
                 )
             }
             
+            // Search Bar
+            HStack(spacing: 12) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 16))
+                    .foregroundColor(.museLightGray)
+                
+                TextField("Search affirmations or categories...", text: $searchText)
+                    .font(.museBodyMedium())
+                    .foregroundColor(.museSoftWhite)
+                    .autocorrectionDisabled()
+                
+                if !searchText.isEmpty {
+                    Button(action: { searchText = "" }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(.museLightGray)
+                    }
+                }
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.white.opacity(0.08))
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(.thinMaterial)
+                            .opacity(0.5)
+                    )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            
             // Categories Section
             if !availableCategories.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
@@ -1523,13 +1720,31 @@ struct StartAffirmationsView: View {
             if !useRandom {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
-                        Text("Select Affirmations")
-                            .font(.museHeadline())
-                            .foregroundColor(.museSoftWhite)
+                        Button(action: {
+                            withAnimation(.spring(response: 0.3)) {
+                                isAffirmationsListCollapsed.toggle()
+                            }
+                        }) {
+                            HStack(spacing: 8) {
+                                Text("Select Affirmations")
+                                    .font(.museHeadline())
+                                    .foregroundColor(.museSoftWhite)
+                                
+                                Image(systemName: isAffirmationsListCollapsed ? "chevron.right" : "chevron.down")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(.museLightGray)
+                                
+                                if !filteredAffirmations.isEmpty {
+                                    Text("(\(filteredAffirmations.count))")
+                                        .font(.museCaption())
+                                        .foregroundColor(.museLightGray)
+                                }
+                            }
+                        }
                         
                         Spacer()
                         
-                        if !filteredAffirmations.isEmpty {
+                        if !filteredAffirmations.isEmpty && !isAffirmationsListCollapsed {
                             Button(action: {
                                 if selectedAffirmations.count == filteredAffirmations.count {
                                     selectedAffirmations.removeAll()
@@ -1544,24 +1759,30 @@ struct StartAffirmationsView: View {
                         }
                     }
                     
-                    if filteredAffirmations.isEmpty {
-                        Text("No affirmations in this category")
-                            .font(.museBodyMedium())
-                            .foregroundColor(.museLightGray)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 40)
-                    } else {
-                        VStack(spacing: 10) {
-                            ForEach(filteredAffirmations) { affirmation in
-                                AffirmationSelectRow(
-                                    affirmation: affirmation,
-                                    isSelected: selectedAffirmations.contains(affirmation.id)
-                                ) {
-                                    toggleSelection(affirmation)
+                    // Use opacity-based animation for smooth collapse (avoids animating 900+ views)
+                    Group {
+                        if filteredAffirmations.isEmpty {
+                            Text(searchText.isEmpty ? "No affirmations in this category" : "No affirmations match your search")
+                                .font(.museBodyMedium())
+                                .foregroundColor(.museLightGray)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 40)
+                        } else {
+                            VStack(spacing: 10) {
+                                ForEach(filteredAffirmations) { affirmation in
+                                    AffirmationSelectRow(
+                                        affirmation: affirmation,
+                                        isSelected: selectedAffirmations.contains(affirmation.id)
+                                    ) {
+                                        toggleSelection(affirmation)
+                                    }
                                 }
                             }
                         }
                     }
+                    .frame(maxHeight: isAffirmationsListCollapsed ? 0 : nil)
+                    .opacity(isAffirmationsListCollapsed ? 0 : 1)
+                    .clipped()
                 }
             }
             
@@ -1604,7 +1825,17 @@ struct StartAffirmationsView: View {
                                 .padding(.vertical, 12)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .fill(duration == durationOption ? Color.museAccentBlue : Color.museDarkGray)
+                                        .fill(duration == durationOption ? Color.museAccentBlue.opacity(0.8) : Color.white.opacity(0.08))
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(.thinMaterial)
+                                                .opacity(0.5)
+                                        )
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(duration == durationOption ? Color.museAccentBlue : Color.clear, lineWidth: 1)
                                 )
                         }
                     }
@@ -1696,12 +1927,18 @@ struct MusicTrackButton: View {
             }
             .padding(14)
             .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(isSelected ? Color.museSuccessGreen.opacity(0.1) : Color.museDarkGray)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(isSelected ? Color.museSuccessGreen.opacity(0.5) : Color.museMediumGray.opacity(0.3), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? Color.museSuccessGreen.opacity(0.1) : Color.white.opacity(0.08))
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(.thinMaterial)
+                            .opacity(isSelected ? 0.3 : 0.5)
                     )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isSelected ? Color.museSuccessGreen.opacity(0.5) : Color.clear, lineWidth: 1)
             )
         }
         .buttonStyle(PlainButtonStyle())

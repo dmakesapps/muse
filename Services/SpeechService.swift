@@ -47,10 +47,11 @@ class SpeechService: NSObject, ObservableObject {
         
         super.init()
         
-        // Clear old cache (cache key format changed to include punctuation normalization)
-        try? FileManager.default.removeItem(at: cacheDirectory)
+        // Ensure cache directory exists (don't clear it - we want persistent caching!)
         try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
-        cachedAudioURLs = [:]
+        
+        // Load previously cached audio references from disk
+        loadCachedReferences()
     }
     
     // MARK: - Audio Session

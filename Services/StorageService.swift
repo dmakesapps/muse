@@ -136,9 +136,12 @@ class StorageService: ObservableObject {
     
     // MARK: - Affirmations
     func saveAffirmation(_ affirmation: Affirmation) {
+        // Normalize text to ensure proper punctuation for TTS
+        let normalizedAffirmation = normalizeAffirmation(affirmation)
+        
         // Check by content (text) to prevent duplicates even if UUID differs
-        if !savedAffirmations.contains(where: { $0.text == affirmation.text }) {
-            savedAffirmations.append(affirmation)
+        if !savedAffirmations.contains(where: { $0.text == normalizedAffirmation.text }) {
+            savedAffirmations.append(normalizedAffirmation)
             saveAffirmations()
         }
     }
@@ -185,12 +188,29 @@ class StorageService: ObservableObject {
     /// Save multiple AI-generated affirmations at once
     func saveAIGeneratedAffirmations(_ affirmations: [Affirmation]) {
         for affirmation in affirmations {
+            // Normalize text to ensure proper punctuation for TTS
+            let normalizedAffirmation = normalizeAffirmation(affirmation)
+            
             // Check by content (text) to prevent duplicates
-            if !aiGeneratedAffirmations.contains(where: { $0.text == affirmation.text }) {
-                aiGeneratedAffirmations.append(affirmation)
+            if !aiGeneratedAffirmations.contains(where: { $0.text == normalizedAffirmation.text }) {
+                aiGeneratedAffirmations.append(normalizedAffirmation)
             }
         }
         persistAIAffirmations()
+    }
+    
+    /// Normalize affirmation text to ensure proper punctuation for TTS
+    private func normalizeAffirmation(_ affirmation: Affirmation) -> Affirmation {
+        let trimmedText = affirmation.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Check if already ends with sentence-ending punctuation
+        let sentenceEndings: Set<Character> = [".", "!", "?", "…"]
+        if let lastChar = trimmedText.last, sentenceEndings.contains(lastChar) {
+            return Affirmation(id: affirmation.id, text: trimmedText, category: affirmation.category)
+        }
+        
+        // Add period for proper TTS intonation
+        return Affirmation(id: affirmation.id, text: trimmedText + ".", category: affirmation.category)
     }
     
     /// Remove an AI-generated affirmation
