@@ -46,8 +46,8 @@ struct ChatBoxView: View {
                     ScrollView {
                         VStack(spacing: 24) {
                             if !messages.isEmpty {
-                                // Add generous top padding to clear the journal button
-                                Spacer().frame(height: 60)
+                                // Add generous top padding to clear the header bar
+                                Spacer().frame(height: 80)
                                 
                                 ForEach(messages) { message in
                                     ChatBubble(message: message)
@@ -62,22 +62,36 @@ struct ChatBoxView: View {
                                     .padding(.leading, 20)
                                     .id("typing")
                                 }
+                                
+                                // Bottom anchor for reliable scrolling
+                                Color.clear
+                                    .frame(height: 1)
+                                    .id("bottom")
                             }
                         }
                         .padding(.horizontal, 16)
-                        .padding(.bottom, 140) // Clearance for input bar
+                        .padding(.bottom, 350) // Large clearance for input bar
                     }
                     .onChange(of: messages.count) { _, _ in
-                        if let lastMessage = messages.last {
-                            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                                proxy.scrollTo(lastMessage.id, anchor: .bottom)
-                            }
+                        // Aggressive scrolling - scroll to last message at top of view
+                        scrollToLastMessage(proxy: proxy)
+                        
+                        // Retry after short delay (for layout)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                            scrollToLastMessage(proxy: proxy)
+                        }
+                        
+                        // Final retry after longer delay (for content rendering)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            scrollToLastMessage(proxy: proxy)
                         }
                     }
                     .onChange(of: isTyping) { _, newValue in
                          if newValue {
-                             withAnimation {
-                                 proxy.scrollTo("typing", anchor: .bottom)
+                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                 withAnimation(.easeOut(duration: 0.3)) {
+                                     proxy.scrollTo("typing", anchor: .top)
+                                 }
                              }
                          }
                     }
@@ -126,12 +140,13 @@ struct ChatBoxView: View {
                                 .foregroundColor(.museLightGray.opacity(0.8))
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding(.vertical, 12)
+                                .allowsHitTesting(false) // Let taps pass through to TextField
                         }
                         
                         TextField("", text: $messageText, axis: .vertical)
                             .font(.system(size: 17, weight: .regular, design: .rounded))
                             .foregroundColor(.museSoftWhite)
-                            .multilineTextAlignment(messageText.isEmpty ? .center : .leading)
+                            .multilineTextAlignment(.leading) // Always left-aligned
                             .lineLimit(1...5)
                             .padding(.horizontal, 4)
                             .padding(.vertical, 12)
@@ -238,7 +253,14 @@ struct ChatBoxView: View {
             }
         }
     }
-
+    
+    /// Scroll to the last message, positioning it at the top of visible area
+    private func scrollToLastMessage(proxy: ScrollViewProxy) {
+        guard let lastMessage = messages.last else { return }
+        withAnimation(.easeOut(duration: 0.3)) {
+            proxy.scrollTo(lastMessage.id, anchor: .top)
+        }
+    }
     
     private func setQuickAction(_ text: String) {
         messageText = text

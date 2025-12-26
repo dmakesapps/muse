@@ -33,7 +33,8 @@ struct MuseChatView: View {
                 }
                 
                 // Header - Chat History Button + Muse Title + Journal Button
-                VStack {
+                VStack(spacing: 0) {
+                    // Header bar with background
                     ZStack {
                         // Centered Title
                         Text("Muse")
@@ -98,7 +99,26 @@ struct MuseChatView: View {
                         }
                     }
                     .padding(.horizontal, 20)
-                    .padding(.top, 8)
+                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        // Glassmorphic header background
+                        Rectangle()
+                            .fill(.ultraThinMaterial)
+                            .overlay(
+                                Rectangle()
+                                    .fill(Color.museDeepNavy.opacity(0.7))
+                            )
+                            .overlay(
+                                // Subtle bottom border
+                                VStack {
+                                    Spacer()
+                                    Rectangle()
+                                        .fill(Color.museMediumGray.opacity(0.3))
+                                        .frame(height: 0.5)
+                                }
+                            )
+                    )
                     
                     Spacer()
                 }
