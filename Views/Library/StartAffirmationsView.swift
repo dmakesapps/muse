@@ -627,6 +627,7 @@ struct StartAffirmationsView: View {
     @State private var showAIChat = false // For AI-generated affirmations chat
     @State private var searchText: String = "" // Search affirmations by text or category
     @State private var isAffirmationsListCollapsed: Bool = false // Collapse/expand affirmations list
+    @State private var isSavedAIExpanded: Bool = false // Expand saved AI affirmations for selection
     
     enum PracticeMode: String, CaseIterable {
         case affirmations = "Affirmations"
@@ -1442,6 +1443,9 @@ struct StartAffirmationsView: View {
             Button(action: {
                 withAnimation(.spring(response: 0.3)) {
                     selectedSource = nil
+                    selectedAffirmations.removeAll()
+                    useRandom = false
+                    isSavedAIExpanded = false
                 }
             }) {
                 HStack(spacing: 8) {
@@ -1473,38 +1477,193 @@ struct StartAffirmationsView: View {
             // Previously Generated Section
             if !storage.aiGeneratedAffirmations.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Text("Previously Generated")
-                            .font(.museHeadline())
-                            .foregroundColor(.museSoftWhite)
-                        
-                        Spacer()
-                        
-                        Text("\(storage.aiGeneratedAffirmations.count) saved")
-                            .font(.museCaption())
-                            .foregroundColor(.museLightGray)
+                    // Header with expand/collapse toggle
+                    Button(action: {
+                        withAnimation(.spring(response: 0.3)) {
+                            isSavedAIExpanded.toggle()
+                            if !isSavedAIExpanded {
+                                // Reset selections when collapsing
+                                selectedAffirmations.removeAll()
+                                useRandom = false
+                            }
+                        }
+                    }) {
+                        HStack {
+                            Text("Previously Generated")
+                                .font(.museHeadline())
+                                .foregroundColor(.museSoftWhite)
+                            
+                            Image(systemName: isSavedAIExpanded ? "chevron.down" : "chevron.right")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.museLightGray)
+                            
+                            Spacer()
+                            
+                            Text("\(storage.aiGeneratedAffirmations.count) saved")
+                                .font(.museCaption())
+                                .foregroundColor(.museLightGray)
+                        }
                     }
                     
-                    // Quick use button for saved AI affirmations
-                    Button(action: {
-                        // Use saved AI affirmations
-                        selectedAffirmations = Set(storage.aiGeneratedAffirmations.map { $0.id })
-                        useRandom = true
-                        isActive = true
-                    }) {
-                        HStack(spacing: 12) {
-                            Image(systemName: "play.fill")
-                                .font(.system(size: 14))
-                            Text("Use Saved Affirmations")
-                                .font(.museButtonMedium())
+                    // Expanded content
+                    if isSavedAIExpanded {
+                        // Random option
+                        Button(action: {
+                            withAnimation(.spring(response: 0.3)) {
+                                useRandom.toggle()
+                                if useRandom {
+                                    selectedAffirmations.removeAll()
+                                }
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: "shuffle")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(useRandom ? .museSoftWhite : .museTeal)
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Random")
+                                        .font(.museBodyMedium())
+                                        .foregroundColor(.museSoftWhite)
+                                    Text("Cycle through all saved")
+                                        .font(.museCaption())
+                                        .foregroundColor(.museLightGray)
+                                }
+                                
+                                Spacer()
+                                
+                                Image(systemName: useRandom ? "checkmark.circle.fill" : "circle")
+                                    .font(.system(size: 22))
+                                    .foregroundColor(useRandom ? .museSuccessGreen : .museLightGray)
+                            }
+                            .padding(14)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(useRandom ? Color.museTeal.opacity(0.15) : Color.white.opacity(0.08))
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(.thinMaterial)
+                                            .opacity(0.5)
+                                    )
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(useRandom ? Color.museTeal : Color.clear, lineWidth: 1)
+                            )
                         }
-                        .foregroundColor(.museSoftWhite)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.museTeal.opacity(0.3))
-                        )
+                        
+                        // Selection controls (only when not using random)
+                        if !useRandom {
+                            HStack {
+                                Text("Select Affirmations")
+                                    .font(.museCaption())
+                                    .foregroundColor(.museLightGray)
+                                
+                                Spacer()
+                                
+                                Button(action: {
+                                    if selectedAffirmations.count == storage.aiGeneratedAffirmations.count {
+                                        selectedAffirmations.removeAll()
+                                    } else {
+                                        selectedAffirmations = Set(storage.aiGeneratedAffirmations.map { $0.id })
+                                    }
+                                }) {
+                                    Text(selectedAffirmations.count == storage.aiGeneratedAffirmations.count ? "Deselect All" : "Select All")
+                                        .font(.museCaption())
+                                        .foregroundColor(.museTeal)
+                                }
+                            }
+                            .padding(.top, 8)
+                            
+                            // Affirmations list
+                            VStack(spacing: 8) {
+                                ForEach(storage.aiGeneratedAffirmations) { affirmation in
+                                    Button(action: {
+                                        if selectedAffirmations.contains(affirmation.id) {
+                                            selectedAffirmations.remove(affirmation.id)
+                                        } else {
+                                            selectedAffirmations.insert(affirmation.id)
+                                        }
+                                    }) {
+                                        HStack(spacing: 12) {
+                                            Image(systemName: selectedAffirmations.contains(affirmation.id) ? "checkmark.circle.fill" : "circle")
+                                                .font(.system(size: 20))
+                                                .foregroundColor(selectedAffirmations.contains(affirmation.id) ? .museSuccessGreen : .museLightGray)
+                                            
+                                            Text(affirmation.text)
+                                                .font(.museBodyMedium())
+                                                .foregroundColor(.museSoftWhite)
+                                                .lineLimit(2)
+                                                .multilineTextAlignment(.leading)
+                                            
+                                            Spacer()
+                                        }
+                                        .padding(12)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(selectedAffirmations.contains(affirmation.id) ? Color.museSuccessGreen.opacity(0.1) : Color.white.opacity(0.05))
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(selectedAffirmations.contains(affirmation.id) ? Color.museSuccessGreen.opacity(0.4) : Color.clear, lineWidth: 1)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Start Session button (when selections made or random enabled)
+                        if useRandom || !selectedAffirmations.isEmpty {
+                            Button(action: {
+                                if useRandom {
+                                    selectedAffirmations = Set(storage.aiGeneratedAffirmations.map { $0.id })
+                                }
+                                isActive = true
+                            }) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "play.fill")
+                                        .font(.system(size: 16))
+                                    Text("Start Session (\(useRandom ? storage.aiGeneratedAffirmations.count : selectedAffirmations.count) affirmations)")
+                                        .font(.museButtonMedium())
+                                }
+                                .foregroundColor(.museSoftWhite)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.museTeal)
+                                )
+                            }
+                            .padding(.top, 8)
+                        }
+                    } else {
+                        // Collapsed state - quick use button
+                        Button(action: {
+                            withAnimation(.spring(response: 0.3)) {
+                                isSavedAIExpanded = true
+                            }
+                        }) {
+                            HStack(spacing: 12) {
+                                Image(systemName: "chevron.down.circle")
+                                    .font(.system(size: 14))
+                                Text("Tap to select affirmations")
+                                    .font(.museBodyMedium())
+                            }
+                            .foregroundColor(.museLightGray)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.white.opacity(0.08))
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .fill(.thinMaterial)
+                                            .opacity(0.5)
+                                    )
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
                     }
                 }
                 .padding(.top, 10)

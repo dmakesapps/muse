@@ -72,7 +72,7 @@ struct ProgressView: View {
                         KeyMetricsView(
                             totalSessions: progressService.totalSessions,
                             totalTime: progressService.totalTime,
-                            longestStreak: progressService.longestStreak
+                            currentStreak: progressService.currentStreak
                         )
                         .padding(.horizontal, 20)
                         
@@ -433,7 +433,7 @@ struct AddTaskSheet: View {
 struct KeyMetricsView: View {
     let totalSessions: Int
     let totalTime: TimeInterval
-    let longestStreak: Int
+    let currentStreak: Int
     
     private var formattedTime: String {
         let hours = Int(totalTime) / 3600
@@ -463,7 +463,7 @@ struct KeyMetricsView: View {
             
             MetricCard(
                 title: "Streak",
-                value: "\(longestStreak)",
+                value: "\(currentStreak)",
                 icon: "flame.fill",
                 color: .museOrange
             )
