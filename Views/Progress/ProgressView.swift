@@ -692,7 +692,7 @@ class NotificationService: ObservableObject {
         let content = UNMutableNotificationContent()
         content.title = "Muse Test"
         content.body = "If you see this, notifications are working! 🎉"
-        content.sound = .default
+        content.sound = UNNotificationSound(named: UNNotificationSoundName("notisound.wav"))
         
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
         let request = UNNotificationRequest(identifier: "test_notification", content: content, trigger: trigger)
@@ -786,7 +786,7 @@ class NotificationService: ObservableObject {
         content.title = "Muse"
         let message = notificationMessages.randomElement() ?? notificationMessages[0]
         content.body = String(format: message, reminder.sessionType.rawValue.lowercased())
-        content.sound = .default
+        content.sound = UNNotificationSound(named: UNNotificationSoundName("notisound.wav"))
         
         let calendar = Calendar.current
         let components = calendar.dateComponents([.hour, .minute], from: reminder.time)
@@ -889,7 +889,7 @@ class NotificationService: ObservableObject {
         let notificationContent = UNMutableNotificationContent()
         notificationContent.title = title
         notificationContent.body = body
-        notificationContent.sound = .default
+        notificationContent.sound = UNNotificationSound(named: UNNotificationSoundName("notisound.wav"))
         
         // Generate random hour between 8 AM and 9 PM, spread throughout the day
         let startHour = 8

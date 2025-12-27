@@ -31,6 +31,7 @@
 		72B90C192EEFCDCA00A446A2 /* backgroundjungle2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 72B90C182EEFCDCA00A446A2 /* backgroundjungle2.jpg */; };
 		72D83ED02EFF698B002E235A /* clouds.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 72D83ECE2EFF698B002E235A /* clouds.jpg */; };
 		72D83ED12EFF698B002E235A /* ocean.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 72D83ECF2EFF698B002E235A /* ocean.jpg */; };
+		72D83ED32EFF765C002E235A /* notisound.wav in Resources */ = {isa = PBXBuildFile; fileRef = 72D83ED22EFF765C002E235A /* notisound.wav */; };
 		72E2629E2EC68E040080CF29 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262902EC68E040080CF29 /* ContentView.swift */; };
 		72E262A52EC68E040080CF29 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262A62EC68E040080CF29 /* Theme.swift */; };
 		72E262AA2EC68E040080CF29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72E262A92EC68E040080CF29 /* Assets.xcassets */; };
@@ -134,6 +135,7 @@
 		72B90C182EEFCDCA00A446A2 /* backgroundjungle2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = backgroundjungle2.jpg; sourceTree = "<group>"; };
 		72D83ECE2EFF698B002E235A /* clouds.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = clouds.jpg; sourceTree = "<group>"; };
 		72D83ECF2EFF698B002E235A /* ocean.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = ocean.jpg; sourceTree = "<group>"; };
+		72D83ED22EFF765C002E235A /* notisound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = notisound.wav; sourceTree = "<group>"; };
 		72E262572EC68CF40080CF29 /* Muse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Muse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		72E262662EC68CF60080CF29 /* MuseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		72E262702EC68CF60080CF29 /* MuseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -324,6 +326,7 @@
 		AAAA00062EC6F00000000004 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				72D83ED22EFF765C002E235A /* notisound.wav */,
 				72D83ECE2EFF698B002E235A /* clouds.jpg */,
 				72D83ECF2EFF698B002E235A /* ocean.jpg */,
 				726A39482EF795AA00BF8F8E /* 174-hz-pain-release.mp3 */,
@@ -509,6 +512,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72D83ED32EFF765C002E235A /* notisound.wav in Resources */,
 				724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */,
 				72996E252EF23F6200795B97 /* bell321.mp3 in Resources */,
 				724C1B682EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 in Resources */,
