@@ -1683,7 +1683,7 @@ We may update this privacy policy from time to time. We will notify you of any c
                         policySection(title: "Contact Us", content: """
 If you have questions about this Privacy Policy, please contact us at:
 
-Email: support@museapp.com
+Email: splashcapital1@gmail.com
 """)
                     }
                 }
@@ -1805,7 +1805,7 @@ We reserve the right to modify these Terms at any time. Continued use of the App
                         policySection(title: "Contact", content: """
 For questions about these Terms, contact us at:
 
-Email: support@museapp.com
+Email: splashcapital1@gmail.com
 """)
                     }
                 }
@@ -1925,7 +1925,7 @@ This EULA shall be governed by and construed in accordance with the laws of the 
                         policySection(title: "Contact Information", content: """
 For questions regarding this EULA, please contact:
 
-Email: support@museapp.com
+Email: splashcapital1@gmail.com
 """)
                     }
                 }
