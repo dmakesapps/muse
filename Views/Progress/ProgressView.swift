@@ -617,25 +617,15 @@ class NotificationService: ObservableObject {
     @Published var journalReminders: [SessionReminder] = []
     @Published var isAuthorized: Bool = false
     
-    // Daily Inspiration Settings
-    @Published var dailyInspirationEnabled: Bool = false
-    @Published var dailyInspirationCount: Int = 3 // 1-5
-    @Published var dailyInspirationSource: InspirationSource = .affirmations
-    @Published var selectedCategories: Set<String> = []
+    // Affirmation Notifications Settings (0 = None, 1-5 = frequency per day)
+    @Published var affirmationNotificationCount: Int = 0
+    @Published var affirmationCategories: Set<String> = []
+    
+    // Quote Notifications Settings (0 = None, 1-5 = frequency per day)
+    @Published var quoteNotificationCount: Int = 0
+    @Published var quoteCategories: Set<String> = []
     
     static let maxReminders = 5
-    
-    enum InspirationSource: String, CaseIterable, Codable {
-        case affirmations = "Affirmations"
-        case quotes = "Quotes"
-        
-        var icon: String {
-            switch self {
-            case .affirmations: return "sparkles"
-            case .quotes: return "quote.bubble.fill"
-            }
-        }
-    }
     
     enum SessionType: String, CaseIterable, Codable {
         case affirmations = "Affirmations"
@@ -676,7 +666,7 @@ class NotificationService: ObservableObject {
     
     private init() {
         loadReminders()
-        loadInspirationSettings()
+        loadContentSettings()
         checkAuthorizationStatus()
     }
     
@@ -826,116 +816,155 @@ class NotificationService: ObservableObject {
         journalReminders = decoded.filter { $0.sessionType == .journaling }
     }
     
-    // MARK: - Daily Inspiration
+    // MARK: - Affirmation & Quote Notifications
     
-    func updateInspirationSettings(enabled: Bool, count: Int, source: InspirationSource, categories: Set<String>) {
-        dailyInspirationEnabled = enabled
-        dailyInspirationCount = count
-        dailyInspirationSource = source
-        selectedCategories = categories
-        saveInspirationSettings()
-        rescheduleInspirationNotifications()
+    func updateAffirmationSettings(count: Int, categories: Set<String>) {
+        affirmationNotificationCount = count
+        affirmationCategories = categories
+        saveContentSettings()
+        rescheduleContentNotifications()
     }
     
-    func rescheduleInspirationNotifications() {
-        // Cancel existing inspiration notifications
-        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
-            let inspirationIds = requests.filter { $0.identifier.hasPrefix("inspiration_") }.map { $0.identifier }
-            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: inspirationIds)
+    func updateQuoteSettings(count: Int, categories: Set<String>) {
+        quoteNotificationCount = count
+        quoteCategories = categories
+        saveContentSettings()
+        rescheduleContentNotifications()
+    }
+    
+    func rescheduleContentNotifications() {
+        // Cancel existing content notifications
+        UNUserNotificationCenter.current().getPendingNotificationRequests { [weak self] requests in
+            guard let self = self else { return }
+            let contentIds = requests.filter { 
+                $0.identifier.hasPrefix("affirmation_") || $0.identifier.hasPrefix("quote_") 
+            }.map { $0.identifier }
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: contentIds)
+            
+            // Schedule new notifications on main thread
+            DispatchQueue.main.async {
+                self.scheduleAffirmationNotifications()
+                self.scheduleQuoteNotifications()
+            }
         }
+    }
+    
+    private func scheduleAffirmationNotifications() {
+        guard affirmationNotificationCount > 0, !affirmationCategories.isEmpty else { return }
         
-        guard dailyInspirationEnabled, !selectedCategories.isEmpty else { return }
-        
-        // Load content
-        let content: [String]
-        if dailyInspirationSource == .affirmations {
-            content = loadAffirmations()
-        } else {
-            content = loadQuotes()
-        }
-        
+        let content = loadAffirmationsContent()
         guard !content.isEmpty else { return }
         
-        // Schedule notifications at random times between 8 AM and 9 PM
-        for i in 0..<dailyInspirationCount {
+        for i in 0..<affirmationNotificationCount {
             let randomContent = content.randomElement() ?? content[0]
-            scheduleInspirationNotification(content: randomContent, index: i)
+            scheduleContentNotification(
+                identifier: "affirmation_\(i)",
+                title: "✨ Daily Affirmation",
+                body: randomContent,
+                index: i,
+                totalCount: affirmationNotificationCount
+            )
         }
     }
     
-    private func scheduleInspirationNotification(content: String, index: Int) {
+    private func scheduleQuoteNotifications() {
+        guard quoteNotificationCount > 0, !quoteCategories.isEmpty else { return }
+        
+        let content = loadQuotesContent()
+        guard !content.isEmpty else { return }
+        
+        for i in 0..<quoteNotificationCount {
+            let randomContent = content.randomElement() ?? content[0]
+            scheduleContentNotification(
+                identifier: "quote_\(i)",
+                title: "💭 Daily Quote",
+                body: randomContent,
+                index: i,
+                totalCount: quoteNotificationCount
+            )
+        }
+    }
+    
+    private func scheduleContentNotification(identifier: String, title: String, body: String, index: Int, totalCount: Int) {
         let notificationContent = UNMutableNotificationContent()
-        notificationContent.title = dailyInspirationSource == .affirmations ? "✨ Daily Affirmation" : "💭 Daily Quote"
-        notificationContent.body = content
+        notificationContent.title = title
+        notificationContent.body = body
         notificationContent.sound = .default
         
-        // Generate random hour between 8 AM and 9 PM
+        // Generate random hour between 8 AM and 9 PM, spread throughout the day
         let startHour = 8
         let endHour = 21
         let hoursRange = endHour - startHour
-        let spacing = hoursRange / max(dailyInspirationCount, 1)
-        let hour = startHour + (spacing * index) + Int.random(in: 0..<max(spacing, 1))
+        let spacing = hoursRange / max(totalCount, 1)
+        let baseHour = startHour + (spacing * index)
+        let hour = min(baseHour + Int.random(in: 0..<max(spacing, 1)), endHour)
         let minute = Int.random(in: 0..<60)
         
         var components = DateComponents()
-        components.hour = min(hour, endHour)
+        components.hour = hour
         components.minute = minute
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
-        let request = UNNotificationRequest(identifier: "inspiration_\(index)", content: notificationContent, trigger: trigger)
+        let request = UNNotificationRequest(identifier: identifier, content: notificationContent, trigger: trigger)
         
-        UNUserNotificationCenter.current().add(request)
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("❌ Notification scheduling error: \(error)")
+            } else {
+                print("✅ Scheduled \(identifier) at \(hour):\(String(format: "%02d", minute))")
+            }
+        }
     }
     
-    private func loadAffirmations() -> [String] {
+    private func loadAffirmationsContent() -> [String] {
         guard let path = Bundle.main.path(forResource: "affirmations", ofType: "json"),
               let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
               let affirmations = try? JSONDecoder().decode([Affirmation].self, from: data) else {
             return []
         }
         
-        if selectedCategories.isEmpty {
+        if affirmationCategories.isEmpty {
             return affirmations.map { $0.text }
         } else {
-            return affirmations.filter { selectedCategories.contains($0.category) }.map { $0.text }
+            return affirmations.filter { affirmationCategories.contains($0.category) }.map { $0.text }
         }
     }
     
-    private func loadQuotes() -> [String] {
+    private func loadQuotesContent() -> [String] {
         guard let path = Bundle.main.path(forResource: "quotes", ofType: "json"),
               let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
               let quotes = try? JSONDecoder().decode([Quote].self, from: data) else {
             return []
         }
         
-        if selectedCategories.isEmpty {
+        if quoteCategories.isEmpty {
             return quotes.map { "\"\($0.text)\" — \($0.author)" }
         } else {
-            return quotes.filter { selectedCategories.contains($0.category) }.map { "\"\($0.text)\" — \($0.author)" }
+            return quotes.filter { quoteCategories.contains($0.category) }.map { "\"\($0.text)\" — \($0.author)" }
         }
     }
     
-    private func saveInspirationSettings() {
+    private func saveContentSettings() {
         let settings: [String: Any] = [
-            "enabled": dailyInspirationEnabled,
-            "count": dailyInspirationCount,
-            "source": dailyInspirationSource.rawValue,
-            "categories": Array(selectedCategories)
+            "affirmationCount": affirmationNotificationCount,
+            "affirmationCategories": Array(affirmationCategories),
+            "quoteCount": quoteNotificationCount,
+            "quoteCategories": Array(quoteCategories)
         ]
         UserDefaults.standard.set(settings, forKey: inspirationKey)
     }
     
-    private func loadInspirationSettings() {
+    private func loadContentSettings() {
         guard let settings = UserDefaults.standard.dictionary(forKey: inspirationKey) else { return }
         
-        dailyInspirationEnabled = settings["enabled"] as? Bool ?? false
-        dailyInspirationCount = settings["count"] as? Int ?? 3
-        if let sourceRaw = settings["source"] as? String,
-           let source = InspirationSource(rawValue: sourceRaw) {
-            dailyInspirationSource = source
+        affirmationNotificationCount = settings["affirmationCount"] as? Int ?? 0
+        quoteNotificationCount = settings["quoteCount"] as? Int ?? 0
+        
+        if let categories = settings["affirmationCategories"] as? [String] {
+            affirmationCategories = Set(categories)
         }
-        if let categories = settings["categories"] as? [String] {
-            selectedCategories = Set(categories)
+        if let categories = settings["quoteCategories"] as? [String] {
+            quoteCategories = Set(categories)
         }
     }
 }
@@ -978,13 +1007,16 @@ struct NotificationSettingsView: View {
                 .padding(.vertical, 16)
                 
                 ScrollView {
-                    VStack(spacing: 24) {
+                    VStack(spacing: 20) {
                         if !notificationService.isAuthorized {
                             authorizationCard
                         }
                         
-                        // Daily Inspiration Section
-                        dailyInspirationSection
+                        // Affirmation Notifications Section
+                        affirmationsSection
+                        
+                        // Quote Notifications Section
+                        quotesSection
                         
                         Divider()
                             .background(Color.museMediumGray)
@@ -1027,182 +1059,202 @@ struct NotificationSettingsView: View {
         }
         .onAppear { 
             notificationService.checkAuthorizationStatus()
-            loadCategories()
+            loadAllCategories()
         }
         .sheet(isPresented: $showAddReminder) { addReminderSheet }
     }
     
-    // MARK: - Daily Inspiration Section
+    // MARK: - Content Notification Sections
     
-    @State private var availableCategories: [String] = []
+    @State private var affirmationCategories: [String] = []
+    @State private var quoteCategories: [String] = []
     
-    private func loadCategories() {
-        // Load categories based on source
-        if notificationService.dailyInspirationSource == .affirmations {
-            if let path = Bundle.main.path(forResource: "affirmations", ofType: "json"),
-               let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
-               let items = try? JSONDecoder().decode([Affirmation].self, from: data) {
-                availableCategories = Array(Set(items.map { $0.category })).sorted()
-            }
-        } else {
-            if let path = Bundle.main.path(forResource: "quotes", ofType: "json"),
-               let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
-               let items = try? JSONDecoder().decode([Quote].self, from: data) {
-                availableCategories = Array(Set(items.map { $0.category })).sorted()
-            }
+    private func loadAllCategories() {
+        // Load affirmation categories
+        if let path = Bundle.main.path(forResource: "affirmations", ofType: "json"),
+           let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
+           let items = try? JSONDecoder().decode([Affirmation].self, from: data) {
+            affirmationCategories = Array(Set(items.map { $0.category })).sorted()
+        }
+        
+        // Load quote categories
+        if let path = Bundle.main.path(forResource: "quotes", ofType: "json"),
+           let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
+           let items = try? JSONDecoder().decode([Quote].self, from: data) {
+            quoteCategories = Array(Set(items.map { $0.category })).sorted()
         }
     }
     
-    private var dailyInspirationSection: some View {
+    private var affirmationsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Image(systemName: "sparkles")
-                    .foregroundColor(.museOrange)
-                Text("Daily Inspiration")
-                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.purple)
+                Text("Affirmation Notifications")
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.museSoftWhite)
-                
-                Spacer()
-                
-                Toggle("", isOn: Binding(
-                    get: { notificationService.dailyInspirationEnabled },
-                    set: { enabled in
-                        notificationService.updateInspirationSettings(
-                            enabled: enabled,
-                            count: notificationService.dailyInspirationCount,
-                            source: notificationService.dailyInspirationSource,
-                            categories: notificationService.selectedCategories
-                        )
-                    }
-                ))
-                .tint(.museOrange)
             }
             
-            if notificationService.dailyInspirationEnabled {
-                // Source Selection
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Content Type")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.museLightGray)
-                    
-                    HStack(spacing: 12) {
-                        ForEach(NotificationService.InspirationSource.allCases, id: \.self) { source in
-                            Button(action: {
-                                withAnimation {
-                                    notificationService.dailyInspirationSource = source
-                                    notificationService.selectedCategories = []
-                                    loadCategories()
-                                }
-                            }) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: source.icon)
-                                    Text(source.rawValue)
-                                }
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(notificationService.dailyInspirationSource == source ? .museSoftWhite : .museLightGray)
-                                .padding(.horizontal, 16)
+            // Frequency Selection (None, 1-5)
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Daily frequency")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.museLightGray)
+                
+                HStack(spacing: 6) {
+                    ForEach(0...5, id: \.self) { count in
+                        Button(action: {
+                            notificationService.updateAffirmationSettings(
+                                count: count,
+                                categories: notificationService.affirmationCategories
+                            )
+                        }) {
+                            Text(count == 0 ? "None" : "\(count)")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(notificationService.affirmationNotificationCount == count ? .museSoftWhite : .museLightGray)
+                                .frame(maxWidth: .infinity)
                                 .padding(.vertical, 10)
                                 .background(
-                                    Capsule()
-                                        .fill(notificationService.dailyInspirationSource == source ? Color.museOrange.opacity(0.3) : Color.white.opacity(0.08))
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(notificationService.affirmationNotificationCount == count ? Color.purple : Color.white.opacity(0.08))
                                 )
-                                .overlay(
-                                    Capsule()
-                                        .stroke(notificationService.dailyInspirationSource == source ? Color.museOrange : Color.clear, lineWidth: 1)
-                                )
-                            }
                         }
                     }
                 }
-                
-                // Count Selection
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Text("Notifications per day")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.museLightGray)
-                        
-                        Spacer()
-                        
-                        Text("\(notificationService.dailyInspirationCount)")
-                            .font(.system(size: 16, weight: .semibold, design: .rounded))
-                            .foregroundColor(.museOrange)
-                    }
-                    
-                    HStack(spacing: 8) {
-                        ForEach(1...5, id: \.self) { count in
-                            Button(action: {
-                                notificationService.updateInspirationSettings(
-                                    enabled: true,
-                                    count: count,
-                                    source: notificationService.dailyInspirationSource,
-                                    categories: notificationService.selectedCategories
-                                )
-                            }) {
-                                Text("\(count)")
-                                    .font(.system(size: 16, weight: .semibold))
-                                    .foregroundColor(notificationService.dailyInspirationCount == count ? .museSoftWhite : .museLightGray)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .fill(notificationService.dailyInspirationCount == count ? Color.museOrange : Color.white.opacity(0.08))
-                                    )
-                            }
-                        }
-                    }
-                }
-                
-                // Category Selection
-                VStack(alignment: .leading, spacing: 12) {
+            }
+            
+            // Category Selection (only show if frequency > 0)
+            if notificationService.affirmationNotificationCount > 0 {
+                VStack(alignment: .leading, spacing: 10) {
                     Text("Categories")
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 13, weight: .medium))
                         .foregroundColor(.museLightGray)
                     
-                    FlowLayout(spacing: 8) {
-                        ForEach(availableCategories, id: \.self) { category in
+                    FlowLayout(spacing: 6) {
+                        ForEach(affirmationCategories, id: \.self) { category in
                             Button(action: {
                                 withAnimation {
-                                    if notificationService.selectedCategories.contains(category) {
-                                        notificationService.selectedCategories.remove(category)
+                                    var categories = notificationService.affirmationCategories
+                                    if categories.contains(category) {
+                                        categories.remove(category)
                                     } else {
-                                        notificationService.selectedCategories.insert(category)
+                                        categories.insert(category)
                                     }
-                                    notificationService.updateInspirationSettings(
-                                        enabled: true,
-                                        count: notificationService.dailyInspirationCount,
-                                        source: notificationService.dailyInspirationSource,
-                                        categories: notificationService.selectedCategories
+                                    notificationService.updateAffirmationSettings(
+                                        count: notificationService.affirmationNotificationCount,
+                                        categories: categories
                                     )
                                 }
                             }) {
                                 Text(category.capitalized)
-                                    .font(.system(size: 13, weight: .medium))
-                                    .foregroundColor(notificationService.selectedCategories.contains(category) ? .museSoftWhite : .museLightGray)
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 8)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(notificationService.affirmationCategories.contains(category) ? .museSoftWhite : .museLightGray)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
                                     .background(
                                         Capsule()
-                                            .fill(notificationService.selectedCategories.contains(category) ? Color.museOrange.opacity(0.4) : Color.white.opacity(0.08))
-                                    )
-                                    .overlay(
-                                        Capsule()
-                                            .stroke(notificationService.selectedCategories.contains(category) ? Color.museOrange : Color.clear, lineWidth: 1)
+                                            .fill(notificationService.affirmationCategories.contains(category) ? Color.purple.opacity(0.5) : Color.white.opacity(0.08))
                                     )
                             }
                         }
                     }
                     
-                    if notificationService.selectedCategories.isEmpty {
+                    if notificationService.affirmationCategories.isEmpty {
                         Text("Select at least one category")
-                            .font(.system(size: 12))
+                            .font(.system(size: 11))
                             .foregroundColor(.red.opacity(0.8))
                     }
                 }
             }
         }
-        .padding(16)
-        .background(RoundedRectangle(cornerRadius: 16).fill(Color.white.opacity(0.08)))
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 14).fill(Color.white.opacity(0.08)))
+    }
+    
+    private var quotesSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Image(systemName: "quote.bubble.fill")
+                    .foregroundColor(.museAccentBlue)
+                Text("Quote Notifications")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.museSoftWhite)
+            }
+            
+            // Frequency Selection (None, 1-5)
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Daily frequency")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.museLightGray)
+                
+                HStack(spacing: 6) {
+                    ForEach(0...5, id: \.self) { count in
+                        Button(action: {
+                            notificationService.updateQuoteSettings(
+                                count: count,
+                                categories: notificationService.quoteCategories
+                            )
+                        }) {
+                            Text(count == 0 ? "None" : "\(count)")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(notificationService.quoteNotificationCount == count ? .museSoftWhite : .museLightGray)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(notificationService.quoteNotificationCount == count ? Color.museAccentBlue : Color.white.opacity(0.08))
+                                )
+                        }
+                    }
+                }
+            }
+            
+            // Category Selection (only show if frequency > 0)
+            if notificationService.quoteNotificationCount > 0 {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Categories")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.museLightGray)
+                    
+                    FlowLayout(spacing: 6) {
+                        ForEach(quoteCategories, id: \.self) { category in
+                            Button(action: {
+                                withAnimation {
+                                    var categories = notificationService.quoteCategories
+                                    if categories.contains(category) {
+                                        categories.remove(category)
+                                    } else {
+                                        categories.insert(category)
+                                    }
+                                    notificationService.updateQuoteSettings(
+                                        count: notificationService.quoteNotificationCount,
+                                        categories: categories
+                                    )
+                                }
+                            }) {
+                                Text(category.capitalized)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(notificationService.quoteCategories.contains(category) ? .museSoftWhite : .museLightGray)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        Capsule()
+                                            .fill(notificationService.quoteCategories.contains(category) ? Color.museAccentBlue.opacity(0.5) : Color.white.opacity(0.08))
+                                    )
+                            }
+                        }
+                    }
+                    
+                    if notificationService.quoteCategories.isEmpty {
+                        Text("Select at least one category")
+                            .font(.system(size: 11))
+                            .foregroundColor(.red.opacity(0.8))
+                    }
+                }
+            }
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 14).fill(Color.white.opacity(0.08)))
     }
     
     private var authorizationCard: some View {
