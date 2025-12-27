@@ -697,6 +697,25 @@ class NotificationService: ObservableObject {
         }
     }
     
+    /// Send a test notification in 5 seconds (for testing purposes)
+    func sendTestNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "Muse Test"
+        content.body = "If you see this, notifications are working! 🎉"
+        content.sound = .default
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+        let request = UNNotificationRequest(identifier: "test_notification", content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("❌ Test notification error: \(error)")
+            } else {
+                print("✅ Test notification scheduled for 5 seconds from now")
+            }
+        }
+    }
+    
     func addReminder(for sessionType: SessionType, at time: Date) {
         let reminder = SessionReminder(time: time, sessionType: sessionType)
         
@@ -978,6 +997,27 @@ struct NotificationSettingsView: View {
                         
                         sessionTypeTabs
                         remindersSection
+                        
+                        // Test notification button
+                        Button(action: {
+                            notificationService.sendTestNotification()
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "bell.badge")
+                                Text("Send Test Notification (5 sec)")
+                            }
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.museSoftWhite)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.white.opacity(0.1))
+                            .cornerRadius(12)
+                        }
+                        .padding(.top, 20)
+                        
+                        Text("Put the app in background to see it")
+                            .font(.system(size: 12))
+                            .foregroundColor(.museLightGray)
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 20)
