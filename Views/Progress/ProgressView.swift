@@ -141,6 +141,78 @@ struct ProgressView: View {
                         .padding(.horizontal, 20)
                         .padding(.top, 10)
                         
+                        // 6. Legal Section
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Legal")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding(.leading, 4)
+                            
+                            VStack(spacing: 0) {
+                                NavigationLink(destination: PrivacyPolicyView()) {
+                                    HStack {
+                                        Image(systemName: "hand.raised.fill")
+                                            .foregroundColor(.museLightGray)
+                                            .frame(width: 24)
+                                        Text("Privacy Policy")
+                                            .foregroundColor(.museSoftWhite)
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.system(size: 14))
+                                            .foregroundColor(.museLightGray)
+                                    }
+                                    .padding(.vertical, 14)
+                                    .padding(.horizontal, 16)
+                                }
+                                
+                                Divider().background(Color.museMediumGray)
+                                
+                                NavigationLink(destination: TermsOfServiceView()) {
+                                    HStack {
+                                        Image(systemName: "doc.text.fill")
+                                            .foregroundColor(.museLightGray)
+                                            .frame(width: 24)
+                                        Text("Terms of Service")
+                                            .foregroundColor(.museSoftWhite)
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.system(size: 14))
+                                            .foregroundColor(.museLightGray)
+                                    }
+                                    .padding(.vertical, 14)
+                                    .padding(.horizontal, 16)
+                                }
+                                
+                                Divider().background(Color.museMediumGray)
+                                
+                                NavigationLink(destination: EULAView()) {
+                                    HStack {
+                                        Image(systemName: "signature")
+                                            .foregroundColor(.museLightGray)
+                                            .frame(width: 24)
+                                        Text("End User License Agreement")
+                                            .foregroundColor(.museSoftWhite)
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.system(size: 14))
+                                            .foregroundColor(.museLightGray)
+                                    }
+                                    .padding(.vertical, 14)
+                                    .padding(.horizontal, 16)
+                                }
+                            }
+                            .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.08)))
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
+                        
+                        // App Version
+                        Text("Muse v1.0.0")
+                            .font(.system(size: 12))
+                            .foregroundColor(.museLightGray)
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 20)
+                        
                         // Spacer for bottom
                         Spacer(minLength: 40)
                     }
@@ -1511,5 +1583,370 @@ struct FlowLayout: Layout {
             
             self.size.height = y + rowHeight
         }
+    }
+}
+
+// MARK: - Privacy Policy View
+struct PrivacyPolicyView: View {
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
+    var body: some View {
+        ZStack {
+            MuseBackgroundView(selectedBackground: selectedBackground)
+                .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Privacy Policy")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.museSoftWhite)
+                    
+                    Text("Last Updated: December 26, 2024")
+                        .font(.system(size: 14))
+                        .foregroundColor(.museLightGray)
+                    
+                    Group {
+                        policySection(title: "Introduction", content: """
+Welcome to Muse. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you use our app.
+
+Muse is a mindfulness and wellness application designed to help you practice affirmations, breathwork, journaling, and meditation.
+""")
+                        
+                        policySection(title: "Information We Collect", content: """
+**Data Stored Locally on Your Device:**
+• Affirmation preferences and favorites
+• Breathwork session history
+• Journal entries and mood logs
+• App settings and preferences
+• Session progress and streaks
+• Custom habits and goals
+
+**Data Processed Through Third-Party Services:**
+• AI chat conversations (processed via OpenRouter/Google Gemini)
+• Text-to-speech requests (processed via OpenAI)
+
+We do NOT collect, store, or have access to your personal data on our servers. All your personal content remains on your device.
+""")
+                        
+                        policySection(title: "How We Use Your Information", content: """
+Your data is used solely to:
+• Provide personalized affirmations and quotes
+• Track your wellness journey and progress
+• Enable AI-powered coaching conversations
+• Deliver notification reminders you configure
+• Improve your overall app experience
+
+We do not sell, rent, or share your personal information with third parties for marketing purposes.
+""")
+                        
+                        policySection(title: "Third-Party Services", content: """
+Muse integrates with the following third-party services:
+
+**OpenRouter (AI Chat):** When you use the AI chat feature, your messages are sent to OpenRouter's API which routes to Google Gemini. These conversations may be processed according to their privacy policies.
+
+**OpenAI (Text-to-Speech):** When you use voice features, text is sent to OpenAI for speech synthesis.
+
+We recommend reviewing the privacy policies of these services:
+• OpenRouter: openrouter.ai/privacy
+• OpenAI: openai.com/privacy
+• Google: policies.google.com/privacy
+""")
+                        
+                        policySection(title: "Data Security", content: """
+We implement appropriate security measures to protect your information:
+• All data is stored locally on your device using iOS secure storage
+• API communications use HTTPS encryption
+• No personal data is stored on external servers
+
+However, no method of electronic storage is 100% secure. While we strive to protect your information, we cannot guarantee absolute security.
+""")
+                        
+                        policySection(title: "Your Rights", content: """
+You have the right to:
+• Access all data stored in the app
+• Delete your data at any time by uninstalling the app
+• Disable notifications in your device settings
+• Opt out of AI features by not using the chat function
+
+All your data can be removed by simply deleting the Muse app from your device.
+""")
+                        
+                        policySection(title: "Children's Privacy", content: """
+Muse is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.
+""")
+                        
+                        policySection(title: "Changes to This Policy", content: """
+We may update this privacy policy from time to time. We will notify you of any changes by updating the "Last Updated" date at the top of this policy. We encourage you to review this policy periodically.
+""")
+                        
+                        policySection(title: "Contact Us", content: """
+If you have questions about this Privacy Policy, please contact us at:
+
+Email: support@museapp.com
+""")
+                    }
+                }
+                .padding(20)
+                .padding(.bottom, 40)
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private func policySection(title: String, content: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(.museSoftWhite)
+            
+            Text(LocalizedStringKey(content))
+                .font(.system(size: 15))
+                .foregroundColor(.museLightGray)
+                .lineSpacing(4)
+        }
+        .padding(.top, 8)
+    }
+}
+
+// MARK: - Terms of Service View
+struct TermsOfServiceView: View {
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
+    var body: some View {
+        ZStack {
+            MuseBackgroundView(selectedBackground: selectedBackground)
+                .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Terms of Service")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.museSoftWhite)
+                    
+                    Text("Last Updated: December 26, 2024")
+                        .font(.system(size: 14))
+                        .foregroundColor(.museLightGray)
+                    
+                    Group {
+                        policySection(title: "Agreement to Terms", content: """
+By downloading, installing, or using Muse ("the App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use the App.
+""")
+                        
+                        policySection(title: "Description of Service", content: """
+Muse is a wellness and mindfulness application that provides:
+• Daily affirmations and inspirational quotes
+• Guided breathwork exercises
+• Journaling and mood tracking features
+• AI-powered coaching conversations
+• Meditation and relaxation tools
+• Progress tracking and habit building
+
+The App is designed to support your mental wellness journey but is not a substitute for professional medical or mental health treatment.
+""")
+                        
+                        policySection(title: "Health and Wellness Disclaimer", content: """
+**IMPORTANT: Muse is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or medical condition.**
+
+The content provided in this App, including affirmations, breathwork exercises, and AI conversations, is for informational and educational purposes only. It should not be considered medical advice.
+
+If you are experiencing a mental health crisis, please contact:
+• National Suicide Prevention Lifeline: 988
+• Crisis Text Line: Text HOME to 741741
+• Emergency Services: 911
+
+Always consult with a qualified healthcare provider before starting any wellness program.
+""")
+                        
+                        policySection(title: "User Conduct", content: """
+You agree to use Muse only for lawful purposes and in accordance with these Terms. You agree NOT to:
+• Use the App in any way that violates applicable laws
+• Attempt to gain unauthorized access to the App's systems
+• Use the AI chat feature to generate harmful, illegal, or inappropriate content
+• Reverse engineer, decompile, or disassemble the App
+• Share your account or access with others
+""")
+                        
+                        policySection(title: "Intellectual Property", content: """
+All content in Muse, including but not limited to text, graphics, logos, icons, images, audio clips, and software, is the property of Muse or its content suppliers and is protected by copyright and other intellectual property laws.
+
+You may not reproduce, distribute, modify, or create derivative works from any content in the App without express written permission.
+""")
+                        
+                        policySection(title: "AI-Generated Content", content: """
+The AI chat feature in Muse uses third-party AI services to generate responses. While we strive to provide helpful and accurate information:
+
+• AI responses may not always be accurate or appropriate
+• AI is not a substitute for professional advice
+• We are not responsible for actions taken based on AI responses
+• Conversations may be processed by third-party AI providers
+""")
+                        
+                        policySection(title: "Subscription and Payments", content: """
+Some features of Muse may require a subscription or one-time purchase. By making a purchase:
+
+• You agree to pay all applicable fees
+• Subscriptions auto-renew unless cancelled
+• You can manage subscriptions in your Apple ID settings
+• Refunds are subject to Apple's refund policies
+""")
+                        
+                        policySection(title: "Limitation of Liability", content: """
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, MUSE AND ITS DEVELOPERS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES.
+
+The App is provided "AS IS" without warranties of any kind.
+""")
+                        
+                        policySection(title: "Changes to Terms", content: """
+We reserve the right to modify these Terms at any time. Continued use of the App after changes constitutes acceptance of the new Terms.
+""")
+                        
+                        policySection(title: "Contact", content: """
+For questions about these Terms, contact us at:
+
+Email: support@museapp.com
+""")
+                    }
+                }
+                .padding(20)
+                .padding(.bottom, 40)
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private func policySection(title: String, content: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(.museSoftWhite)
+            
+            Text(LocalizedStringKey(content))
+                .font(.system(size: 15))
+                .foregroundColor(.museLightGray)
+                .lineSpacing(4)
+        }
+        .padding(.top, 8)
+    }
+}
+
+// MARK: - EULA View
+struct EULAView: View {
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
+    var body: some View {
+        ZStack {
+            MuseBackgroundView(selectedBackground: selectedBackground)
+                .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("End User License Agreement")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.museSoftWhite)
+                    
+                    Text("Last Updated: December 26, 2024")
+                        .font(.system(size: 14))
+                        .foregroundColor(.museLightGray)
+                    
+                    Group {
+                        policySection(title: "License Grant", content: """
+This End User License Agreement ("EULA") is a legal agreement between you and Muse ("Licensor") for the use of the Muse mobile application ("Application").
+
+By installing or using the Application, you agree to be bound by this EULA. If you do not agree, do not install or use the Application.
+
+The Licensor grants you a limited, non-exclusive, non-transferable, revocable license to use the Application for personal, non-commercial purposes on devices you own or control, subject to this EULA and the Usage Rules of the App Store.
+""")
+                        
+                        policySection(title: "Scope of License", content: """
+This license does not allow you to:
+• Distribute or make the Application available over a network
+• Sell, lease, lend, or sublicense the Application
+• Reverse engineer, disassemble, or decompile the Application
+• Copy, modify, or create derivative works of the Application
+• Remove any copyright or proprietary notices
+
+This license is effective until terminated. Your rights under this license will terminate automatically if you fail to comply with any of its terms.
+""")
+                        
+                        policySection(title: "Apple's Role", content: """
+You acknowledge that this EULA is between you and the Licensor, not Apple. Apple is not responsible for the Application or its content.
+
+Apple has no obligation to furnish any maintenance or support services with respect to the Application.
+
+To the maximum extent permitted by applicable law, Apple will have no other warranty obligation with respect to the Application.
+""")
+                        
+                        policySection(title: "Intellectual Property", content: """
+The Application and all intellectual property rights therein are and shall remain the property of the Licensor. Nothing in this EULA transfers any ownership rights to you.
+
+All content, including affirmations, quotes, graphics, and code, is protected by copyright and other intellectual property laws.
+""")
+                        
+                        policySection(title: "Third-Party Services", content: """
+The Application may enable access to third-party services and content. You agree to comply with all applicable terms and conditions when using such third-party services.
+
+The Licensor is not responsible for examining or evaluating the content or accuracy of third-party services and shall not be liable for any third-party services.
+""")
+                        
+                        policySection(title: "Disclaimer of Warranties", content: """
+THE APPLICATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE LICENSOR DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
+
+• WARRANTIES OF MERCHANTABILITY
+• FITNESS FOR A PARTICULAR PURPOSE
+• NON-INFRINGEMENT
+• ACCURACY OR RELIABILITY OF CONTENT
+""")
+                        
+                        policySection(title: "Limitation of Liability", content: """
+IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE, OR CONSEQUENTIAL DAMAGES ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF THE APPLICATION.
+
+THE LICENSOR'S TOTAL LIABILITY SHALL NOT EXCEED THE AMOUNT YOU PAID FOR THE APPLICATION.
+""")
+                        
+                        policySection(title: "Health Disclaimer", content: """
+The Application provides wellness content for informational purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment.
+
+The Licensor is not liable for any health-related decisions made based on the Application's content. Always seek the advice of qualified health providers with any questions regarding medical conditions.
+""")
+                        
+                        policySection(title: "Termination", content: """
+This EULA is effective until terminated. Your rights under this EULA will terminate automatically without notice if you fail to comply with any term.
+
+Upon termination, you must cease all use of the Application and destroy all copies.
+""")
+                        
+                        policySection(title: "Governing Law", content: """
+This EULA shall be governed by and construed in accordance with the laws of the United States, without regard to its conflict of law provisions.
+""")
+                        
+                        policySection(title: "Contact Information", content: """
+For questions regarding this EULA, please contact:
+
+Email: support@museapp.com
+""")
+                    }
+                }
+                .padding(20)
+                .padding(.bottom, 40)
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private func policySection(title: String, content: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(.museSoftWhite)
+            
+            Text(LocalizedStringKey(content))
+                .font(.system(size: 15))
+                .foregroundColor(.museLightGray)
+                .lineSpacing(4)
+        }
+        .padding(.top, 8)
     }
 }
