@@ -1029,27 +1029,6 @@ struct NotificationSettingsView: View {
                         
                         sessionTypeTabs
                         remindersSection
-                        
-                        // Test notification button
-                        Button(action: {
-                            notificationService.sendTestNotification()
-                        }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "bell.badge")
-                                Text("Send Test Notification (5 sec)")
-                            }
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.museSoftWhite)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(Color.white.opacity(0.1))
-                            .cornerRadius(12)
-                        }
-                        .padding(.top, 20)
-                        
-                        Text("Put the app in background to see it")
-                            .font(.system(size: 12))
-                            .foregroundColor(.museLightGray)
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 20)
