@@ -17,6 +17,9 @@ struct ProgressView: View {
     // Icons for selection
     let availableIcons = ["bed.double.fill", "dumbbell.fill", "figure.mind.and.body", "figure.walk", "leaf.fill", "drop.fill", "book.fill", "pencil", "star.fill"]
     @State private var selectedIcon = "star.fill"
+    
+    // Notification settings
+    @State private var showNotificationSettings = false
 
     var body: some View {
         NavigationStack {
@@ -30,7 +33,7 @@ struct ProgressView: View {
                     VStack(spacing: 24) {
                         // 1. Header (Notification, Date, Add)
                         HStack {
-                            Button(action: {}) {
+                            Button(action: { showNotificationSettings = true }) {
                                 Image(systemName: "bell.badge.fill")
                                     .foregroundStyle(.white, .red)
                                     .font(.system(size: 20))
@@ -168,6 +171,11 @@ struct ProgressView: View {
                 .presentationDetents([.fraction(0.4)])
                 .presentationDragIndicator(.visible)
                 .preferredColorScheme(.dark)
+            }
+            .sheet(isPresented: $showNotificationSettings) {
+                NotificationSettingsView()
+                    .presentationDragIndicator(.visible)
+                    .preferredColorScheme(.dark)
             }
         }
     }
@@ -596,4 +604,472 @@ struct ContributionCalendarView: View {
 #Preview {
     ProgressView()
         .modelContainer(for: [AffirmationSession.self])
+}
+
+// MARK: - Notification Service
+import UserNotifications
+
+class NotificationService: ObservableObject {
+    static let shared = NotificationService()
+    
+    @Published var affirmationReminders: [SessionReminder] = []
+    @Published var breathworkReminders: [SessionReminder] = []
+    @Published var journalReminders: [SessionReminder] = []
+    @Published var isAuthorized: Bool = false
+    
+    static let maxReminders = 5
+    
+    enum SessionType: String, CaseIterable, Codable {
+        case affirmations = "Affirmations"
+        case breathwork = "Breathwork"
+        case journaling = "Journaling"
+        
+        var icon: String {
+            switch self {
+            case .affirmations: return "quote.bubble.fill"
+            case .breathwork: return "wind"
+            case .journaling: return "book.closed.fill"
+            }
+        }
+    }
+    
+    struct SessionReminder: Identifiable, Codable, Equatable {
+        let id: UUID
+        var time: Date
+        var sessionType: SessionType
+        var isEnabled: Bool
+        
+        init(id: UUID = UUID(), time: Date, sessionType: SessionType, isEnabled: Bool = true) {
+            self.id = id
+            self.time = time
+            self.sessionType = sessionType
+            self.isEnabled = isEnabled
+        }
+    }
+    
+    private let notificationMessages = [
+        "It's time for %@.",
+        "Let's do a %@ session.",
+        "Ready for your %@ session?"
+    ]
+    
+    private let userDefaultsKey = "sessionReminders"
+    
+    private init() {
+        loadReminders()
+        checkAuthorizationStatus()
+    }
+    
+    func requestAuthorization(completion: @escaping (Bool) -> Void) {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+            DispatchQueue.main.async {
+                self.isAuthorized = granted
+                completion(granted)
+            }
+        }
+    }
+    
+    func checkAuthorizationStatus() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                self.isAuthorized = settings.authorizationStatus == .authorized
+            }
+        }
+    }
+    
+    func addReminder(for sessionType: SessionType, at time: Date) {
+        let reminder = SessionReminder(time: time, sessionType: sessionType)
+        
+        switch sessionType {
+        case .affirmations:
+            guard affirmationReminders.count < Self.maxReminders else { return }
+            affirmationReminders.append(reminder)
+        case .breathwork:
+            guard breathworkReminders.count < Self.maxReminders else { return }
+            breathworkReminders.append(reminder)
+        case .journaling:
+            guard journalReminders.count < Self.maxReminders else { return }
+            journalReminders.append(reminder)
+        }
+        
+        saveReminders()
+        scheduleNotification(for: reminder)
+    }
+    
+    func removeReminder(_ reminder: SessionReminder) {
+        switch reminder.sessionType {
+        case .affirmations:
+            affirmationReminders.removeAll { $0.id == reminder.id }
+        case .breathwork:
+            breathworkReminders.removeAll { $0.id == reminder.id }
+        case .journaling:
+            journalReminders.removeAll { $0.id == reminder.id }
+        }
+        
+        saveReminders()
+        cancelNotification(for: reminder)
+    }
+    
+    func toggleReminder(_ reminder: SessionReminder) {
+        var updatedReminder = reminder
+        updatedReminder.isEnabled.toggle()
+        
+        switch reminder.sessionType {
+        case .affirmations:
+            if let index = affirmationReminders.firstIndex(where: { $0.id == reminder.id }) {
+                affirmationReminders[index] = updatedReminder
+            }
+        case .breathwork:
+            if let index = breathworkReminders.firstIndex(where: { $0.id == reminder.id }) {
+                breathworkReminders[index] = updatedReminder
+            }
+        case .journaling:
+            if let index = journalReminders.firstIndex(where: { $0.id == reminder.id }) {
+                journalReminders[index] = updatedReminder
+            }
+        }
+        
+        saveReminders()
+        
+        if updatedReminder.isEnabled {
+            scheduleNotification(for: updatedReminder)
+        } else {
+            cancelNotification(for: updatedReminder)
+        }
+    }
+    
+    func reminders(for sessionType: SessionType) -> [SessionReminder] {
+        switch sessionType {
+        case .affirmations: return affirmationReminders
+        case .breathwork: return breathworkReminders
+        case .journaling: return journalReminders
+        }
+    }
+    
+    func canAddReminder(for sessionType: SessionType) -> Bool {
+        return reminders(for: sessionType).count < Self.maxReminders
+    }
+    
+    private func scheduleNotification(for reminder: SessionReminder) {
+        guard reminder.isEnabled else { return }
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Muse"
+        let message = notificationMessages.randomElement() ?? notificationMessages[0]
+        content.body = String(format: message, reminder.sessionType.rawValue.lowercased())
+        content.sound = .default
+        
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: reminder.time)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+        
+        let request = UNNotificationRequest(identifier: reminder.id.uuidString, content: content, trigger: trigger)
+        UNUserNotificationCenter.current().add(request)
+    }
+    
+    private func cancelNotification(for reminder: SessionReminder) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [reminder.id.uuidString])
+    }
+    
+    private func saveReminders() {
+        let allReminders = affirmationReminders + breathworkReminders + journalReminders
+        if let encoded = try? JSONEncoder().encode(allReminders) {
+            UserDefaults.standard.set(encoded, forKey: userDefaultsKey)
+        }
+    }
+    
+    private func loadReminders() {
+        guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+              let decoded = try? JSONDecoder().decode([SessionReminder].self, from: data) else { return }
+        
+        affirmationReminders = decoded.filter { $0.sessionType == .affirmations }
+        breathworkReminders = decoded.filter { $0.sessionType == .breathwork }
+        journalReminders = decoded.filter { $0.sessionType == .journaling }
+    }
+}
+
+// MARK: - Notification Settings View
+struct NotificationSettingsView: View {
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var notificationService = NotificationService.shared
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
+    @State private var selectedSessionType: NotificationService.SessionType = .affirmations
+    @State private var showAddReminder = false
+    @State private var newReminderTime = Date()
+    
+    var body: some View {
+        ZStack {
+            MuseBackgroundView(selectedBackground: selectedBackground)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Header
+                ZStack {
+                    Text("Reminders")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(.museSoftWhite)
+                    
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.museSoftWhite)
+                                .frame(width: 36, height: 36)
+                                .background(Color.white.opacity(0.1))
+                                .clipShape(Circle())
+                        }
+                        Spacer()
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        if !notificationService.isAuthorized {
+                            authorizationCard
+                        }
+                        
+                        sessionTypeTabs
+                        remindersSection
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .padding(.bottom, 40)
+                }
+            }
+        }
+        .onAppear { notificationService.checkAuthorizationStatus() }
+        .sheet(isPresented: $showAddReminder) { addReminderSheet }
+    }
+    
+    private var authorizationCard: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "bell.slash.fill")
+                .font(.system(size: 36))
+                .foregroundColor(.museOrange)
+            
+            Text("Notifications Disabled")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(.museSoftWhite)
+            
+            Text("Enable notifications to receive daily session reminders.")
+                .font(.system(size: 14))
+                .foregroundColor(.museLightGray)
+                .multilineTextAlignment(.center)
+            
+            Button(action: {
+                notificationService.requestAuthorization { _ in }
+            }) {
+                Text("Enable Notifications")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(Color.museAccentBlue)
+                    .cornerRadius(20)
+            }
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity)
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color.white.opacity(0.08)))
+    }
+    
+    private var sessionTypeTabs: some View {
+        HStack(spacing: 8) {
+            ForEach(NotificationService.SessionType.allCases, id: \.self) { type in
+                Button(action: {
+                    withAnimation(.spring(response: 0.3)) { selectedSessionType = type }
+                }) {
+                    VStack(spacing: 8) {
+                        Image(systemName: type.icon)
+                            .font(.system(size: 20))
+                        Text(type.rawValue)
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundColor(selectedSessionType == type ? .museSoftWhite : .museLightGray)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(selectedSessionType == type ? colorForType(type).opacity(0.3) : Color.white.opacity(0.08))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(selectedSessionType == type ? colorForType(type) : Color.clear, lineWidth: 1)
+                    )
+                }
+            }
+        }
+    }
+    
+    private var remindersSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("\(selectedSessionType.rawValue) Reminders")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.museSoftWhite)
+                Spacer()
+                Text("\(notificationService.reminders(for: selectedSessionType).count)/\(NotificationService.maxReminders)")
+                    .font(.system(size: 12))
+                    .foregroundColor(.museLightGray)
+            }
+            
+            let reminders = notificationService.reminders(for: selectedSessionType)
+            
+            if reminders.isEmpty {
+                VStack(spacing: 12) {
+                    Image(systemName: "bell.badge")
+                        .font(.system(size: 32))
+                        .foregroundColor(.museMediumGray)
+                    Text("No reminders set")
+                        .font(.system(size: 14))
+                        .foregroundColor(.museLightGray)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 32)
+                .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.05)))
+            } else {
+                ForEach(reminders) { reminder in
+                    reminderRow(reminder)
+                }
+            }
+            
+            if notificationService.canAddReminder(for: selectedSessionType) {
+                Button(action: {
+                    newReminderTime = defaultTimeForType(selectedSessionType)
+                    showAddReminder = true
+                }) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 20))
+                        Text("Add Reminder")
+                            .font(.system(size: 14, weight: .medium))
+                    }
+                    .foregroundColor(colorForType(selectedSessionType))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(colorForType(selectedSessionType).opacity(0.5), style: StrokeStyle(lineWidth: 1, dash: [5]))
+                    )
+                }
+            }
+        }
+    }
+    
+    private func reminderRow(_ reminder: NotificationService.SessionReminder) -> some View {
+        HStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(reminder.time.formatted(date: .omitted, time: .shortened))
+                    .font(.system(size: 24, weight: .medium, design: .rounded))
+                    .foregroundColor(reminder.isEnabled ? .museSoftWhite : .museMediumGray)
+                Text("Daily")
+                    .font(.system(size: 12))
+                    .foregroundColor(.museLightGray)
+            }
+            
+            Spacer()
+            
+            Toggle("", isOn: Binding(
+                get: { reminder.isEnabled },
+                set: { _ in notificationService.toggleReminder(reminder) }
+            ))
+            .tint(colorForType(selectedSessionType))
+            
+            Button(action: {
+                withAnimation { notificationService.removeReminder(reminder) }
+            }) {
+                Image(systemName: "trash")
+                    .font(.system(size: 16))
+                    .foregroundColor(.red.opacity(0.8))
+            }
+        }
+        .padding(16)
+        .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.08)))
+    }
+    
+    private var addReminderSheet: some View {
+        ZStack {
+            Color.museDeepNavy.ignoresSafeArea()
+            
+            VStack(spacing: 24) {
+                HStack {
+                    Button("Cancel") { showAddReminder = false }
+                        .foregroundColor(.museLightGray)
+                    Spacer()
+                    Text("Add Reminder")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.museSoftWhite)
+                    Spacer()
+                    Button("Add") {
+                        notificationService.addReminder(for: selectedSessionType, at: newReminderTime)
+                        showAddReminder = false
+                    }
+                    .foregroundColor(colorForType(selectedSessionType))
+                    .fontWeight(.semibold)
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+                
+                HStack(spacing: 12) {
+                    Image(systemName: selectedSessionType.icon)
+                        .font(.system(size: 24))
+                        .foregroundColor(colorForType(selectedSessionType))
+                    Text(selectedSessionType.rawValue)
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(.museSoftWhite)
+                }
+                
+                DatePicker("", selection: $newReminderTime, displayedComponents: .hourAndMinute)
+                    .datePickerStyle(.wheel)
+                    .labelsHidden()
+                    .colorScheme(.dark)
+                
+                VStack(spacing: 8) {
+                    Text("Notification Preview")
+                        .font(.system(size: 12))
+                        .foregroundColor(.museLightGray)
+                    
+                    HStack(spacing: 12) {
+                        Image(systemName: "bell.fill")
+                            .foregroundColor(.museAccentBlue)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Muse")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.museSoftWhite)
+                            Text("It's time for \(selectedSessionType.rawValue.lowercased()).")
+                                .font(.system(size: 13))
+                                .foregroundColor(.museLightGray)
+                        }
+                        Spacer()
+                    }
+                    .padding(16)
+                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.1)))
+                    .padding(.horizontal, 20)
+                }
+                
+                Spacer()
+            }
+        }
+        .presentationDetents([.medium])
+    }
+    
+    private func colorForType(_ type: NotificationService.SessionType) -> Color {
+        switch type {
+        case .affirmations: return .purple
+        case .breathwork: return .museAccentBlue
+        case .journaling: return .museOrange
+        }
+    }
+    
+    private func defaultTimeForType(_ type: NotificationService.SessionType) -> Date {
+        let calendar = Calendar.current
+        switch type {
+        case .affirmations: return calendar.date(bySettingHour: 8, minute: 0, second: 0, of: Date()) ?? Date()
+        case .breathwork: return calendar.date(bySettingHour: 12, minute: 0, second: 0, of: Date()) ?? Date()
+        case .journaling: return calendar.date(bySettingHour: 21, minute: 0, second: 0, of: Date()) ?? Date()
+        }
+    }
 }
