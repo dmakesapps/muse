@@ -1578,6 +1578,7 @@ struct FlowLayout: Layout {
                 rowHeight = max(rowHeight, size.height)
                 x += size.width + spacing
                 
+                
                 self.size.width = max(self.size.width, x - spacing)
             }
             
@@ -1607,13 +1608,13 @@ struct PrivacyPolicyView: View {
                         .foregroundColor(.museLightGray)
                     
                     Group {
-                        policySection(title: "Introduction", content: """
-Welcome to Muse. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you use our app.
+                        policySection(title: "1. Introduction", content: """
+Welcome to Muse ("the App"), operated by **Ephesian 28 LLC** ("Company", "we", "us", or "our"). We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you use our app.
 
-Muse is a mindfulness and wellness application designed to help you practice affirmations, breathwork, journaling, and meditation.
+By using the App, you agree to the collection and use of information in accordance with this policy.
 """)
                         
-                        policySection(title: "Information We Collect", content: """
+                        policySection(title: "2. Information We Collect", content: """
 **Data Stored Locally on Your Device:**
 • Affirmation preferences and favorites
 • Breathwork session history
@@ -1629,7 +1630,7 @@ Muse is a mindfulness and wellness application designed to help you practice aff
 We do NOT collect, store, or have access to your personal data on our servers. All your personal content remains on your device.
 """)
                         
-                        policySection(title: "How We Use Your Information", content: """
+                        policySection(title: "3. How We Use Your Information", content: """
 Your data is used solely to:
 • Provide personalized affirmations and quotes
 • Track your wellness journey and progress
@@ -1640,7 +1641,7 @@ Your data is used solely to:
 We do not sell, rent, or share your personal information with third parties for marketing purposes.
 """)
                         
-                        policySection(title: "Third-Party Services", content: """
+                        policySection(title: "4. Third-Party Services", content: """
 Muse integrates with the following third-party services:
 
 **OpenRouter (AI Chat):** When you use the AI chat feature, your messages are sent to OpenRouter's API which routes to Google Gemini. These conversations may be processed according to their privacy policies.
@@ -1653,37 +1654,38 @@ We recommend reviewing the privacy policies of these services:
 • Google: policies.google.com/privacy
 """)
                         
-                        policySection(title: "Data Security", content: """
+                        policySection(title: "5. Data Security", content: """
 We implement appropriate security measures to protect your information:
 • All data is stored locally on your device using iOS secure storage
 • API communications use HTTPS encryption
 • No personal data is stored on external servers
 
-However, no method of electronic storage is 100% secure. While we strive to protect your information, we cannot guarantee absolute security.
+However, no method of transmission over the Internet or method of electronic storage is 100% secure. While we strive to protect your information, we cannot guarantee its absolute security.
 """)
                         
-                        policySection(title: "Your Rights", content: """
+                        policySection(title: "6. Your Rights", content: """
 You have the right to:
 • Access all data stored in the app
 • Delete your data at any time by uninstalling the app
 • Disable notifications in your device settings
 • Opt out of AI features by not using the chat function
 
-All your data can be removed by simply deleting the Muse app from your device.
+All your data can be removed simply by deleting the Muse app from your device.
 """)
                         
-                        policySection(title: "Children's Privacy", content: """
-Muse is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.
+                        policySection(title: "7. Children's Privacy", content: """
+Muse is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us immediately.
 """)
                         
-                        policySection(title: "Changes to This Policy", content: """
-We may update this privacy policy from time to time. We will notify you of any changes by updating the "Last Updated" date at the top of this policy. We encourage you to review this policy periodically.
+                        policySection(title: "8. Changes to This Policy", content: """
+We may update this privacy policy from time to time. We will notify you of any changes by updating the "Last Updated" date at the top of this policy. You are advised to review this Privacy Policy periodically for any changes.
 """)
                         
-                        policySection(title: "Contact Us", content: """
+                        policySection(title: "9. Contact Us", content: """
 If you have questions about this Privacy Policy, please contact us at:
 
-Email: splashcapital1@gmail.com
+**Ephesian 28 LLC**
+Email: ephesian28mgmt@yahoo.com
 """)
                     }
                 }
@@ -1730,82 +1732,81 @@ struct TermsOfServiceView: View {
                         .foregroundColor(.museLightGray)
                     
                     Group {
-                        policySection(title: "Agreement to Terms", content: """
-By downloading, installing, or using Muse ("the App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use the App.
+                        policySection(title: "1. Agreement to Terms", content: """
+By downloading, installing, or using Muse ("the App"), provided by **Ephesian 28 LLC** ("Company", "we", "us"), you agree to be strictly bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you must immediately uninstall and discontinue use of the App.
+
+**THESE TERMS INCLUDE A BINDING ARBITRATION CLAUSE AND A CLASS ACTION WAIVER.**
 """)
                         
-                        policySection(title: "Description of Service", content: """
+                        policySection(title: "2. Description of Service", content: """
 Muse is a wellness and mindfulness application that provides:
 • Daily affirmations and inspirational quotes
 • Guided breathwork exercises
 • Journaling and mood tracking features
 • AI-powered coaching conversations
 • Meditation and relaxation tools
-• Progress tracking and habit building
 
-The App is designed to support your mental wellness journey but is not a substitute for professional medical or mental health treatment.
+The App is designed solely for informational, educational, and entertainment purposes.
 """)
                         
-                        policySection(title: "Health and Wellness Disclaimer", content: """
-**IMPORTANT: Muse is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or medical condition.**
+                        policySection(title: "3. Health and Medical Disclaimer", content: """
+**STRICT MEDICAL DISCLAIMER: THE APP IS NOT A MEDICAL DEVICE AND DOES NOT PROVIDE MEDICAL ADVICE.**
 
-The content provided in this App, including affirmations, breathwork exercises, and AI conversations, is for informational and educational purposes only. It should not be considered medical advice.
-
-If you are experiencing a mental health crisis, please contact:
-• National Suicide Prevention Lifeline: 988
-• Crisis Text Line: Text HOME to 741741
-• Emergency Services: 911
-
-Always consult with a qualified healthcare provider before starting any wellness program.
+(a) **No Medical Advice:** The content, tools, and AI interactions within the App are not intended to diagnose, treat, cure, or prevent any disease, mental health condition, or physical ailment.
+(b) **Consult a Professional:** Always seek the advice of your physician or qualified health provider with any questions you may have regarding a medical condition. Never disregard professional medical advice or delay in seeking it because of something you have read on the App.
+(c) **Use at Your Own Risk:** Your use of any information or tools provided by the App is solely at your own risk. Ephesian 28 LLC is not responsible for any health problems that may result from training programs, consultations, products, or events you learn about through the App.
+(d) **Emergency:** If you think you may have a medical emergency, call your doctor or 911 immediately.
 """)
                         
-                        policySection(title: "User Conduct", content: """
-You agree to use Muse only for lawful purposes and in accordance with these Terms. You agree NOT to:
-• Use the App in any way that violates applicable laws
-• Attempt to gain unauthorized access to the App's systems
-• Use the AI chat feature to generate harmful, illegal, or inappropriate content
-• Reverse engineer, decompile, or disassemble the App
-• Share your account or access with others
-""")
-                        
-                        policySection(title: "Intellectual Property", content: """
-All content in Muse, including but not limited to text, graphics, logos, icons, images, audio clips, and software, is the property of Muse or its content suppliers and is protected by copyright and other intellectual property laws.
+                        policySection(title: "4. User Conduct & Prohibited Use", content: """
+You agree to use the App only for lawful purposes. You are strictly prohibited from:
+• Using the App for any illegal purpose.
+• Harassing, threatening, or defrauding other users or the Company.
+• Meaningfully attempting to bypass any security features.
+• Reverse engineering, decompiling, or disassembling the App.
+• Using the AI chat to generate hate speech, violence, or illegal content.
 
-You may not reproduce, distribute, modify, or create derivative works from any content in the App without express written permission.
+Ephesian 28 LLC reserves the right to terminate your access immediately, without notice, for any violation of these Terms.
 """)
                         
-                        policySection(title: "AI-Generated Content", content: """
-The AI chat feature in Muse uses third-party AI services to generate responses. While we strive to provide helpful and accurate information:
+                        policySection(title: "5. Intellectual Property Rights", content: """
+The App and its entire contents, features, and functionality (including but not limited to all information, software, text, displays, images, video, and audio) are owned by **Ephesian 28 LLC**, its licensors, or other providers of such material and are protected by United States and international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.
+""")
+                        
+                        policySection(title: "6. AI-Generated Content Disclaimer", content: """
+The App utilizes artificial intelligence ("AI") to generate certain content. You acknowledge that:
+• AI responses may be inaccurate, inappropriate, or misleading.
+• You should not rely on AI for advice of any kind (medical, legal, financial, etc.).
+• Ephesian 28 LLC expressly disclaims all liability for any actions you take based on AI-generated content.
+""")
+                        
+                        policySection(title: "7. Limitation of Liability", content: """
+**TO THE MAXIMUM EXTENT PERMITTED BY LAW:**
 
-• AI responses may not always be accurate or appropriate
-• AI is not a substitute for professional advice
-• We are not responsible for actions taken based on AI responses
-• Conversations may be processed by third-party AI providers
-""")
-                        
-                        policySection(title: "Subscription and Payments", content: """
-Some features of Muse may require a subscription or one-time purchase. By making a purchase:
+(A) IN NO EVENT SHALL **EPHESIAN 28 LLC**, ITS OFFICERS, DIRECTORS, EMPLOYEES, OR AGENTS, BE LIABLE TO YOU FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE, OR CONSEQUENTIAL DAMAGES WHATSOEVER RESULTING FROM ANY (I) ERRORS, MISTAKES, OR INACCURACIES OF CONTENT, (II) PERSONAL INJURY OR PROPERTY DAMAGE, OF ANY NATURE WHATSOEVER, RESULTING FROM YOUR ACCESS TO AND USE OF OUR APP, (III) ANY UNAUTHORIZED ACCESS TO OR USE OF OUR SECURE SERVERS AND/OR ANY AND ALL PERSONAL INFORMATION STORED THEREIN.
 
-• You agree to pay all applicable fees
-• Subscriptions auto-renew unless cancelled
-• You can manage subscriptions in your Apple ID settings
-• Refunds are subject to Apple's refund policies
+(B) IN NO EVENT SHALL THE TOTAL LIABILITY OF EPHESIAN 28 LLC EXCEED THE AMOUNT PAID BY YOU, IF ANY, FOR ACCESSING THE APP.
 """)
                         
-                        policySection(title: "Limitation of Liability", content: """
-TO THE MAXIMUM EXTENT PERMITTED BY LAW, MUSE AND ITS DEVELOPERS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES.
+                        policySection(title: "8. Indemnification", content: """
+You agree to defend, indemnify, and hold harmless **Ephesian 28 LLC** and its officers, directors, employees, and agents from and against any and all claims, damages, obligations, losses, liabilities, costs or debt, and expenses (including but not limited to attorney's fees) arising from: (i) your use of and access to the App; (ii) your violation of any term of these Terms; (iii) your violation of any third-party right, including without limitation any copyright, property, or privacy right. This defense and indemnification obligation will survive these Terms and your use of the App.
+""")
+                        
+                        policySection(title: "9. Dispute Resolution: Arbitration & Class Action Waiver", content: """
+**PLEASE READ THIS SECTION CAREFULLY. IT AFFECTS YOUR LEGAL RIGHTS.**
 
-The App is provided "AS IS" without warranties of any kind.
-""")
-                        
-                        policySection(title: "Changes to Terms", content: """
-We reserve the right to modify these Terms at any time. Continued use of the App after changes constitutes acceptance of the new Terms.
-""")
-                        
-                        policySection(title: "Contact", content: """
-For questions about these Terms, contact us at:
+(a) **Binding Arbitration:** Any dispute, controversy, or claim arising out of or relating to these Terms or the App shall be settled by binding arbitration in accordance with the American Arbitration Association (AAA) rules. Judgment on the award rendered by the arbitrator(s) may be entered in any court having jurisdiction thereof.
 
-Email: splashcapital1@gmail.com
+(b) **Class Action Waiver:** YOU AND EPHESIAN 28 LLC AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS OR REPRESENTATIVE PROCEEDING.
+
+(c) **Jury Trial Waiver:** You and Ephesian 28 LLC hereby waive any constitutional and statutory rights to sue in court and have a trial in front of a judge or a jury.
+""")
+                        
+                        policySection(title: "10. Contact Information", content: """
+For any questions regarding these Terms, please contact:
+
+**Ephesian 28 LLC**
+Email: ephesian28mgmt@yahoo.com
 """)
                     }
                 }
@@ -1852,80 +1853,57 @@ struct EULAView: View {
                         .foregroundColor(.museLightGray)
                     
                     Group {
-                        policySection(title: "License Grant", content: """
-This End User License Agreement ("EULA") is a legal agreement between you and Muse ("Licensor") for the use of the Muse mobile application ("Application").
+                        policySection(title: "1. Acknowledgment", content: """
+This End User License Agreement ("EULA") is a legal agreement between you ("User") and **Ephesian 28 LLC** ("Licensor") for the use of the Muse mobile application ("Application").
 
-By installing or using the Application, you agree to be bound by this EULA. If you do not agree, do not install or use the Application.
-
-The Licensor grants you a limited, non-exclusive, non-transferable, revocable license to use the Application for personal, non-commercial purposes on devices you own or control, subject to this EULA and the Usage Rules of the App Store.
+You acknowledge that this EULA is concluded between you and Ephesian 28 LLC only, and not with Apple. Ephesian 28 LLC, not Apple, is solely responsible for the Application and the content thereof.
 """)
                         
-                        policySection(title: "Scope of License", content: """
-This license does not allow you to:
-• Distribute or make the Application available over a network
-• Sell, lease, lend, or sublicense the Application
-• Reverse engineer, disassemble, or decompile the Application
-• Copy, modify, or create derivative works of the Application
-• Remove any copyright or proprietary notices
-
-This license is effective until terminated. Your rights under this license will terminate automatically if you fail to comply with any of its terms.
+                        policySection(title: "2. License Grant", content: """
+The Licensor grants you a revocable, non-exclusive, non-transferable, limited license to download, install, and use the Application for your personal, non-commercial purposes strictly in accordance with the terms of this EULA and the Usage Rules set forth in the Apple Media Services Terms and Conditions.
 """)
                         
-                        policySection(title: "Apple's Role", content: """
-You acknowledge that this EULA is between you and the Licensor, not Apple. Apple is not responsible for the Application or its content.
+                        policySection(title: "3. Scope of License", content: """
+You may not:
+• Distribute or make the Application available over a network where it could be used by multiple devices at the same time.
+• Rent, lease, lend, sell, redistribute, or sublicense the Application.
+• Reverse engineer, disassemble, attempt to derive the source code of, or modify the Application.
+• Create derivative works of the Application.
 
-Apple has no obligation to furnish any maintenance or support services with respect to the Application.
-
-To the maximum extent permitted by applicable law, Apple will have no other warranty obligation with respect to the Application.
+Any attempt to do so is a violation of the rights of Ephesian 28 LLC and its licensors.
 """)
                         
-                        policySection(title: "Intellectual Property", content: """
-The Application and all intellectual property rights therein are and shall remain the property of the Licensor. Nothing in this EULA transfers any ownership rights to you.
+                        policySection(title: "4. No Warranty", content: """
+**YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT USE OF THE APPLICATION IS AT YOUR SOLE RISK.** TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE APPLICATION IS PROVIDED "AS IS" AND "AS AVAILABLE," WITH ALL FAULTS AND WITHOUT WARRANTY OF ANY KIND.
 
-All content, including affirmations, quotes, graphics, and code, is protected by copyright and other intellectual property laws.
+EPHESIAN 28 LLC HEREBY DISCLAIMS ALL WARRANTIES AND CONDITIONS WITH RESPECT TO THE APPLICATION, EITHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, OF SATISFACTORY QUALITY, OF FITNESS FOR A PARTICULAR PURPOSE, OF ACCURACY, AND OF NON-INFRINGEMENT OF THIRD-PARTY RIGHTS.
 """)
                         
-                        policySection(title: "Third-Party Services", content: """
-The Application may enable access to third-party services and content. You agree to comply with all applicable terms and conditions when using such third-party services.
-
-The Licensor is not responsible for examining or evaluating the content or accuracy of third-party services and shall not be liable for any third-party services.
+                        policySection(title: "5. Limitation of Liability", content: """
+TO THE EXTENT NOT PROHIBITED BY LAW, IN NO EVENT SHALL **EPHESIAN 28 LLC** BE LIABLE FOR PERSONAL INJURY OR ANY INCIDENTAL, SPECIAL, INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER, INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF PROFITS, LOSS OF DATA, BUSINESS INTERRUPTION, OR ANY OTHER COMMERCIAL DAMAGES OR LOSSES, ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE THE APPLICATION, HOWEVER CAUSED, REGARDLESS OF THE THEORY OF LIABILITY (CONTRACT, TORT, OR OTHERWISE).
 """)
                         
-                        policySection(title: "Disclaimer of Warranties", content: """
-THE APPLICATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE LICENSOR DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
-
-• WARRANTIES OF MERCHANTABILITY
-• FITNESS FOR A PARTICULAR PURPOSE
-• NON-INFRINGEMENT
-• ACCURACY OR RELIABILITY OF CONTENT
+                        policySection(title: "6. Maintenance and Support", content: """
+Ephesian 28 LLC is solely responsible for providing any maintenance and support services with respect to the Application. You acknowledge that Apple has no obligation whatsoever to furnish any maintenance and support services with respect to the Application.
 """)
                         
-                        policySection(title: "Limitation of Liability", content: """
-IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, PUNITIVE, OR CONSEQUENTIAL DAMAGES ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF THE APPLICATION.
-
-THE LICENSOR'S TOTAL LIABILITY SHALL NOT EXCEED THE AMOUNT YOU PAID FOR THE APPLICATION.
+                        policySection(title: "7. Third-Party Beneficiary", content: """
+You acknowledge and agree that Apple, and Apple's subsidiaries, are third-party beneficiaries of this EULA, and that, upon your acceptance of the terms and conditions of this EULA, Apple will have the right (and will be deemed to have accepted the right) to enforce this EULA against you as a third-party beneficiary thereof.
 """)
                         
-                        policySection(title: "Health Disclaimer", content: """
-The Application provides wellness content for informational purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment.
-
-The Licensor is not liable for any health-related decisions made based on the Application's content. Always seek the advice of qualified health providers with any questions regarding medical conditions.
+                        policySection(title: "8. Dispute Resolution", content: """
+Any dispute arising under this EULA will be resolved through binding arbitration as detailed in the Terms of Service. **YOU WAIVE YOUR RIGHT TO A JURY TRIAL AND TO PARTICIPATE IN A CLASS ACTION LAWSUIT.**
 """)
                         
-                        policySection(title: "Termination", content: """
-This EULA is effective until terminated. Your rights under this EULA will terminate automatically without notice if you fail to comply with any term.
-
-Upon termination, you must cease all use of the Application and destroy all copies.
+                        policySection(title: "9. Governing Law", content: """
+The laws of the State of Delaware, excluding its conflicts of law rules, govern this license and your use of the Application. Your use of the Application may also be subject to other local, state, national, or international laws.
 """)
                         
-                        policySection(title: "Governing Law", content: """
-This EULA shall be governed by and construed in accordance with the laws of the United States, without regard to its conflict of law provisions.
-""")
-                        
-                        policySection(title: "Contact Information", content: """
-For questions regarding this EULA, please contact:
+                        policySection(title: "10. Contact Information", content: """
+Should you have any questions, complaints, or claims with respect to the Application, please contact:
 
-Email: splashcapital1@gmail.com
+**Ephesian 28 LLC**
+Email: ephesian28mgmt@yahoo.com
 """)
                     }
                 }
