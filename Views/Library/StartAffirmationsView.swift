@@ -628,6 +628,7 @@ struct StartAffirmationsView: View {
     @State private var searchText: String = "" // Search affirmations by text or category
     @State private var isAffirmationsListCollapsed: Bool = false // Collapse/expand affirmations list
     @State private var isSavedAIExpanded: Bool = false // Expand saved AI affirmations for selection
+    @State private var showJournalView: Bool = false // Show journal view
     
     enum PracticeMode: String, CaseIterable {
         case affirmations = "Affirmations"
@@ -830,6 +831,9 @@ struct StartAffirmationsView: View {
                 onComplete: { activeFrequency = nil }
             )
         }
+        .fullScreenCover(isPresented: $showJournalView) {
+            JournalView()
+        }
     }
     
     private var headerTitle: String {
@@ -909,15 +913,15 @@ struct StartAffirmationsView: View {
                     showManifestView = true
                 }
                 
-                // Meditation Button
+                // Journal Button
                 PracticeModeButton(
-                    title: "Meditation",
-                    subtitle: "Find clarity and inner peace",
-                    icon: "brain.head.profile",
-                    color: .blue,
-                    isDisabled: true
+                    title: "Journal",
+                    subtitle: "Reflect on your day",
+                    icon: "book.closed.fill",
+                    color: .orange,
+                    isDisabled: false
                 ) {
-                    // Coming soon
+                    showJournalView = true
                 }
             }
         }

@@ -291,7 +291,6 @@ struct FeedView: View {
                                 Spacer()
                                 LiquidMenu(
                                     isOpen: $showHamburgerMenu,
-                                    onChat: onMessageTap,
                                     onCategory: { showMixPopup = true },
                                     onBackground: { showBackgroundPicker = true }
                                 )
@@ -424,7 +423,6 @@ struct AnyContentItem: Identifiable {
 struct LiquidMenu: View {
     @Binding var isOpen: Bool
     // Actions
-    let onChat: () -> Void
     let onCategory: () -> Void
     let onBackground: () -> Void
     
@@ -439,21 +437,15 @@ struct LiquidMenu: View {
         ZStack(alignment: .top) {
             // Options Stack (Behind the toggle button)
             ZStack {
-                // Item 3: Background (Bottom-most)
-                LiquidMenuItem(icon: "paintbrush.fill", index: 3, isOpen: isOpen) {
+                // Item 2: Background (Bottom-most)
+                LiquidMenuItem(icon: "paintbrush.fill", index: 2, isOpen: isOpen) {
                     onBackground()
                     withAnimation { isOpen = false }
                 }
                 
-                // Item 2: Categories
-                LiquidMenuItem(icon: "square.grid.2x2.fill", index: 2, isOpen: isOpen) {
+                // Item 1: Categories (Top-most)
+                LiquidMenuItem(icon: "square.grid.2x2.fill", index: 1, isOpen: isOpen) {
                     onCategory()
-                    withAnimation { isOpen = false }
-                }
-                
-                // Item 1: Chat (Top-most)
-                LiquidMenuItem(icon: "message.fill", index: 1, isOpen: isOpen) {
-                    onChat()
                     withAnimation { isOpen = false }
                 }
             }
@@ -490,8 +482,8 @@ struct LiquidMenu: View {
             .zIndex(1)
         }
         // Ensure the expanded menu doesn't capture touches outside the buttons
-        // Adjusted frame calculation for the new mix of shapes
-        .frame(width: 60, height: isOpen ? (50 * 4) + (spacing * 3) : 40, alignment: .top)
+        // Adjusted frame calculation for 2 menu items
+        .frame(width: 60, height: isOpen ? (50 * 3) + (spacing * 2) : 40, alignment: .top)
     }
 }
 
