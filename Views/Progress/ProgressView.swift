@@ -617,7 +617,25 @@ class NotificationService: ObservableObject {
     @Published var journalReminders: [SessionReminder] = []
     @Published var isAuthorized: Bool = false
     
+    // Daily Inspiration Settings
+    @Published var dailyInspirationEnabled: Bool = false
+    @Published var dailyInspirationCount: Int = 3 // 1-5
+    @Published var dailyInspirationSource: InspirationSource = .affirmations
+    @Published var selectedCategories: Set<String> = []
+    
     static let maxReminders = 5
+    
+    enum InspirationSource: String, CaseIterable, Codable {
+        case affirmations = "Affirmations"
+        case quotes = "Quotes"
+        
+        var icon: String {
+            switch self {
+            case .affirmations: return "sparkles"
+            case .quotes: return "quote.bubble.fill"
+            }
+        }
+    }
     
     enum SessionType: String, CaseIterable, Codable {
         case affirmations = "Affirmations"
@@ -654,9 +672,11 @@ class NotificationService: ObservableObject {
     ]
     
     private let userDefaultsKey = "sessionReminders"
+    private let inspirationKey = "dailyInspirationSettings"
     
     private init() {
         loadReminders()
+        loadInspirationSettings()
         checkAuthorizationStatus()
     }
     
@@ -786,6 +806,119 @@ class NotificationService: ObservableObject {
         breathworkReminders = decoded.filter { $0.sessionType == .breathwork }
         journalReminders = decoded.filter { $0.sessionType == .journaling }
     }
+    
+    // MARK: - Daily Inspiration
+    
+    func updateInspirationSettings(enabled: Bool, count: Int, source: InspirationSource, categories: Set<String>) {
+        dailyInspirationEnabled = enabled
+        dailyInspirationCount = count
+        dailyInspirationSource = source
+        selectedCategories = categories
+        saveInspirationSettings()
+        rescheduleInspirationNotifications()
+    }
+    
+    func rescheduleInspirationNotifications() {
+        // Cancel existing inspiration notifications
+        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+            let inspirationIds = requests.filter { $0.identifier.hasPrefix("inspiration_") }.map { $0.identifier }
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: inspirationIds)
+        }
+        
+        guard dailyInspirationEnabled, !selectedCategories.isEmpty else { return }
+        
+        // Load content
+        let content: [String]
+        if dailyInspirationSource == .affirmations {
+            content = loadAffirmations()
+        } else {
+            content = loadQuotes()
+        }
+        
+        guard !content.isEmpty else { return }
+        
+        // Schedule notifications at random times between 8 AM and 9 PM
+        for i in 0..<dailyInspirationCount {
+            let randomContent = content.randomElement() ?? content[0]
+            scheduleInspirationNotification(content: randomContent, index: i)
+        }
+    }
+    
+    private func scheduleInspirationNotification(content: String, index: Int) {
+        let notificationContent = UNMutableNotificationContent()
+        notificationContent.title = dailyInspirationSource == .affirmations ? "✨ Daily Affirmation" : "💭 Daily Quote"
+        notificationContent.body = content
+        notificationContent.sound = .default
+        
+        // Generate random hour between 8 AM and 9 PM
+        let startHour = 8
+        let endHour = 21
+        let hoursRange = endHour - startHour
+        let spacing = hoursRange / max(dailyInspirationCount, 1)
+        let hour = startHour + (spacing * index) + Int.random(in: 0..<max(spacing, 1))
+        let minute = Int.random(in: 0..<60)
+        
+        var components = DateComponents()
+        components.hour = min(hour, endHour)
+        components.minute = minute
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+        let request = UNNotificationRequest(identifier: "inspiration_\(index)", content: notificationContent, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request)
+    }
+    
+    private func loadAffirmations() -> [String] {
+        guard let path = Bundle.main.path(forResource: "affirmations", ofType: "json"),
+              let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
+              let affirmations = try? JSONDecoder().decode([Affirmation].self, from: data) else {
+            return []
+        }
+        
+        if selectedCategories.isEmpty {
+            return affirmations.map { $0.text }
+        } else {
+            return affirmations.filter { selectedCategories.contains($0.category) }.map { $0.text }
+        }
+    }
+    
+    private func loadQuotes() -> [String] {
+        guard let path = Bundle.main.path(forResource: "quotes", ofType: "json"),
+              let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
+              let quotes = try? JSONDecoder().decode([Quote].self, from: data) else {
+            return []
+        }
+        
+        if selectedCategories.isEmpty {
+            return quotes.map { "\"\($0.text)\" — \($0.author)" }
+        } else {
+            return quotes.filter { selectedCategories.contains($0.category) }.map { "\"\($0.text)\" — \($0.author)" }
+        }
+    }
+    
+    private func saveInspirationSettings() {
+        let settings: [String: Any] = [
+            "enabled": dailyInspirationEnabled,
+            "count": dailyInspirationCount,
+            "source": dailyInspirationSource.rawValue,
+            "categories": Array(selectedCategories)
+        ]
+        UserDefaults.standard.set(settings, forKey: inspirationKey)
+    }
+    
+    private func loadInspirationSettings() {
+        guard let settings = UserDefaults.standard.dictionary(forKey: inspirationKey) else { return }
+        
+        dailyInspirationEnabled = settings["enabled"] as? Bool ?? false
+        dailyInspirationCount = settings["count"] as? Int ?? 3
+        if let sourceRaw = settings["source"] as? String,
+           let source = InspirationSource(rawValue: sourceRaw) {
+            dailyInspirationSource = source
+        }
+        if let categories = settings["categories"] as? [String] {
+            selectedCategories = Set(categories)
+        }
+    }
 }
 
 // MARK: - Notification Settings View
@@ -831,6 +964,18 @@ struct NotificationSettingsView: View {
                             authorizationCard
                         }
                         
+                        // Daily Inspiration Section
+                        dailyInspirationSection
+                        
+                        Divider()
+                            .background(Color.museMediumGray)
+                        
+                        // Session Reminders Section
+                        Text("Session Reminders")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.museSoftWhite)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
                         sessionTypeTabs
                         remindersSection
                     }
@@ -840,8 +985,184 @@ struct NotificationSettingsView: View {
                 }
             }
         }
-        .onAppear { notificationService.checkAuthorizationStatus() }
+        .onAppear { 
+            notificationService.checkAuthorizationStatus()
+            loadCategories()
+        }
         .sheet(isPresented: $showAddReminder) { addReminderSheet }
+    }
+    
+    // MARK: - Daily Inspiration Section
+    
+    @State private var availableCategories: [String] = []
+    
+    private func loadCategories() {
+        // Load categories based on source
+        if notificationService.dailyInspirationSource == .affirmations {
+            if let path = Bundle.main.path(forResource: "affirmations", ofType: "json"),
+               let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
+               let items = try? JSONDecoder().decode([Affirmation].self, from: data) {
+                availableCategories = Array(Set(items.map { $0.category })).sorted()
+            }
+        } else {
+            if let path = Bundle.main.path(forResource: "quotes", ofType: "json"),
+               let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
+               let items = try? JSONDecoder().decode([Quote].self, from: data) {
+                availableCategories = Array(Set(items.map { $0.category })).sorted()
+            }
+        }
+    }
+    
+    private var dailyInspirationSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Image(systemName: "sparkles")
+                    .foregroundColor(.museOrange)
+                Text("Daily Inspiration")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.museSoftWhite)
+                
+                Spacer()
+                
+                Toggle("", isOn: Binding(
+                    get: { notificationService.dailyInspirationEnabled },
+                    set: { enabled in
+                        notificationService.updateInspirationSettings(
+                            enabled: enabled,
+                            count: notificationService.dailyInspirationCount,
+                            source: notificationService.dailyInspirationSource,
+                            categories: notificationService.selectedCategories
+                        )
+                    }
+                ))
+                .tint(.museOrange)
+            }
+            
+            if notificationService.dailyInspirationEnabled {
+                // Source Selection
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Content Type")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.museLightGray)
+                    
+                    HStack(spacing: 12) {
+                        ForEach(NotificationService.InspirationSource.allCases, id: \.self) { source in
+                            Button(action: {
+                                withAnimation {
+                                    notificationService.dailyInspirationSource = source
+                                    notificationService.selectedCategories = []
+                                    loadCategories()
+                                }
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: source.icon)
+                                    Text(source.rawValue)
+                                }
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(notificationService.dailyInspirationSource == source ? .museSoftWhite : .museLightGray)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(
+                                    Capsule()
+                                        .fill(notificationService.dailyInspirationSource == source ? Color.museOrange.opacity(0.3) : Color.white.opacity(0.08))
+                                )
+                                .overlay(
+                                    Capsule()
+                                        .stroke(notificationService.dailyInspirationSource == source ? Color.museOrange : Color.clear, lineWidth: 1)
+                                )
+                            }
+                        }
+                    }
+                }
+                
+                // Count Selection
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Notifications per day")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.museLightGray)
+                        
+                        Spacer()
+                        
+                        Text("\(notificationService.dailyInspirationCount)")
+                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                            .foregroundColor(.museOrange)
+                    }
+                    
+                    HStack(spacing: 8) {
+                        ForEach(1...5, id: \.self) { count in
+                            Button(action: {
+                                notificationService.updateInspirationSettings(
+                                    enabled: true,
+                                    count: count,
+                                    source: notificationService.dailyInspirationSource,
+                                    categories: notificationService.selectedCategories
+                                )
+                            }) {
+                                Text("\(count)")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundColor(notificationService.dailyInspirationCount == count ? .museSoftWhite : .museLightGray)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .fill(notificationService.dailyInspirationCount == count ? Color.museOrange : Color.white.opacity(0.08))
+                                    )
+                            }
+                        }
+                    }
+                }
+                
+                // Category Selection
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Categories")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.museLightGray)
+                    
+                    FlowLayout(spacing: 8) {
+                        ForEach(availableCategories, id: \.self) { category in
+                            Button(action: {
+                                withAnimation {
+                                    if notificationService.selectedCategories.contains(category) {
+                                        notificationService.selectedCategories.remove(category)
+                                    } else {
+                                        notificationService.selectedCategories.insert(category)
+                                    }
+                                    notificationService.updateInspirationSettings(
+                                        enabled: true,
+                                        count: notificationService.dailyInspirationCount,
+                                        source: notificationService.dailyInspirationSource,
+                                        categories: notificationService.selectedCategories
+                                    )
+                                }
+                            }) {
+                                Text(category.capitalized)
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(notificationService.selectedCategories.contains(category) ? .museSoftWhite : .museLightGray)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        Capsule()
+                                            .fill(notificationService.selectedCategories.contains(category) ? Color.museOrange.opacity(0.4) : Color.white.opacity(0.08))
+                                    )
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(notificationService.selectedCategories.contains(category) ? Color.museOrange : Color.clear, lineWidth: 1)
+                                    )
+                            }
+                        }
+                    }
+                    
+                    if notificationService.selectedCategories.isEmpty {
+                        Text("Select at least one category")
+                            .font(.system(size: 12))
+                            .foregroundColor(.red.opacity(0.8))
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color.white.opacity(0.08)))
     }
     
     private var authorizationCard: some View {
@@ -1070,6 +1391,54 @@ struct NotificationSettingsView: View {
         case .affirmations: return calendar.date(bySettingHour: 8, minute: 0, second: 0, of: Date()) ?? Date()
         case .breathwork: return calendar.date(bySettingHour: 12, minute: 0, second: 0, of: Date()) ?? Date()
         case .journaling: return calendar.date(bySettingHour: 21, minute: 0, second: 0, of: Date()) ?? Date()
+        }
+    }
+}
+
+// MARK: - Flow Layout for Category Tags
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
+    
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let result = FlowResult(in: proposal.width ?? 0, subviews: subviews, spacing: spacing)
+        return result.size
+    }
+    
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let result = FlowResult(in: bounds.width, subviews: subviews, spacing: spacing)
+        for (index, subview) in subviews.enumerated() {
+            subview.place(at: CGPoint(x: bounds.minX + result.positions[index].x,
+                                      y: bounds.minY + result.positions[index].y),
+                         proposal: .unspecified)
+        }
+    }
+    
+    struct FlowResult {
+        var size: CGSize = .zero
+        var positions: [CGPoint] = []
+        
+        init(in width: CGFloat, subviews: Subviews, spacing: CGFloat) {
+            var x: CGFloat = 0
+            var y: CGFloat = 0
+            var rowHeight: CGFloat = 0
+            
+            for subview in subviews {
+                let size = subview.sizeThatFits(.unspecified)
+                
+                if x + size.width > width, x > 0 {
+                    x = 0
+                    y += rowHeight + spacing
+                    rowHeight = 0
+                }
+                
+                positions.append(CGPoint(x: x, y: y))
+                rowHeight = max(rowHeight, size.height)
+                x += size.width + spacing
+                
+                self.size.width = max(self.size.width, x - spacing)
+            }
+            
+            self.size.height = y + rowHeight
         }
     }
 }
