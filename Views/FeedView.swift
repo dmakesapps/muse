@@ -18,7 +18,7 @@ struct FeedView: View {
     @State private var showHamburgerMenu = false  // Custom hamburger menu popup
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     
-    let backgroundOptions = ["backgroundjungle2", "clouds", "ocean", "SolidDark", "SolidLight"]
+    let backgroundOptions = ["backgroundjungle2", "clouds", "ocean", "SolidDark"]
     
     enum ContentCategory: String {
         case affirmation = "affirmation"
@@ -55,19 +55,6 @@ struct FeedView: View {
         }
         
         return items
-    }
-    
-    // Adaptive text colors for light/dark backgrounds
-    private var isLightMode: Bool {
-        MuseBackgroundView.isLightBackground(selectedBackground)
-    }
-    
-    private var primaryTextColor: Color {
-        isLightMode ? .museDeepNavy : .museSoftWhite
-    }
-    
-    private var secondaryTextColor: Color {
-        isLightMode ? .museMediumGray : .museLightGray
     }
     
     var body: some View {
@@ -126,14 +113,14 @@ struct FeedView: View {
                                         
                                         Text(item.text)
                                             .font(.system(size: fontSizeFor(text: item.text), weight: .medium, design: .serif))
-                                            .foregroundColor(primaryTextColor)
+                                            .foregroundColor(.museSoftWhite)
                                             .multilineTextAlignment(.center)
                                             .lineSpacing(8)
                                         
                                         if let author = item.author {
                                             Text("— \(author)")
                                                 .font(.system(size: fontSizeFor(text: item.text) * 0.65, weight: .regular, design: .serif))
-                                                .foregroundColor(secondaryTextColor)
+                                                .foregroundColor(.museLightGray)
                                                 .padding(.top, 8)
                                         }
                                     }
@@ -1808,13 +1795,29 @@ private struct CategoryRow: View {
 struct MuseBackgroundView: View {
     let selectedBackground: String
     
+    private func loadImage() -> UIImage? {
+        // First try UIImage(named:) which works for asset catalogs
+        if let image = UIImage(named: selectedBackground) {
+            return image
+        }
+        // Then try loading from bundle with .jpg extension (for files in Resources folder)
+        if let path = Bundle.main.path(forResource: selectedBackground, ofType: "jpg"),
+           let image = UIImage(contentsOfFile: path) {
+            return image
+        }
+        // Try .png as fallback
+        if let path = Bundle.main.path(forResource: selectedBackground, ofType: "png"),
+           let image = UIImage(contentsOfFile: path) {
+            return image
+        }
+        return nil
+    }
+    
     var body: some View {
         ZStack {
             if selectedBackground == "SolidDark" {
                 Color.museDeepNavy
-            } else if selectedBackground == "SolidLight" {
-                Color.white
-            } else if let uiImage = UIImage(named: selectedBackground) {
+            } else if let uiImage = loadImage() {
                 GeometryReader { geometry in
                     Image(uiImage: uiImage)
                         .resizable()
@@ -1829,11 +1832,6 @@ struct MuseBackgroundView: View {
             }
         }
     }
-    
-    /// Helper to determine if the current background is light (for adaptive text colors)
-    static func isLightBackground(_ background: String) -> Bool {
-        return background == "SolidLight"
-    }
 }
 
 // MARK: - Background Picker View
@@ -1841,6 +1839,24 @@ struct BackgroundPickerView: View {
     @Binding var selectedBackground: String
     let options: [String]
     @Environment(\.dismiss) private var dismiss
+    
+    private func loadPickerImage(_ name: String) -> UIImage? {
+        // First try UIImage(named:) which works for asset catalogs
+        if let image = UIImage(named: name) {
+            return image
+        }
+        // Then try loading from bundle with .jpg extension
+        if let path = Bundle.main.path(forResource: name, ofType: "jpg"),
+           let image = UIImage(contentsOfFile: path) {
+            return image
+        }
+        // Try .png as fallback
+        if let path = Bundle.main.path(forResource: name, ofType: "png"),
+           let image = UIImage(contentsOfFile: path) {
+            return image
+        }
+        return nil
+    }
     
     var body: some View {
         ZStack {
@@ -1872,17 +1888,7 @@ struct BackgroundPickerView: View {
                                                             .font(.system(size: 14, weight: .medium))
                                                             .foregroundColor(.museSoftWhite)
                                                     )
-                                            } else if bg == "SolidLight" {
-                                                Rectangle()
-                                                    .fill(Color.white)
-                                                    .frame(width: 100, height: 160)
-                                                    .cornerRadius(12)
-                                                    .overlay(
-                                                        Text("Light")
-                                                            .font(.system(size: 14, weight: .medium))
-                                                            .foregroundColor(.museDeepNavy)
-                                                    )
-                                            } else if let uiImage = UIImage(named: bg) {
+                                            } else if let uiImage = loadPickerImage(bg) {
                                                 Image(uiImage: uiImage)
                                                     .resizable()
                                                     .aspectRatio(contentMode: .fill)
