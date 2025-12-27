@@ -18,7 +18,7 @@ struct FeedView: View {
     @State private var showHamburgerMenu = false  // Custom hamburger menu popup
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     
-    let backgroundOptions = ["backgroundjungle2", "clouds", "ocean", "SolidDark"]
+    let backgroundOptions = ["backgroundjungle2", "clouds", "ocean", "SolidDark", "SolidLight"]
     
     enum ContentCategory: String {
         case affirmation = "affirmation"
@@ -55,6 +55,19 @@ struct FeedView: View {
         }
         
         return items
+    }
+    
+    // Adaptive text colors for light/dark backgrounds
+    private var isLightMode: Bool {
+        MuseBackgroundView.isLightBackground(selectedBackground)
+    }
+    
+    private var primaryTextColor: Color {
+        isLightMode ? .museDeepNavy : .museSoftWhite
+    }
+    
+    private var secondaryTextColor: Color {
+        isLightMode ? .museMediumGray : .museLightGray
     }
     
     var body: some View {
@@ -113,14 +126,14 @@ struct FeedView: View {
                                         
                                         Text(item.text)
                                             .font(.system(size: fontSizeFor(text: item.text), weight: .medium, design: .serif))
-                                            .foregroundColor(.museSoftWhite)
+                                            .foregroundColor(primaryTextColor)
                                             .multilineTextAlignment(.center)
                                             .lineSpacing(8)
                                         
                                         if let author = item.author {
                                             Text("— \(author)")
                                                 .font(.system(size: fontSizeFor(text: item.text) * 0.65, weight: .regular, design: .serif))
-                                                .foregroundColor(.museLightGray)
+                                                .foregroundColor(secondaryTextColor)
                                                 .padding(.top, 8)
                                         }
                                     }
@@ -1799,6 +1812,8 @@ struct MuseBackgroundView: View {
         ZStack {
             if selectedBackground == "SolidDark" {
                 Color.museDeepNavy
+            } else if selectedBackground == "SolidLight" {
+                Color.white
             } else if let uiImage = UIImage(named: selectedBackground) {
                 GeometryReader { geometry in
                     Image(uiImage: uiImage)
@@ -1813,6 +1828,11 @@ struct MuseBackgroundView: View {
                 Color.museDeepNavy
             }
         }
+    }
+    
+    /// Helper to determine if the current background is light (for adaptive text colors)
+    static func isLightBackground(_ background: String) -> Bool {
+        return background == "SolidLight"
     }
 }
 
@@ -1851,6 +1871,16 @@ struct BackgroundPickerView: View {
                                                         Text("Dark")
                                                             .font(.system(size: 14, weight: .medium))
                                                             .foregroundColor(.museSoftWhite)
+                                                    )
+                                            } else if bg == "SolidLight" {
+                                                Rectangle()
+                                                    .fill(Color.white)
+                                                    .frame(width: 100, height: 160)
+                                                    .cornerRadius(12)
+                                                    .overlay(
+                                                        Text("Light")
+                                                            .font(.system(size: 14, weight: .medium))
+                                                            .foregroundColor(.museDeepNavy)
                                                     )
                                             } else if let uiImage = UIImage(named: bg) {
                                                 Image(uiImage: uiImage)
