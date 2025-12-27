@@ -9,16 +9,10 @@
 /* Begin PBXBuildFile section */
 		720DF7282EF88AAF00EB49D2 /* APIKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720DF7272EF88AAF00EB49D2 /* APIKeys.swift */; };
 		720DF72A2EF88DF800EB49D2 /* AIAffirmationsChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720DF7292EF88DF800EB49D2 /* AIAffirmationsChatView.swift */; };
-		FFFF00052EF9000000000005 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00012EF9000000000001 /* JournalView.swift */; };
-		FFFF00062EF9000000000006 /* ChatHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00022EF9000000000002 /* ChatHistoryView.swift */; };
-		FFFF00072EF9000000000007 /* ImmersiveManifestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00032EF9000000000003 /* ImmersiveManifestView.swift */; };
-
 		72305A062EF717AB003A8399 /* ChatStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72305A052EF717AB003A8399 /* ChatStorageService.swift */; };
-
 		724C1B5C2EF3E62B0052D8AE /* SpeechRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B5B2EF3E62B0052D8AE /* SpeechRecognizer.swift */; };
 		724C1B5E2EF3E67B0052D8AE /* ManifestGenerationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */; };
 		724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */; };
-
 		724C1B682EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B672EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 */; };
 		726A39512EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394C2EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 */; };
 		726A39522EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A39492EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 */; };
@@ -35,6 +29,8 @@
 		72996E252EF23F6200795B97 /* bell321.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72996E242EF23F6200795B97 /* bell321.mp3 */; };
 		72B90C152EEF62E600A446A2 /* KrishnaCmaj.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72B90C142EEF62E600A446A2 /* KrishnaCmaj.mp3 */; };
 		72B90C192EEFCDCA00A446A2 /* backgroundjungle2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 72B90C182EEFCDCA00A446A2 /* backgroundjungle2.jpg */; };
+		72D83ED02EFF698B002E235A /* clouds.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 72D83ECE2EFF698B002E235A /* clouds.jpg */; };
+		72D83ED12EFF698B002E235A /* ocean.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 72D83ECF2EFF698B002E235A /* ocean.jpg */; };
 		72E2629E2EC68E040080CF29 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262902EC68E040080CF29 /* ContentView.swift */; };
 		72E262A52EC68E040080CF29 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262A62EC68E040080CF29 /* Theme.swift */; };
 		72E262AA2EC68E040080CF29 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72E262A92EC68E040080CF29 /* Assets.xcassets */; };
@@ -50,8 +46,6 @@
 		72E262DC2EC68E040080CF29 /* ProgressService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262DD2EC68E040080CF29 /* ProgressService.swift */; };
 		72E262DF2EC68E040080CF29 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262DE2EC68E040080CF29 /* FeedView.swift */; };
 		72E262E12EC68E040080CF29 /* PromiseKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262E02EC68E040080CF29 /* PromiseKeeperApp.swift */; };
-		72E73EBA2EF0B8FE009D3CDB /* Gradient2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 72E73EB92EF0B8FE009D3CDB /* Gradient2.jpg */; };
-		72E73EBB2EF0B8FE009D3CDB /* Gradient1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 72E73EB82EF0B8FE009D3CDB /* Gradient1.jpg */; };
 		72E73EBF2EF0BE9F009D3CDB /* forestbirds.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72E73EBC2EF0BE9F009D3CDB /* forestbirds.mp3 */; };
 		72E73EC02EF0BE9F009D3CDB /* rain.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72E73EBD2EF0BE9F009D3CDB /* rain.mp3 */; };
 		72E73EC12EF0BE9F009D3CDB /* river.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72E73EBE2EF0BE9F009D3CDB /* river.mp3 */; };
@@ -59,6 +53,8 @@
 		AAAA00032EC6F00000000002 /* quotes.json in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00022EC6F00000000002 /* quotes.json */; };
 		AAAA00052EC6F00000000003 /* affirmations.json in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00042EC6F00000000003 /* affirmations.json */; };
 		AAAA00072EC6F00000000005 /* DJTAYEbackground.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00062EC6F00000000005 /* DJTAYEbackground.mp3 */; };
+		AAAA11112EFA000000000001 /* MuseAgentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA11102EFA000000000001 /* MuseAgentService.swift */; };
+		AAAA11132EFA000000000002 /* MuseUserProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA11122EFA000000000002 /* MuseUserProfileService.swift */; };
 		BBBB00012EC7000000000001 /* MuseWidgetsExtensionBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00002EC7000000000001 /* MuseWidgetsExtensionBundle.swift */; };
 		BBBB00032EC7000000000002 /* MuseWidgetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00022EC7000000000002 /* MuseWidgetsExtension.swift */; };
 		BBBB00052EC7000000000003 /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00042EC7000000000003 /* AppIntent.swift */; };
@@ -69,8 +65,9 @@
 		DDDD00012EF6000000000001 /* FrequencyItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD00002EF6000000000001 /* FrequencyItem.swift */; };
 		DDDD00032EF6000000000002 /* ImmersiveFrequenciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */; };
 		EEEE00012EF7000000000001 /* LocalSecrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE00002EF7000000000001 /* LocalSecrets.swift */; };
-		AAAA11112EFA000000000001 /* MuseAgentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA11102EFA000000000001 /* MuseAgentService.swift */; };
-		AAAA11132EFA000000000002 /* MuseUserProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA11122EFA000000000002 /* MuseUserProfileService.swift */; };
+		FFFF00052EF9000000000005 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00012EF9000000000001 /* JournalView.swift */; };
+		FFFF00062EF9000000000006 /* ChatHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00022EF9000000000002 /* ChatHistoryView.swift */; };
+		FFFF00072EF9000000000007 /* ImmersiveManifestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00032EF9000000000003 /* ImmersiveManifestView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -114,17 +111,11 @@
 /* Begin PBXFileReference section */
 		720DF7272EF88AAF00EB49D2 /* APIKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKeys.swift; sourceTree = "<group>"; };
 		720DF7292EF88DF800EB49D2 /* AIAffirmationsChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAffirmationsChatView.swift; sourceTree = "<group>"; };
-		FFFF00012EF9000000000001 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
-		FFFF00022EF9000000000002 /* ChatHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryView.swift; sourceTree = "<group>"; };
-		FFFF00032EF9000000000003 /* ImmersiveManifestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveManifestView.swift; sourceTree = "<group>"; };
-
 		72305A052EF717AB003A8399 /* ChatStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStorageService.swift; sourceTree = "<group>"; };
-
 		724C1B5A2EF3BF150052D8AE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		724C1B5B2EF3E62B0052D8AE /* SpeechRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognizer.swift; sourceTree = "<group>"; };
 		724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestGenerationService.swift; sourceTree = "<group>"; };
 		724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = manifest_5min.m4a; sourceTree = "<group>"; };
-
 		724C1B672EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "soul-of-the-earth_10min.mp3"; sourceTree = "<group>"; };
 		726A39482EF795AA00BF8F8E /* 174-hz-pain-release.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "174-hz-pain-release.mp3"; sourceTree = "<group>"; };
 		726A39492EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "285-hz-tissue-and-organ-healing-156262.mp3"; sourceTree = "<group>"; };
@@ -141,6 +132,8 @@
 		72996E242EF23F6200795B97 /* bell321.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = bell321.mp3; sourceTree = "<group>"; };
 		72B90C142EEF62E600A446A2 /* KrishnaCmaj.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = KrishnaCmaj.mp3; sourceTree = "<group>"; };
 		72B90C182EEFCDCA00A446A2 /* backgroundjungle2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = backgroundjungle2.jpg; sourceTree = "<group>"; };
+		72D83ECE2EFF698B002E235A /* clouds.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = clouds.jpg; sourceTree = "<group>"; };
+		72D83ECF2EFF698B002E235A /* ocean.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = ocean.jpg; sourceTree = "<group>"; };
 		72E262572EC68CF40080CF29 /* Muse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Muse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		72E262662EC68CF60080CF29 /* MuseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		72E262702EC68CF60080CF29 /* MuseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -159,8 +152,6 @@
 		72E262DD2EC68E040080CF29 /* ProgressService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressService.swift; sourceTree = "<group>"; };
 		72E262DE2EC68E040080CF29 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		72E262E02EC68E040080CF29 /* PromiseKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseKeeperApp.swift; sourceTree = "<group>"; };
-		72E73EB82EF0B8FE009D3CDB /* Gradient1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Gradient1.jpg; sourceTree = "<group>"; };
-		72E73EB92EF0B8FE009D3CDB /* Gradient2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Gradient2.jpg; sourceTree = "<group>"; };
 		72E73EBC2EF0BE9F009D3CDB /* forestbirds.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = forestbirds.mp3; sourceTree = "<group>"; };
 		72E73EBD2EF0BE9F009D3CDB /* rain.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = rain.mp3; sourceTree = "<group>"; };
 		72E73EBE2EF0BE9F009D3CDB /* river.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = river.mp3; sourceTree = "<group>"; };
@@ -169,6 +160,8 @@
 		AAAA00022EC6F00000000002 /* quotes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = quotes.json; sourceTree = "<group>"; };
 		AAAA00042EC6F00000000003 /* affirmations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = affirmations.json; sourceTree = "<group>"; };
 		AAAA00062EC6F00000000005 /* DJTAYEbackground.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = DJTAYEbackground.mp3; sourceTree = "<group>"; };
+		AAAA11102EFA000000000001 /* MuseAgentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseAgentService.swift; sourceTree = "<group>"; };
+		AAAA11122EFA000000000002 /* MuseUserProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseUserProfileService.swift; sourceTree = "<group>"; };
 		BBBB00002EC7000000000001 /* MuseWidgetsExtensionBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseWidgetsExtensionBundle.swift; sourceTree = "<group>"; };
 		BBBB00022EC7000000000002 /* MuseWidgetsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseWidgetsExtension.swift; sourceTree = "<group>"; };
 		BBBB00042EC7000000000003 /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
@@ -181,8 +174,9 @@
 		DDDD00002EF6000000000001 /* FrequencyItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequencyItem.swift; sourceTree = "<group>"; };
 		DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveFrequenciesView.swift; sourceTree = "<group>"; };
 		EEEE00002EF7000000000001 /* LocalSecrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSecrets.swift; sourceTree = "<group>"; };
-		AAAA11102EFA000000000001 /* MuseAgentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseAgentService.swift; sourceTree = "<group>"; };
-		AAAA11122EFA000000000002 /* MuseUserProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseUserProfileService.swift; sourceTree = "<group>"; };
+		FFFF00012EF9000000000001 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
+		FFFF00022EF9000000000002 /* ChatHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryView.swift; sourceTree = "<group>"; };
+		FFFF00032EF9000000000003 /* ImmersiveManifestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveManifestView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -286,7 +280,6 @@
 		72E262932EC68E040080CF29 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-
 				72E262902EC68E040080CF29 /* ContentView.swift */,
 				72E262DE2EC68E040080CF29 /* FeedView.swift */,
 				72E262A62EC68E040080CF29 /* Theme.swift */,
@@ -328,17 +321,11 @@
 			path = Progress;
 			sourceTree = "<group>";
 		};
-		FFFF00042EF9000000000004 /* Manifest */ = {
-			isa = PBXGroup;
-			children = (
-				FFFF00032EF9000000000003 /* ImmersiveManifestView.swift */,
-			);
-			path = Manifest;
-			sourceTree = "<group>";
-		};
 		AAAA00062EC6F00000000004 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				72D83ECE2EFF698B002E235A /* clouds.jpg */,
+				72D83ECF2EFF698B002E235A /* ocean.jpg */,
 				726A39482EF795AA00BF8F8E /* 174-hz-pain-release.mp3 */,
 				726A39492EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 */,
 				726A394A2EF795AA00BF8F8E /* 396-hz-root-chakra-156263.mp3 */,
@@ -362,8 +349,6 @@
 				72996E242EF23F6200795B97 /* bell321.mp3 */,
 				724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */,
 				72B90C182EEFCDCA00A446A2 /* backgroundjungle2.jpg */,
-				72E73EB82EF0B8FE009D3CDB /* Gradient1.jpg */,
-				72E73EB92EF0B8FE009D3CDB /* Gradient2.jpg */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -378,6 +363,14 @@
 				BBBB000D2EC7000000000009 /* Info.plist */,
 			);
 			path = MuseWidgetsExtension;
+			sourceTree = "<group>";
+		};
+		FFFF00042EF9000000000004 /* Manifest */ = {
+			isa = PBXGroup;
+			children = (
+				FFFF00032EF9000000000003 /* ImmersiveManifestView.swift */,
+			);
+			path = Manifest;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -519,6 +512,8 @@
 				724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */,
 				72996E252EF23F6200795B97 /* bell321.mp3 in Resources */,
 				724C1B682EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 in Resources */,
+				72D83ED02EFF698B002E235A /* clouds.jpg in Resources */,
+				72D83ED12EFF698B002E235A /* ocean.jpg in Resources */,
 				72E262AA2EC68E040080CF29 /* Assets.xcassets in Resources */,
 				72996E212EF2354500795B97 /* gonginhale.mp3 in Resources */,
 				AAAA00032EC6F00000000002 /* quotes.json in Resources */,
@@ -540,8 +535,6 @@
 				726A39582EF795AA00BF8F8E /* 396-hz-root-chakra-156263.mp3 in Resources */,
 				726A39592EF795AA00BF8F8E /* 528-hz-solar-plexus-156266.mp3 in Resources */,
 				72B90C192EEFCDCA00A446A2 /* backgroundjungle2.jpg in Resources */,
-				72E73EBA2EF0B8FE009D3CDB /* Gradient2.jpg in Resources */,
-				72E73EBB2EF0B8FE009D3CDB /* Gradient1.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -580,11 +573,9 @@
 				72E262A52EC68E040080CF29 /* Theme.swift in Sources */,
 				72E262C52EC68E040080CF29 /* MuseChatView.swift in Sources */,
 				724C1B5C2EF3E62B0052D8AE /* SpeechRecognizer.swift in Sources */,
-
 				72E262D72EC68E040080CF29 /* ChatBoxView.swift in Sources */,
 				72E262C72EC68E040080CF29 /* ProgressView.swift in Sources */,
 				72E262D32EC68E040080CF29 /* StartAffirmationsView.swift in Sources */,
-
 				72E262D52EC68E040080CF29 /* ImmersiveAffirmationView.swift in Sources */,
 				720DF7282EF88AAF00EB49D2 /* APIKeys.swift in Sources */,
 				72E262C92EC68E040080CF29 /* Quote.swift in Sources */,
@@ -596,7 +587,6 @@
 				720DF72A2EF88DF800EB49D2 /* AIAffirmationsChatView.swift in Sources */,
 				72E262DC2EC68E040080CF29 /* ProgressService.swift in Sources */,
 				AAAA00012EC6F00000000001 /* ContentLoader.swift in Sources */,
-
 				CCCC00012EEE500000000001 /* SpeechService.swift in Sources */,
 				CCCC00032EEE500000000002 /* OpenAIConfig.swift in Sources */,
 				DDDD00012EF6000000000001 /* FrequencyItem.swift in Sources */,

@@ -18,7 +18,7 @@ struct FeedView: View {
     @State private var showHamburgerMenu = false  // Custom hamburger menu popup
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     
-    let backgroundOptions = ["backgroundjungle2", "Gradient1", "Gradient2", "SolidDark"]
+    let backgroundOptions = ["backgroundjungle2", "clouds", "ocean", "SolidDark"]
     
     enum ContentCategory: String {
         case affirmation = "affirmation"
