@@ -2,3 +2,10 @@
 Services/OpenAIConfig.local.swift
 Services/LocalSecrets.swift
 Services/APIKeys.swift
+
+# Xcode
+.DS_Store
+xcuserdata/
+*.xcuserstate
+project.xcworkspace/
+
