@@ -456,6 +456,9 @@ struct AIAffirmationsChatView: View {
                 
                 switch result {
                 case .success(let affirmations):
+                    // Increment Daily Usage Count (Entitlement Check)
+                    EntitlementManager.shared.incrementAIGenerationCount()
+                    
                     generatedAffirmations = affirmations
                     // Small delay then show immersive view
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

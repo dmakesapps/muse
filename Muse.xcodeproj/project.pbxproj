@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E00400022EF88DF800EB49D3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E00400012EF88DF800EB49D3 /* PrivacyInfo.xcprivacy */; };
 		720DF7282EF88AAF00EB49D2 /* APIKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720DF7272EF88AAF00EB49D2 /* APIKeys.swift */; };
 		720DF72A2EF88DF800EB49D2 /* AIAffirmationsChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720DF7292EF88DF800EB49D2 /* AIAffirmationsChatView.swift */; };
 		72305A062EF717AB003A8399 /* ChatStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72305A052EF717AB003A8399 /* ChatStorageService.swift */; };
@@ -14,6 +15,7 @@
 		724C1B5E2EF3E67B0052D8AE /* ManifestGenerationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */; };
 		724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */; };
 		724C1B682EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B672EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 */; };
+		725082702F076DFD00B5679E /* SuperwallKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7250826F2F076DFD00B5679E /* SuperwallKit */; };
 		726A39512EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394C2EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 */; };
 		726A39522EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A39492EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 */; };
 		726A39532EF795AA00BF8F8E /* 741hz-throat-chakra-balancing-fostering-honest-expressions-157686.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394F2EF795AA00BF8F8E /* 741hz-throat-chakra-balancing-fostering-honest-expressions-157686.mp3 */; };
@@ -65,6 +67,8 @@
 		CCCC00032EEE500000000002 /* OpenAIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCCC00022EEE500000000002 /* OpenAIConfig.swift */; };
 		DDDD00012EF6000000000001 /* FrequencyItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD00002EF6000000000001 /* FrequencyItem.swift */; };
 		DDDD00032EF6000000000002 /* ImmersiveFrequenciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */; };
+		E00100022EF88DF800EB49D2 /* EntitlementManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00100012EF88DF800EB49D2 /* EntitlementManager.swift */; };
+		E00200022EF88DF800EB49D2 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00200012EF88DF800EB49D2 /* OnboardingContainerView.swift */; };
 		EEEE00012EF7000000000001 /* LocalSecrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE00002EF7000000000001 /* LocalSecrets.swift */; };
 		FFFF00052EF9000000000005 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00012EF9000000000001 /* JournalView.swift */; };
 		FFFF00062EF9000000000006 /* ChatHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00022EF9000000000002 /* ChatHistoryView.swift */; };
@@ -110,6 +114,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E00400012EF88DF800EB49D3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		720DF7272EF88AAF00EB49D2 /* APIKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKeys.swift; sourceTree = "<group>"; };
 		720DF7292EF88DF800EB49D2 /* AIAffirmationsChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAffirmationsChatView.swift; sourceTree = "<group>"; };
 		72305A052EF717AB003A8399 /* ChatStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStorageService.swift; sourceTree = "<group>"; };
@@ -175,6 +180,8 @@
 		CCCC00022EEE500000000002 /* OpenAIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIConfig.swift; sourceTree = "<group>"; };
 		DDDD00002EF6000000000001 /* FrequencyItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequencyItem.swift; sourceTree = "<group>"; };
 		DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveFrequenciesView.swift; sourceTree = "<group>"; };
+		E00100012EF88DF800EB49D2 /* EntitlementManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementManager.swift; sourceTree = "<group>"; };
+		E00200012EF88DF800EB49D2 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
 		EEEE00002EF7000000000001 /* LocalSecrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSecrets.swift; sourceTree = "<group>"; };
 		FFFF00012EF9000000000001 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
 		FFFF00022EF9000000000002 /* ChatHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryView.swift; sourceTree = "<group>"; };
@@ -186,6 +193,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				725082702F076DFD00B5679E /* SuperwallKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -243,6 +251,7 @@
 			isa = PBXGroup;
 			children = (
 				724C1B5A2EF3BF150052D8AE /* Info.plist */,
+				E00400012EF88DF800EB49D3 /* PrivacyInfo.xcprivacy */,
 				72EFBB082EEE3E5C00C40084 /* Muse.entitlements */,
 				72E262E02EC68E040080CF29 /* PromiseKeeperApp.swift */,
 			);
@@ -264,6 +273,7 @@
 			isa = PBXGroup;
 			children = (
 				720DF7272EF88AAF00EB49D2 /* APIKeys.swift */,
+				E00100012EF88DF800EB49D2 /* EntitlementManager.swift */,
 				72305A052EF717AB003A8399 /* ChatStorageService.swift */,
 				724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */,
 				724C1B5B2EF3E62B0052D8AE /* SpeechRecognizer.swift */,
@@ -287,6 +297,7 @@
 				72E262A62EC68E040080CF29 /* Theme.swift */,
 				72E262F02EC68E040080CF29 /* Library */,
 				72E262F12EC68E040080CF29 /* Muse */,
+				E00300012EF88DF800EB49D2 /* Onboarding */,
 				72E262F22EC68E040080CF29 /* Progress */,
 				FFFF00042EF9000000000004 /* Manifest */,
 			);
@@ -368,6 +379,14 @@
 			path = MuseWidgetsExtension;
 			sourceTree = "<group>";
 		};
+		E00300012EF88DF800EB49D2 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				E00200012EF88DF800EB49D2 /* OnboardingContainerView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		FFFF00042EF9000000000004 /* Manifest */ = {
 			isa = PBXGroup;
 			children = (
@@ -395,6 +414,7 @@
 			);
 			name = Muse;
 			packageProductDependencies = (
+				7250826F2F076DFD00B5679E /* SuperwallKit */,
 			);
 			productName = Muse;
 			productReference = 72E262572EC68CF40080CF29 /* Muse.app */;
@@ -494,6 +514,9 @@
 			);
 			mainGroup = 72E2624E2EC68CF40080CF29;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				7250826E2F076DFD00B5679E /* XCRemoteSwiftPackageReference "Superwall-iOS" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 72E262582EC68CF40080CF29 /* Products */;
 			projectDirPath = "";
@@ -512,6 +535,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E00400022EF88DF800EB49D3 /* PrivacyInfo.xcprivacy in Resources */,
 				72D83ED32EFF765C002E235A /* notisound.wav in Resources */,
 				724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */,
 				72996E252EF23F6200795B97 /* bell321.mp3 in Resources */,
@@ -586,6 +610,8 @@
 				724C1B5E2EF3E67B0052D8AE /* ManifestGenerationService.swift in Sources */,
 				72E262CB2EC68E040080CF29 /* Affirmation.swift in Sources */,
 				72E262DA2EC68E040080CF29 /* AffirmationSession.swift in Sources */,
+				E00100022EF88DF800EB49D2 /* EntitlementManager.swift in Sources */,
+				E00200022EF88DF800EB49D2 /* OnboardingContainerView.swift in Sources */,
 				72305A062EF717AB003A8399 /* ChatStorageService.swift in Sources */,
 				72E262D12EC68E040080CF29 /* StorageService.swift in Sources */,
 				720DF72A2EF88DF800EB49D2 /* AIAffirmationsChatView.swift in Sources */,
@@ -1009,6 +1035,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7250826E2F076DFD00B5679E /* XCRemoteSwiftPackageReference "Superwall-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/superwall/Superwall-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.11.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7250826F2F076DFD00B5679E /* SuperwallKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7250826E2F076DFD00B5679E /* XCRemoteSwiftPackageReference "Superwall-iOS" */;
+			productName = SuperwallKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 72E2624F2EC68CF40080CF29 /* Project object */;
 }

@@ -611,6 +611,7 @@ struct ImmersiveBreathworkView: View {
 // MARK: - Start Affirmations View
 struct StartAffirmationsView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var entitlementManager: EntitlementManager
     @StateObject private var storage = StorageService.shared
     @State private var selectedMode: PracticeMode? = nil
     @State private var selectedSource: AffirmationSource? = nil
@@ -779,7 +780,11 @@ struct StartAffirmationsView: View {
                 Spacer()
                 
                 if selectedMode == .affirmations && selectedSource != nil && canStart {
-                    Button(action: { isActive = true }) {
+                    Button(action: {
+                        if entitlementManager.canPlaySession() {
+                            isActive = true
+                        }
+                    }) {
                         HStack(spacing: 12) {
                             Image(systemName: "play.fill")
                                 .font(.system(size: 16, weight: .semibold))
@@ -833,6 +838,17 @@ struct StartAffirmationsView: View {
         }
         .fullScreenCover(isPresented: $showJournalView) {
             JournalView()
+        }
+        .alert(isPresented: $entitlementManager.showPaywall) {
+            Alert(
+                title: Text("Upgrade to Premium"),
+                message: Text(entitlementManager.paywallSource == .aiGeneration ? "Unlock personalized AI affirmations with Premium." : "You've reached your free weekly limit. Upgrade for unlimited sessions."),
+                primaryButton: .default(Text("Upgrade"), action: {
+                    // Placeholder for Superwall
+                    print("Show Superwall")
+                }),
+                secondaryButton: .cancel()
+            )
         }
     }
     
@@ -1157,11 +1173,13 @@ struct StartAffirmationsView: View {
                         subtitle: "Create personalized affirmations",
                         icon: "sparkles",
                         color: .museTeal,
-                        isDisabled: false,
+                        isDisabled: false, // We keep it enabled to trigger the paywall on tap
                         isComingSoon: false
                     ) {
-                        withAnimation(.spring(response: 0.3)) {
-                            selectedSource = .aiGenerated
+                        if entitlementManager.canUseAIFeatures() {
+                            withAnimation(.spring(response: 0.3)) {
+                                selectedSource = .aiGenerated
+                            }
                         }
                     }
                 }

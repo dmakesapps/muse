@@ -3,9 +3,22 @@ import SwiftData
 
 @main
 struct MuseApp: App {
+    @StateObject private var entitlementManager = EntitlementManager.shared
+    
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Group {
+                if hasCompletedOnboarding {
+                    ContentView()
+                        .transition(.opacity)
+                } else {
+                    OnboardingContainerView()
+                        .transition(.opacity)
+                }
+            }
+            .environmentObject(entitlementManager)
         }
         .modelContainer(createModelContainer())
     }
