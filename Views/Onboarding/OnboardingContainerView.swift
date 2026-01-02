@@ -16,13 +16,14 @@ struct OnboardingContainerView: View {
             VStack {
                 // Header (Progress)
                 HStack(spacing: 8) {
-                    ForEach(0..<3) { index in
+                    ForEach(0..<2) { index in
                         Capsule()
                             .fill(index <= currentPage ? Color.museAccentBlue : Color.white.opacity(0.2))
                             .frame(height: 4)
                             .frame(maxWidth: .infinity)
                     }
                 }
+
                 .padding(.horizontal, 40)
                 .padding(.top, 60) // Safe Area
                 .padding(.bottom, 20)
@@ -32,20 +33,15 @@ struct OnboardingContainerView: View {
                     OnboardingIntroView(onNext: { withAnimation { currentPage = 1 } })
                         .tag(0)
                     
-                    OnboardingGoalsView(onNext: { withAnimation { currentPage = 2 } })
+                    OnboardingGoalsView(onNext: {
+                        // User finished goals.
+                        // 1. Trigger Superwall
+                        EntitlementManager.shared.triggerPaywall(source: .onboarding)
+                        // 2. Mark onboarding as complete (User enters app as Free or Paid)
+                        // Note: Superwall presents on top of the window, so switching the underlying view is fine.
+                        completeOnboarding()
+                    })
                         .tag(1)
-                    
-                    OnboardingPaywallView(
-                        onFinish: {
-                            // Called if we manually finish (backup)
-                            completeOnboarding()
-                        },
-                        onSkip: {
-                            // User explicitly chose "Limited Version"
-                            completeOnboarding()
-                        }
-                    )
-                    .tag(2)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 // .disabled(true) // REMOVED: This disables ALL interaction inside
@@ -56,7 +52,11 @@ struct OnboardingContainerView: View {
                     }
                 }
             }
-        }
+    }
+    .onAppear {
+        // Start background music (Forest Birds default)
+        BackgroundMusicManager.shared.startIfNeeded()
+    }
     }
     
     private func completeOnboarding() {

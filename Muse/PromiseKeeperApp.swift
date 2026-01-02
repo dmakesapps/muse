@@ -19,6 +19,10 @@ struct MuseApp: App {
                 }
             }
             .environmentObject(entitlementManager)
+            .onAppear {
+                // Ensure background music starts playing if enabled
+                BackgroundMusicManager.shared.startIfNeeded()
+            }
         }
         .modelContainer(createModelContainer())
     }

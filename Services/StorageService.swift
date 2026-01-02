@@ -257,7 +257,7 @@ class BackgroundMusicManager: ObservableObject {
     
     private var audioPlayer: AVAudioPlayer?
     
-    @AppStorage("selectedMusicTrack") var selectedTrack: BackgroundMusicTrack = .none {
+    @AppStorage("selectedMusicTrack") var selectedTrack: BackgroundMusicTrack = .forest {
         didSet {
             playTrack()
         }
