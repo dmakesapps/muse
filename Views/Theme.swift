@@ -21,6 +21,7 @@ extension Color {
     static let musePremiumGold = Color(hex: "FFD700")   // Premium badge
     static let museTeal = Color(hex: "5AC8FA")          // AI-generated content
     static let musePurple = Color(hex: "AF52DE")        // Accents
+    static let musePink = Color(hex: "FF2D55")          // Energetic accents
     static let museOrange = Color(hex: "FF9500")        // Alerts/Warmth
     
     // MARK: - Convenience Colors
