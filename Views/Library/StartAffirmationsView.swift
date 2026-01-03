@@ -630,6 +630,7 @@ struct StartAffirmationsView: View {
     @State private var isAffirmationsListCollapsed: Bool = false // Collapse/expand affirmations list
     @State private var isSavedAIExpanded: Bool = false // Expand saved AI affirmations for selection
     @State private var showJournalView: Bool = false // Show journal view
+    @State private var isLoadingLibrary: Bool = false // Loading state for library affirmations
     
     enum PracticeMode: String, CaseIterable {
         case affirmations = "Affirmations"
@@ -1157,14 +1158,12 @@ struct StartAffirmationsView: View {
                     // All Affirmations Button
                     SourceButton(
                         title: "All",
-                        subtitle: "Browse all available affirmations",
-                        icon: "list.bullet",
+                        subtitle: isLoadingLibrary ? "Loading..." : "Browse all available affirmations",
+                        icon: isLoadingLibrary ? "circle.dashed" : "list.bullet",
                         color: .museAccentBlue,
-                        isDisabled: false
+                        isDisabled: isLoadingLibrary
                     ) {
-                        withAnimation(.spring(response: 0.3)) {
-                            selectedSource = .library
-                        }
+                        loadLibraryAffirmations()
                     }
                     
                     // AI Generated Button
@@ -1184,6 +1183,33 @@ struct StartAffirmationsView: View {
                     }
                 }
                 .padding(.top, 20)
+                
+                // Loading Overlay
+                if isLoadingLibrary {
+                    VStack(spacing: 16) {
+                        ZStack {
+                            Circle()
+                                .stroke(Color.museAccentBlue.opacity(0.3), lineWidth: 3)
+                                .frame(width: 60, height: 60)
+                            
+                            Circle()
+                                .trim(from: 0, to: 0.7)
+                                .stroke(Color.museAccentBlue, lineWidth: 3)
+                                .frame(width: 60, height: 60)
+                                .rotationEffect(.degrees(isLoadingLibrary ? 360 : 0))
+                                .animation(.linear(duration: 1).repeatForever(autoreverses: false), value: isLoadingLibrary)
+                            
+                            Image(systemName: "brain.head.profile")
+                                .font(.system(size: 24))
+                                .foregroundColor(.museAccentBlue)
+                        }
+                        
+                        Text("Loading your neural library...")
+                            .font(.museBodyMedium())
+                            .foregroundColor(.museLightGray)
+                    }
+                    .padding(.top, 40)
+                }
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 20)
@@ -1638,10 +1664,12 @@ struct StartAffirmationsView: View {
                         // Start Session button (when selections made or random enabled)
                         if useRandom || !selectedAffirmations.isEmpty {
                             Button(action: {
-                                if useRandom {
-                                    selectedAffirmations = Set(storage.aiGeneratedAffirmations.map { $0.id })
+                                if entitlementManager.canPlaySession() {
+                                    if useRandom {
+                                        selectedAffirmations = Set(storage.aiGeneratedAffirmations.map { $0.id })
+                                    }
+                                    isActive = true
                                 }
-                                isActive = true
                             }) {
                                 HStack(spacing: 12) {
                                     Image(systemName: "play.fill")
@@ -2040,6 +2068,25 @@ struct StartAffirmationsView: View {
             selectedAffirmations.remove(affirmation.id)
         } else {
             selectedAffirmations.insert(affirmation.id)
+        }
+    }
+    
+    private func loadLibraryAffirmations() {
+        // Show loading state
+        isLoadingLibrary = true
+        
+        // Load on background thread to prevent UI freeze
+        DispatchQueue.global(qos: .userInitiated).async {
+            let loaded = ContentLoader.shared.loadAffirmations()
+            
+            DispatchQueue.main.async {
+                self.allAffirmations = loaded
+                self.isLoadingLibrary = false
+                
+                withAnimation(.spring(response: 0.3)) {
+                    self.selectedSource = .library
+                }
+            }
         }
     }
 }
@@ -2546,28 +2593,17 @@ struct AffirmationDisplayView: View {
     
     @State private var currentPhase: AffirmationPhase = .speaking
     
+    // User's selected background
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
     // Time for user to repeat the affirmation (in seconds)
     private let userRepeatDuration: Double = 6.0
     
     var body: some View {
         ZStack {
-            // Background
-            // Background
-            if let uiImage = UIImage(named: "backgroundjungle2") {
-                GeometryReader { geometry in
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .clipped()
-                        .overlay(.ultraThinMaterial)
-                        .overlay(Color.black.opacity(0.3))
-                }
+            // Background - uses user's selected background with proper blur
+            MuseBackgroundView(selectedBackground: selectedBackground)
                 .ignoresSafeArea()
-            } else {
-                Color.museDeepNavy
-                    .ignoresSafeArea(.all)
-            }
             
             // Progress bar
             VStack {
@@ -2925,21 +2961,21 @@ struct AffirmationDisplayView: View {
         // Save session IMMEDIATELY (before the delay) to avoid context issues
         let elapsed = Int(Date().timeIntervalSince(sessionStartTime))
         if !completedAffirmations.isEmpty {
-            let session = AffirmationSession(
-                date: Date(),
-                duration: TimeInterval(elapsed),
-                affirmationCount: completedAffirmations.count,
-                affirmations: completedAffirmations
-            )
-            modelContext.insert(session)
-            
             do {
+                let session = AffirmationSession(
+                    date: Date(),
+                    duration: TimeInterval(elapsed),
+                    affirmationCount: completedAffirmations.count,
+                    affirmations: completedAffirmations
+                )
+                modelContext.insert(session)
                 try modelContext.save()
                 // Refresh the shared ProgressService so all UI updates
                 ProgressService.shared.setModelContext(modelContext)
                 print("✅ Session saved: \(elapsed)s, \(completedAffirmations.count) affirmations")
             } catch {
                 print("❌ Error saving session: \(error)")
+                // Don't crash - the session just won't be saved
             }
         }
         
@@ -2992,21 +3028,21 @@ struct AffirmationDisplayView: View {
         let sessionDuration = Date().timeIntervalSince(sessionStartTime)
         let affirmationCount = completedAffirmations.count
         
-        let session = AffirmationSession(
-            date: sessionStartTime,
-            duration: sessionDuration,
-            affirmationCount: affirmationCount,
-            affirmations: completedAffirmations
-        )
-        modelContext.insert(session)
-        
         do {
+            let session = AffirmationSession(
+                date: sessionStartTime,
+                duration: sessionDuration,
+                affirmationCount: affirmationCount,
+                affirmations: completedAffirmations
+            )
+            modelContext.insert(session)
             try modelContext.save()
             // Refresh the shared ProgressService so all UI updates
             ProgressService.shared.setModelContext(modelContext)
             print("✅ Session saved: \(Int(sessionDuration))s, \(affirmationCount) affirmations")
         } catch {
             print("❌ Error saving session: \(error)")
+            // Don't crash - the session just won't be saved
         }
         
         onComplete()

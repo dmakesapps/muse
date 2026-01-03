@@ -5,6 +5,7 @@ struct ImmersiveAffirmationView: View {
     let affirmations: [Affirmation]
     let duration: StartAffirmationsView.AffirmationDuration
     var isAIGenerated: Bool = false
+    var isOnboarding: Bool = false // Don't count onboarding sessions towards limit
     let onComplete: () -> Void
     
     @State private var showCountdown = true
@@ -181,6 +182,11 @@ struct ImmersiveAffirmationView: View {
     
     // MARK: - Actions
     private func handleSessionComplete() {
+        // Record session for freemium tracking (skip onboarding)
+        if !isOnboarding {
+            EntitlementManager.shared.recordSessionPlayed()
+        }
+        
         if isAIGenerated {
             // Show save prompt for AI-generated affirmations
             withAnimation(.easeInOut(duration: 0.3)) {

@@ -74,7 +74,10 @@ class ProgressService: ObservableObject {
     }
     
     func getAllSessions() -> [AffirmationSession] {
-        guard let modelContext = modelContext else { return [] }
+        guard let modelContext = modelContext else { 
+            print("⚠️ ProgressService: modelContext is nil in getAllSessions")
+            return [] 
+        }
         
         let descriptor = FetchDescriptor<AffirmationSession>(
             sortBy: [SortDescriptor(\.date, order: .reverse)]
@@ -83,7 +86,9 @@ class ProgressService: ObservableObject {
         do {
             return try modelContext.fetch(descriptor)
         } catch {
-            print("Error fetching all sessions: \(error)")
+            // Handle iCloud/CloudKit sync errors gracefully
+            print("⚠️ ProgressService: Error fetching all sessions: \(error.localizedDescription)")
+            // Return empty array instead of crashing
             return []
         }
     }

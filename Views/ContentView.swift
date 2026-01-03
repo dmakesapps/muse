@@ -21,7 +21,7 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showProgress) {
             NavigationStack {
-                ProgressView()
+                MuseProgressView()
             }
         }
         .preferredColorScheme(.dark)

@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 import Charts
 
-struct ProgressView: View {
+struct MuseProgressView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var progressService = ProgressService.shared
     
@@ -13,6 +13,7 @@ struct ProgressView: View {
     @State private var showAddTaskSheet = false
     @State private var newTaskTitle = ""
     @State private var expandedTaskId: UUID? // accordion logic
+    @State private var isReady = false // Track when model context is set
     
     // Icons for selection
     let availableIcons = ["bed.double.fill", "dumbbell.fill", "figure.mind.and.body", "figure.walk", "leaf.fill", "drop.fill", "book.fill", "pencil", "star.fill"]
@@ -120,8 +121,12 @@ struct ProgressView: View {
                                             if let index = tasks.firstIndex(where: { $0.id == task.id }) {
                                                 withAnimation {
                                                     tasks.remove(at: index)
+                                                    saveTasks()
                                                 }
                                             }
+                                        },
+                                        onToggleComplete: {
+                                            toggleTaskCompletion(task)
                                         }
                                     )
                                 }
@@ -136,7 +141,18 @@ struct ProgressView: View {
                                 .foregroundColor(.white)
                                 .padding(.leading, 4)
                             
-                            ContributionCalendarView(progressService: progressService)
+                            if isReady {
+                                ContributionCalendarView(progressService: progressService)
+                            } else {
+                                // Placeholder while loading
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.museDarkGray.opacity(0.3))
+                                    .frame(height: 300)
+                                    .overlay(
+                                        SwiftUI.ProgressView()
+                                            .tint(.museLightGray)
+                                    )
+                            }
                         }
                         .padding(.horizontal, 20)
                         .padding(.top, 10)
@@ -225,6 +241,9 @@ struct ProgressView: View {
             .toolbar { ToolbarItem(placement: .principal) { EmptyView() } }
             .onAppear {
                 progressService.setModelContext(modelContext)
+                isReady = true
+                loadTasks()
+                resetDailyCompletions()
             }
             // Add Task Sheet
             .sheet(isPresented: $showAddTaskSheet) {
@@ -232,12 +251,11 @@ struct ProgressView: View {
                     let newTask = DailyTask(
                         icon: icon,
                         title: title,
-                        subtitle: "Streak: 0 days", // Initial subtitle
-                        isCompleted: false,
-                        color: .museAccentBlue // Default color
+                        colorHex: "007AFF" // Blue
                     )
                     withAnimation {
                         tasks.insert(newTask, at: 0) // Add to top
+                        saveTasks()
                     }
                 })
                 .presentationDetents([.fraction(0.4)])
@@ -251,16 +269,126 @@ struct ProgressView: View {
             }
         }
     }
+    
+    // MARK: - Persistence
+    private let tasksKey = "savedHabits"
+    
+    private func saveTasks() {
+        if let encoded = try? JSONEncoder().encode(tasks) {
+            UserDefaults.standard.set(encoded, forKey: tasksKey)
+        }
+    }
+    
+    private func loadTasks() {
+        if let data = UserDefaults.standard.data(forKey: tasksKey),
+           let decoded = try? JSONDecoder().decode([DailyTask].self, from: data) {
+            tasks = decoded
+        }
+    }
+    
+    private func resetDailyCompletions() {
+        // Check if we need to reset daily completions (new day)
+        let calendar = Calendar.current
+        var updated = false
+        
+        for i in 0..<tasks.count {
+            if let lastCompleted = tasks[i].lastCompletedDate {
+                // If last completed was NOT today, reset the completion
+                if !calendar.isDateInToday(lastCompleted) {
+                    tasks[i].isCompletedToday = false
+                    updated = true
+                }
+            }
+        }
+        
+        if updated {
+            saveTasks()
+        }
+    }
+    
+    private func toggleTaskCompletion(_ task: DailyTask) {
+        guard let index = tasks.firstIndex(where: { $0.id == task.id }) else { return }
+        
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        
+        if tasks[index].isCompletedToday {
+            // Uncompleting - decrease streak if it was completed today
+            tasks[index].isCompletedToday = false
+            if let lastCompleted = tasks[index].lastCompletedDate,
+               calendar.isDateInToday(lastCompleted) {
+                tasks[index].streak = max(0, tasks[index].streak - 1)
+                tasks[index].lastCompletedDate = nil
+            }
+        } else {
+            // Completing
+            tasks[index].isCompletedToday = true
+            
+            // Check if we should increment streak
+            if let lastCompleted = tasks[index].lastCompletedDate {
+                let lastDay = calendar.startOfDay(for: lastCompleted)
+                let daysBetween = calendar.dateComponents([.day], from: lastDay, to: today).day ?? 0
+                
+                if daysBetween == 1 {
+                    // Consecutive day - keep streak going
+                    tasks[index].streak += 1
+                } else if daysBetween > 1 {
+                    // Missed days - reset streak
+                    tasks[index].streak = 1
+                }
+                // daysBetween == 0 means already completed today (shouldn't happen due to toggle logic)
+            } else {
+                // First time completing
+                tasks[index].streak = 1
+            }
+            
+            tasks[index].lastCompletedDate = Date()
+        }
+        
+        saveTasks()
+    }
 }
 
 // MARK: - Models
-struct DailyTask: Identifiable {
-    let id = UUID()
+struct DailyTask: Identifiable, Codable {
+    let id: UUID
     let icon: String
     let title: String
-    let subtitle: String?
-    var isCompleted: Bool
-    let color: Color
+    var streak: Int
+    var isCompletedToday: Bool
+    var lastCompletedDate: Date?
+    let colorHex: String // Store color as hex for Codable
+    
+    // Computed property for color
+    var color: Color {
+        Color(hex: colorHex)
+    }
+    
+    // Computed subtitle
+    var subtitle: String {
+        "Streak: \(streak) day\(streak == 1 ? "" : "s")"
+    }
+    
+    init(id: UUID = UUID(), icon: String, title: String, streak: Int = 0, isCompletedToday: Bool = false, lastCompletedDate: Date? = nil, colorHex: String = "007AFF") {
+        self.id = id
+        self.icon = icon
+        self.title = title
+        self.streak = streak
+        self.isCompletedToday = isCompletedToday
+        self.lastCompletedDate = lastCompletedDate
+        self.colorHex = colorHex
+    }
+    
+    // Legacy init for backwards compatibility
+    init(icon: String, title: String, subtitle: String?, isCompleted: Bool, color: Color) {
+        self.id = UUID()
+        self.icon = icon
+        self.title = title
+        self.streak = 0
+        self.isCompletedToday = isCompleted
+        self.lastCompletedDate = nil
+        self.colorHex = "007AFF" // Default blue
+    }
 }
 
 // MARK: - Subviews
@@ -341,6 +469,7 @@ struct TaskRow: View {
     let isExpanded: Bool
     let onExpand: () -> Void
     let onDelete: () -> Void
+    let onToggleComplete: () -> Void // New callback for completion logic
     
     var body: some View {
         VStack(spacing: 0) {
@@ -363,14 +492,12 @@ struct TaskRow: View {
                         Text(task.title)
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(.white)
-                            .strikethrough(task.isCompleted)
-                            .opacity(task.isCompleted ? 0.6 : 1)
+                            .strikethrough(task.isCompletedToday)
+                            .opacity(task.isCompletedToday ? 0.6 : 1)
                         
-                        if let subtitle = task.subtitle {
-                            Text(subtitle)
-                                .font(.system(size: 12))
-                                .foregroundColor(.museLightGray)
-                        }
+                        Text(task.subtitle)
+                            .font(.system(size: 12))
+                            .foregroundColor(.museLightGray)
                     }
                     
                     Spacer()
@@ -378,11 +505,11 @@ struct TaskRow: View {
                     // Checkbox (Independent tap)
                     Button(action: {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                            task.isCompleted.toggle()
+                            onToggleComplete()
                         }
                     }) {
                         ZStack {
-                            if task.isCompleted {
+                            if task.isCompletedToday {
                                 Circle()
                                     .fill(LinearGradient(colors: [.musePurple, .museAccentBlue], startPoint: .topLeading, endPoint: .bottomTrailing))
                                     .frame(width: 28, height: 28)
@@ -435,13 +562,9 @@ struct TaskRow: View {
         }
         .background(
             RoundedRectangle(cornerRadius: 24)
-                .fill(Color.black.opacity(0.4))
-                .background(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24)
-                        .stroke(isExpanded ? Color.museAccentBlue.opacity(0.5) : Color.white.opacity(0.08), lineWidth: 1)
-                )
+                .fill(Color.museDarkGray.opacity(0.6))
         )
+        .clipShape(RoundedRectangle(cornerRadius: 24))
     }
 }
 
@@ -588,6 +711,7 @@ struct ContributionCalendarView: View {
     let progressService: ProgressService
     
     @State private var offset: Int = 0 
+    @State private var sessionDates: [Date] = [] // Cache dates, not model objects!
     private let calendar = Calendar.current
     private let daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     private let columns = Array(repeating: GridItem(.flexible()), count: 7)
@@ -610,8 +734,14 @@ struct ContributionCalendarView: View {
     }
     
     private func getSessionCount(for date: Date) -> Int {
+        // Use cached dates instead of model objects
+        return sessionDates.filter { calendar.isDate($0, inSameDayAs: date) }.count
+    }
+    
+    private func loadSessions() {
+        // Extract just the dates from sessions to avoid holding model references
         let sessions = progressService.getAllSessions()
-        return sessions.filter { calendar.isDate($0.date, inSameDayAs: date) }.count
+        sessionDates = sessions.map { $0.date }
     }
     
     private func getIntensityColor(count: Int) -> Color {
@@ -670,11 +800,17 @@ struct ContributionCalendarView: View {
                 .fill(Color.museDarkGray.opacity(0.6))
                 .rainbowBorder()
         )
+        .onAppear {
+            loadSessions()
+        }
+        .onChange(of: offset) { _, _ in
+            loadSessions()
+        }
     }
 }
 
 #Preview {
-    ProgressView()
+    MuseProgressView()
         .modelContainer(for: [AffirmationSession.self])
 }
 
@@ -924,67 +1060,122 @@ class NotificationService: ObservableObject {
     private func scheduleAffirmationNotifications() {
         guard affirmationNotificationCount > 0, !affirmationCategories.isEmpty else { return }
         
-        let content = loadAffirmationsContent()
-        guard !content.isEmpty else { return }
+        let allContent = loadAffirmationsContent()
+        guard !allContent.isEmpty else { return }
         
-        for i in 0..<affirmationNotificationCount {
-            let randomContent = content.randomElement() ?? content[0]
-            scheduleContentNotification(
-                identifier: "affirmation_\(i)",
-                title: "✨ Daily Affirmation",
-                body: randomContent,
-                index: i,
-                totalCount: affirmationNotificationCount
-            )
+        // Get the cycling index and advance it
+        var cycleIndex = UserDefaults.standard.integer(forKey: "affirmationCycleIndex")
+        
+        // Schedule for the next 7 days with fresh content each day
+        for day in 0..<7 {
+            for i in 0..<affirmationNotificationCount {
+                // Get content at current index, cycling through all
+                let contentIndex = (cycleIndex + (day * affirmationNotificationCount) + i) % allContent.count
+                let content = allContent[contentIndex]
+                
+                scheduleDailyContentNotification(
+                    identifier: "affirmation_day\(day)_\(i)",
+                    title: "✨ Daily Affirmation",
+                    body: content,
+                    index: i,
+                    totalCount: affirmationNotificationCount,
+                    daysFromNow: day
+                )
+            }
         }
+        
+        // Update the cycle index for next batch
+        let newIndex = (cycleIndex + (7 * affirmationNotificationCount)) % allContent.count
+        UserDefaults.standard.set(newIndex, forKey: "affirmationCycleIndex")
+        
+        print("📱 Scheduled \(7 * affirmationNotificationCount) affirmation notifications, cycling from index \(cycleIndex) to \(newIndex)")
     }
     
     private func scheduleQuoteNotifications() {
         guard quoteNotificationCount > 0, !quoteCategories.isEmpty else { return }
         
-        let content = loadQuotesContent()
-        guard !content.isEmpty else { return }
+        let allContent = loadQuotesContent()
+        guard !allContent.isEmpty else { return }
         
-        for i in 0..<quoteNotificationCount {
-            let randomContent = content.randomElement() ?? content[0]
-            scheduleContentNotification(
-                identifier: "quote_\(i)",
-                title: "💭 Daily Quote",
-                body: randomContent,
-                index: i,
-                totalCount: quoteNotificationCount
-            )
+        // Get the cycling index and advance it
+        var cycleIndex = UserDefaults.standard.integer(forKey: "quoteCycleIndex")
+        
+        // Schedule for the next 7 days with fresh content each day
+        for day in 0..<7 {
+            for i in 0..<quoteNotificationCount {
+                // Get content at current index, cycling through all
+                let contentIndex = (cycleIndex + (day * quoteNotificationCount) + i) % allContent.count
+                let content = allContent[contentIndex]
+                
+                scheduleDailyContentNotification(
+                    identifier: "quote_day\(day)_\(i)",
+                    title: "💭 Daily Quote",
+                    body: content,
+                    index: i,
+                    totalCount: quoteNotificationCount,
+                    daysFromNow: day
+                )
+            }
         }
+        
+        // Update the cycle index for next batch
+        let newIndex = (cycleIndex + (7 * quoteNotificationCount)) % allContent.count
+        UserDefaults.standard.set(newIndex, forKey: "quoteCycleIndex")
+        
+        print("📱 Scheduled \(7 * quoteNotificationCount) quote notifications, cycling from index \(cycleIndex) to \(newIndex)")
     }
     
-    private func scheduleContentNotification(identifier: String, title: String, body: String, index: Int, totalCount: Int) {
+    private func scheduleDailyContentNotification(identifier: String, title: String, body: String, index: Int, totalCount: Int, daysFromNow: Int) {
         let notificationContent = UNMutableNotificationContent()
         notificationContent.title = title
         notificationContent.body = body
         notificationContent.sound = UNNotificationSound(named: UNNotificationSoundName("notisound.wav"))
         
-        // Generate random hour between 8 AM and 9 PM, spread throughout the day
+        // Generate consistent time based on index, spread throughout the day
         let startHour = 8
         let endHour = 21
         let hoursRange = endHour - startHour
         let spacing = hoursRange / max(totalCount, 1)
-        let baseHour = startHour + (spacing * index)
-        let hour = min(baseHour + Int.random(in: 0..<max(spacing, 1)), endHour)
-        let minute = Int.random(in: 0..<60)
+        let baseHour = startHour + (spacing * index) + (spacing / 2)
+        let hour = min(baseHour, endHour)
         
+        // Use a consistent minute based on the identifier hash for predictability
+        let minute = abs(identifier.hashValue % 60)
+        
+        // Calculate the target date
         var components = DateComponents()
         components.hour = hour
         components.minute = minute
         
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
-        let request = UNNotificationRequest(identifier: identifier, content: notificationContent, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("❌ Notification scheduling error: \(error)")
-            } else {
-                print("✅ Scheduled \(identifier) at \(hour):\(String(format: "%02d", minute))")
+        // Add days from now
+        if let targetDate = Calendar.current.date(byAdding: .day, value: daysFromNow, to: Date()),
+           let scheduledDate = Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: targetDate) {
+            
+            // Only schedule if it's in the future
+            guard scheduledDate > Date() else { return }
+            
+            let dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: scheduledDate)
+            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+            let request = UNNotificationRequest(identifier: identifier, content: notificationContent, trigger: trigger)
+            
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    print("❌ Notification scheduling error: \(error)")
+                }
             }
+        }
+    }
+    
+    /// Call this when app becomes active to refresh notifications for the coming week
+    func refreshDailyNotifications() {
+        // Check if we need to refresh (once per day)
+        let lastRefreshKey = "lastNotificationRefresh"
+        let lastRefresh = UserDefaults.standard.object(forKey: lastRefreshKey) as? Date ?? Date.distantPast
+        
+        if !Calendar.current.isDateInToday(lastRefresh) {
+            print("🔄 Refreshing daily notifications...")
+            rescheduleContentNotifications()
+            UserDefaults.standard.set(Date(), forKey: lastRefreshKey)
         }
     }
     
@@ -995,11 +1186,18 @@ class NotificationService: ObservableObject {
             return []
         }
         
+        // Shuffle based on a daily seed for variety, but consistent within the day
+        let daySeed = Calendar.current.component(.dayOfYear, from: Date())
+        var rng = SeededRandomNumberGenerator(seed: UInt64(daySeed))
+        
+        let filtered: [Affirmation]
         if affirmationCategories.isEmpty {
-            return affirmations.map { $0.text }
+            filtered = affirmations
         } else {
-            return affirmations.filter { affirmationCategories.contains($0.category) }.map { $0.text }
+            filtered = affirmations.filter { affirmationCategories.contains($0.category) }
         }
+        
+        return filtered.map { $0.text }.shuffled(using: &rng)
     }
     
     private func loadQuotesContent() -> [String] {
@@ -1009,11 +1207,18 @@ class NotificationService: ObservableObject {
             return []
         }
         
+        // Shuffle based on a daily seed for variety, but consistent within the day
+        let daySeed = Calendar.current.component(.dayOfYear, from: Date())
+        var rng = SeededRandomNumberGenerator(seed: UInt64(daySeed))
+        
+        let filtered: [Quote]
         if quoteCategories.isEmpty {
-            return quotes.map { "\"\($0.text)\" — \($0.author)" }
+            filtered = quotes
         } else {
-            return quotes.filter { quoteCategories.contains($0.category) }.map { "\"\($0.text)\" — \($0.author)" }
+            filtered = quotes.filter { quoteCategories.contains($0.category) }
         }
+        
+        return filtered.map { "\"\($0.text)\" — \($0.author)" }.shuffled(using: &rng)
     }
     
     private func saveContentSettings() {
@@ -1038,6 +1243,20 @@ class NotificationService: ObservableObject {
         if let categories = settings["quoteCategories"] as? [String] {
             quoteCategories = Set(categories)
         }
+    }
+}
+
+// MARK: - Seeded Random Number Generator
+struct SeededRandomNumberGenerator: RandomNumberGenerator {
+    var state: UInt64
+    
+    init(seed: UInt64) {
+        state = seed
+    }
+    
+    mutating func next() -> UInt64 {
+        state = state &* 6364136223846793005 &+ 1442695040888963407
+        return state
     }
 }
 

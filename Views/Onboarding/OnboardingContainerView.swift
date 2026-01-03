@@ -16,10 +16,12 @@ struct OnboardingContainerView: View {
     
     var body: some View {
         ZStack {
-            // Shared Background - Dark Navy
-            MuseBackgroundView(selectedBackground: "backgroundjungle2")
-                .ignoresSafeArea()
-                .overlay(Color.black.opacity(0.3)) // Slight darken for text legibility
+            // Shared Background - Dark Navy (hide during immersive preview)
+            if currentPage != 8 {
+                MuseBackgroundView(selectedBackground: "backgroundjungle2")
+                    .ignoresSafeArea()
+                    .overlay(Color.black.opacity(0.3)) // Slight darken for text legibility
+            }
             
             // Content Dispatcher
             VStack {
@@ -550,6 +552,7 @@ struct Screen8_ImmersivePreview: View {
             affirmations: affirmations,
             duration: .oneMinute, // Short demo session
             isAIGenerated: false, // Don't show save prompt during onboarding
+            isOnboarding: true, // Don't count towards free session limit
             onComplete: onComplete
         )
     }

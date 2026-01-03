@@ -624,23 +624,9 @@ struct MixPopupView: View {
                         
                         Spacer()
                         
-                        // Unlock All Button
-                        Button(action: {}) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "lock.fill")
-                                    .font(.system(size: 10))
-                                Text("Unlock all")
-                                    .font(.system(size: 12, weight: .semibold))
-                            }
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule()
-                                    .fill(Color.black.opacity(0.3))
-                                    .overlay(Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1))
-                            )
-                        }
+                        // Invisible spacer to balance the header
+                        Color.clear
+                            .frame(width: 32, height: 32)
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 20)
@@ -670,13 +656,6 @@ struct MixPopupView: View {
                                         isLocked: false,
                                         count: userCreatedCount,
                                         action: { showMyAffirmations = true }
-                                    )
-                                    
-                                    MixCategoryCard(
-                                        title: "Reframe Thoughts",
-                                        icon: "brain.head.profile",
-                                        isLocked: true, // Locked as per user request/screenshot
-                                        action: {}
                                     )
                                 }
                             }
