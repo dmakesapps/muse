@@ -9,16 +9,31 @@ class ProgressService: ObservableObject {
     // MARK: - Published Properties (all UI components read from these)
     @Published var currentStreak: Int = 0
     @Published var longestStreak: Int = 0
-    @Published var totalSessions: Int = 0
+    @Published var totalSessions: Int = 0  // Affirmation sessions
     @Published var totalTime: TimeInterval = 0
     @Published var todaySessionCount: Int = 0
     @Published var weeklyData: [(date: Date, count: Int)] = [] // Last 7 days of activity
     
+    // Additional Stats (stored in UserDefaults)
+    @Published var totalBreathworkSessions: Int = 0
+    @Published var totalBreathworkTime: TimeInterval = 0
+    @Published var totalFrequencySessions: Int = 0
+    @Published var totalFrequencyTime: TimeInterval = 0
+    @Published var totalJournalEntries: Int = 0
+    
     private var modelContext: ModelContext?
+    
+    // UserDefaults keys
+    private let breathworkSessionsKey = "muse_breathwork_sessions"
+    private let breathworkTimeKey = "muse_breathwork_time"
+    private let frequencySessionsKey = "muse_frequency_sessions"
+    private let frequencyTimeKey = "muse_frequency_time"
+    private let journalEntriesKey = "muse_journal_entries"
     
     // Private init for singleton pattern, but allow creating new instances for previews
     init(modelContext: ModelContext? = nil) {
         self.modelContext = modelContext
+        loadAdditionalStats()
         if modelContext != nil {
             loadProgress()
         }
@@ -265,6 +280,52 @@ class ProgressService: ObservableObject {
         }
         
         return result
+    }
+    
+    // MARK: - Additional Stats Methods
+    
+    private func loadAdditionalStats() {
+        totalBreathworkSessions = UserDefaults.standard.integer(forKey: breathworkSessionsKey)
+        totalBreathworkTime = UserDefaults.standard.double(forKey: breathworkTimeKey)
+        totalFrequencySessions = UserDefaults.standard.integer(forKey: frequencySessionsKey)
+        totalFrequencyTime = UserDefaults.standard.double(forKey: frequencyTimeKey)
+        totalJournalEntries = UserDefaults.standard.integer(forKey: journalEntriesKey)
+    }
+    
+    /// Log a breathwork session
+    func logBreathworkSession(duration: TimeInterval) {
+        totalBreathworkSessions += 1
+        totalBreathworkTime += duration
+        UserDefaults.standard.set(totalBreathworkSessions, forKey: breathworkSessionsKey)
+        UserDefaults.standard.set(totalBreathworkTime, forKey: breathworkTimeKey)
+        print("✅ ProgressService: Logged breathwork session - duration: \(duration)s, total: \(totalBreathworkSessions)")
+    }
+    
+    /// Log a frequency session
+    func logFrequencySession(duration: TimeInterval) {
+        totalFrequencySessions += 1
+        totalFrequencyTime += duration
+        UserDefaults.standard.set(totalFrequencySessions, forKey: frequencySessionsKey)
+        UserDefaults.standard.set(totalFrequencyTime, forKey: frequencyTimeKey)
+        print("✅ ProgressService: Logged frequency session - duration: \(duration)s, total: \(totalFrequencySessions)")
+    }
+    
+    /// Log a journal entry
+    func logJournalEntry() {
+        totalJournalEntries += 1
+        UserDefaults.standard.set(totalJournalEntries, forKey: journalEntriesKey)
+        print("✅ ProgressService: Logged journal entry, total: \(totalJournalEntries)")
+    }
+    
+    /// Get formatted time string
+    func formattedTime(_ time: TimeInterval) -> String {
+        let hours = Int(time) / 3600
+        let minutes = (Int(time) % 3600) / 60
+        if hours > 0 {
+            return "\(hours)h \(minutes)m"
+        } else {
+            return "\(minutes)m"
+        }
     }
 }
 

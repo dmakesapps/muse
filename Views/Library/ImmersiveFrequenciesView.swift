@@ -47,6 +47,8 @@ struct ImmersiveFrequenciesView: View {
                     HStack {
                         Spacer()
                         Button(action: {
+                            // Log the frequency session before stopping
+                            ProgressService.shared.logFrequencySession(duration: elapsedTime)
                             stop()
                             dismiss()
                         }) {

@@ -178,10 +178,15 @@ struct ImmersiveBreathworkView: View {
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Top info bar
-                topInfoBar
-                    .padding(.top, 60)
+                // Top controls - Volume left, X right (matching AffirmationDisplayView)
+                topControls
                     .opacity(showControls ? 1 : 0)
+                
+                // Top info bar - breathing pattern indicators
+                if showControls {
+                    topInfoBar
+                        .padding(.top, 16)
+                }
                 
                 Spacer()
                 
@@ -190,7 +195,7 @@ struct ImmersiveBreathworkView: View {
                 
                 Spacer()
                 
-                // Bottom controls
+                // Bottom controls - Play/Pause and Timer (matching Manifest style)
                 bottomControls
                     .padding(.bottom, 40)
                     .opacity(showControls ? 1 : 0)
@@ -231,66 +236,114 @@ struct ImmersiveBreathworkView: View {
         }
     }
     
-    // MARK: - Top Info Bar
-    private var topInfoBar: some View {
-        HStack(spacing: 24) {
-            // Inhale indicator
-            VStack(spacing: 4) {
-                Image(systemName: "nose")
-                    .font(.system(size: 24))
-                    .foregroundColor(.museSoftWhite.opacity(0.8))
-                
-                HStack(spacing: 2) {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: 10))
-                    Text("\(Int(pattern.phases.first { $0.type == .inhale }?.duration ?? 4))")
-                        .font(.system(size: 14, weight: .medium))
+    // MARK: - Top Controls (matching AffirmationDisplayView)
+    private var topControls: some View {
+        HStack {
+            // Volume button (left)
+            Button(action: { 
+                withAnimation(.spring(response: 0.3)) {
+                    showVolumeSlider.toggle()
                 }
-                .foregroundColor(.museSuccessGreen)
+            }) {
+                Image(systemName: musicManager.volume > 0 ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.museSoftWhite)
+                    .padding(14)
+                    .background(
+                        Circle()
+                            .fill(Color.museDarkGray.opacity(0.8))
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.museMediumGray.opacity(0.6), lineWidth: 1)
+                            )
+                    )
             }
+            .padding(.leading, 30)
             
-            // Hold indicator (if pattern has hold phases)
-            if pattern.phases.contains(where: { $0.type == .holdIn || $0.type == .holdOut }) {
-                VStack(spacing: 4) {
-                    Image(systemName: "pause.circle")
-                        .font(.system(size: 24))
-                        .foregroundColor(.museSoftWhite.opacity(0.8))
-                    
-                    HStack(spacing: 2) {
-                        Image(systemName: "arrow.up")
-                            .font(.system(size: 10))
-                        Text("\(Int(pattern.phases.first { $0.type == .holdIn || $0.type == .holdOut }?.duration ?? 0))")
-                            .font(.system(size: 14, weight: .medium))
-                    }
-                    .foregroundColor(.museSuccessGreen)
-                }
+            Spacer()
+            
+            // Close button (right)
+            Button(action: {
+                isRunning = false
+                // Log the breathwork session
+                ProgressService.shared.logBreathworkSession(duration: elapsedTime)
+                onComplete()
+            }) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundColor(.museSoftWhite)
+                    .padding(14)
+                    .background(
+                        Circle()
+                            .fill(Color.museDarkGray.opacity(0.8))
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.museMediumGray.opacity(0.6), lineWidth: 1)
+                            )
+                    )
+            }
+            .padding(.trailing, 30)
+        }
+        .padding(.top, 70)
+    }
+    
+    // MARK: - Top Info Bar (compact breathing pattern indicators)
+    private var topInfoBar: some View {
+        HStack(spacing: 16) {
+            // Inhale indicator
+            phaseIndicator(
+                icon: "nose",
+                duration: pattern.phases.first { $0.type == .inhale }?.duration ?? 4
+            )
+            
+            // HoldIn indicator (if pattern has holdIn phase)
+            if let holdIn = pattern.phases.first(where: { $0.type == .holdIn }), holdIn.duration > 0 {
+                phaseIndicator(
+                    icon: "pause.circle",
+                    duration: holdIn.duration
+                )
             }
             
             // Exhale indicator
-            VStack(spacing: 4) {
-                Image(systemName: "mouth")
-                    .font(.system(size: 24))
-                    .foregroundColor(.museSoftWhite.opacity(0.8))
-                
-                HStack(spacing: 2) {
-                    Image(systemName: "arrow.up")
-                        .font(.system(size: 10))
-                    Text("\(Int(pattern.phases.first { $0.type == .exhale }?.duration ?? 4))")
-                        .font(.system(size: 14, weight: .medium))
-                }
-                .foregroundColor(.museSuccessGreen)
+            phaseIndicator(
+                icon: "mouth",
+                duration: pattern.phases.first { $0.type == .exhale }?.duration ?? 4
+            )
+            
+            // HoldOut indicator (if pattern has holdOut phase after exhale)
+            if let holdOut = pattern.phases.first(where: { $0.type == .holdOut }), holdOut.duration > 0 {
+                phaseIndicator(
+                    icon: "pause.circle",
+                    duration: holdOut.duration
+                )
             }
         }
-        .padding(.horizontal, 32)
-        .padding(.vertical, 16)
+        .padding(.horizontal, 24)
+        .padding(.vertical, 12)
         .background(
-            RoundedRectangle(cornerRadius: 20)
+            Capsule()
                 .fill(Color.museDarkGray.opacity(0.6))
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(.ultraThinMaterial)
+                .overlay(
+                    Capsule()
+                        .stroke(Color.museMediumGray.opacity(0.4), lineWidth: 1)
                 )
         )
+    }
+    
+    // Helper for consistent phase indicator styling
+    private func phaseIndicator(icon: String, duration: TimeInterval) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundColor(.museSoftWhite.opacity(0.8))
+                .frame(height: 22) // Fixed height for alignment
+            
+            Text("\(Int(duration))s")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(.museSuccessGreen)
+                .frame(height: 16) // Fixed height for alignment
+        }
+        .frame(width: 40) // Fixed width for consistent spacing
     }
     
     // MARK: - Breathing Circle
@@ -343,67 +396,17 @@ struct ImmersiveBreathworkView: View {
         }
     }
     
-    // MARK: - Bottom Controls
+    // MARK: - Bottom Controls (Play/Pause centered, Timer below)
     private var bottomControls: some View {
         VStack(spacing: 20) {
-            // Control buttons - match AffirmationDisplayView style
-            HStack(spacing: 40) {
-                // Volume button
-                Button(action: { 
-                    withAnimation(.spring(response: 0.3)) {
-                        showVolumeSlider.toggle()
-                    }
-                }) {
-                    Image(systemName: musicManager.volume > 0 ? "speaker.wave.2.fill" : "speaker.slash.fill")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.museSoftWhite)
-                        .frame(width: 50, height: 50)
-                        .background(
-                            Circle()
-                                .fill(Color.museDarkGray.opacity(0.8))
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.museMediumGray.opacity(0.6), lineWidth: 1)
-                                )
-                        )
-                }
-                
-                // Pause/Play button
-                Button(action: {
-                    isPaused.toggle()
-                }) {
-                    Image(systemName: isPaused ? "play.fill" : "pause.fill")
-                        .font(.system(size: 24, weight: .semibold))
-                        .foregroundColor(.museSoftWhite)
-                        .frame(width: 70, height: 70)
-                        .background(
-                            Circle()
-                                .fill(Color.museDarkGray.opacity(0.8))
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.museMediumGray.opacity(0.6), lineWidth: 1)
-                                )
-                        )
-                }
-                
-                // Close button
-                Button(action: {
-                    isRunning = false
-                    onComplete()
-                }) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(.museSoftWhite)
-                        .frame(width: 50, height: 50)
-                        .background(
-                            Circle()
-                                .fill(Color.museDarkGray.opacity(0.8))
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.museMediumGray.opacity(0.6), lineWidth: 1)
-                                )
-                        )
-                }
+            // Pause/Play button (centered, matching Manifest style)
+            Button(action: {
+                isPaused.toggle()
+            }) {
+                Image(systemName: isPaused ? "play.circle.fill" : "pause.circle.fill")
+                    .font(.system(size: 64))
+                    .foregroundColor(.museSoftWhite)
+                    .shadow(color: .black.opacity(0.3), radius: 10)
             }
             
             // Timer display
@@ -414,7 +417,11 @@ struct ImmersiveBreathworkView: View {
                 .padding(.vertical, 10)
                 .background(
                     Capsule()
-                        .fill(Color.museDarkGray.opacity(0.8))
+                        .fill(Color.museDarkGray.opacity(0.6))
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.museMediumGray.opacity(0.4), lineWidth: 1)
+                        )
                 )
         }
     }

@@ -4,6 +4,7 @@ import Charts
 
 struct MuseProgressView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var progressService = ProgressService.shared
     
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
@@ -54,9 +55,10 @@ struct MuseProgressView: View {
                             Spacer()
                             
                             // Add Task Button
-                            Button(action: { showAddTaskSheet = true }) {
-                                Image(systemName: "plus")
-                                    .font(.system(size: 24, weight: .bold)) // Bolder add button
+                            // Close Button
+                            Button(action: { dismiss() }) {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 20, weight: .semibold))
                                     .foregroundColor(.white)
                                     .frame(width: 40, height: 40)
                                     .background(Color.white.opacity(0.1))
@@ -69,67 +71,76 @@ struct MuseProgressView: View {
                         // 2. Weekly Progress Row (Data Driven)
                         // Using real data from ProgressService
                         WeeklyProgressRow(progressService: progressService)
-                            .padding(.horizontal, 20)
-                        
                         // 3. Key Metrics (Restored)
-                        // Shows streaks, time, etc.
-                        KeyMetricsView(
-                            totalSessions: progressService.totalSessions,
-                            totalTime: progressService.totalTime,
-                            currentStreak: progressService.currentStreak
-                        )
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Affirmations Activity")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding(.leading, 4)
+                            
+                            KeyMetricsView(
+                                totalSessions: progressService.totalSessions,
+                                totalTime: progressService.totalTime,
+                                currentStreak: progressService.currentStreak
+                            )
+                        }
                         .padding(.horizontal, 20)
                         
-                        // 4. Task List (The Main Feature)
+                        // 4. Additional Activity Stats
                         VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Text("My Habits")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                Spacer()
-                            }
-                            .padding(.leading, 4)
+                            Text("Activity")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding(.leading, 4)
                             
-                            if tasks.isEmpty {
-                                // Empty State
-                                VStack(spacing: 16) {
-                                    Image(systemName: "checklist")
-                                        .font(.system(size: 40))
-                                        .foregroundColor(.museLightGray.opacity(0.5))
-                                    Text("No tasks yet. Tap + to add one!")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.museLightGray)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(30)
-                                .background(RoundedRectangle(cornerRadius: 16).fill(Color.black.opacity(0.2)))
-                            } else {
-                                ForEach($tasks) { $task in
-                                    TaskRow(
-                                        task: $task,
-                                        isExpanded: expandedTaskId == task.id,
-                                        onExpand: {
-                                            withAnimation(.spring()) {
-                                                if expandedTaskId == task.id {
-                                                    expandedTaskId = nil
-                                                } else {
-                                                    expandedTaskId = task.id
-                                                }
-                                            }
-                                        },
-                                        onDelete: {
-                                            if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-                                                withAnimation {
-                                                    tasks.remove(at: index)
-                                                    saveTasks()
-                                                }
-                                            }
-                                        },
-                                        onToggleComplete: {
-                                            toggleTaskCompletion(task)
-                                        }
-                                    )
-                                }
+                            // Grid of additional stats
+                            LazyVGrid(columns: [
+                                GridItem(.flexible()),
+                                GridItem(.flexible()),
+                                GridItem(.flexible())
+                            ], spacing: 12) {
+                                // Breathwork Sessions
+                                MetricCard(
+                                    title: "Breathwork",
+                                    value: "\(progressService.totalBreathworkSessions)",
+                                    icon: "wind",
+                                    color: .museTeal
+                                )
+                                
+                                // Frequency Sessions
+                                MetricCard(
+                                    title: "Frequencies",
+                                    value: "\(progressService.totalFrequencySessions)",
+                                    icon: "waveform",
+                                    color: .musePink
+                                )
+                                
+                                // Journal Entries
+                                MetricCard(
+                                    title: "Journal",
+                                    value: "\(progressService.totalJournalEntries)",
+                                    icon: "book.fill",
+                                    color: .museAccentBlue
+                                )
+                            }
+                            
+                            // Time breakdown row
+                            HStack(spacing: 12) {
+                                // Breathwork Time
+                                TimeMetricCard(
+                                    title: "Breathwork Time",
+                                    time: progressService.totalBreathworkTime,
+                                    icon: "lungs.fill",
+                                    color: .museTeal
+                                )
+                                
+                                // Frequency Time
+                                TimeMetricCard(
+                                    title: "Frequency Time",
+                                    time: progressService.totalFrequencyTime,
+                                    icon: "waveform.circle.fill",
+                                    color: .musePink
+                                )
                             }
                         }
                         .padding(.horizontal, 20)
@@ -702,6 +713,52 @@ struct MetricCard: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color.black.opacity(0.3))
                 .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.1)))
+        )
+    }
+}
+
+// MARK: - Time Metric Card (for displaying time values)
+struct TimeMetricCard: View {
+    let title: String
+    let time: TimeInterval
+    let icon: String
+    let color: Color
+    
+    private var formattedTime: String {
+        let hours = Int(time) / 3600
+        let minutes = (Int(time) % 3600) / 60
+        if hours > 0 {
+            return "\(hours)h \(minutes)m"
+        } else {
+            return "\(minutes)m"
+        }
+    }
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundColor(color)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(formattedTime)
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundColor(.museSoftWhite)
+                
+                Text(title)
+                    .font(.system(size: 11))
+                    .foregroundColor(.museLightGray)
+            }
+            
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.black.opacity(0.3))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.1)))
         )
     }
 }

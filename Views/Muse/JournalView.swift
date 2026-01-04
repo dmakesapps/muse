@@ -737,6 +737,8 @@ struct JournalView: View {
             savedEntries[index] = newEntry
         } else {
             savedEntries.append(newEntry)
+            // Log the new journal entry
+            ProgressService.shared.logJournalEntry()
         }
         
         withAnimation {
