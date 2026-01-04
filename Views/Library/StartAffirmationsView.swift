@@ -631,6 +631,7 @@ struct StartAffirmationsView: View {
     @State private var isSavedAIExpanded: Bool = false // Expand saved AI affirmations for selection
     @State private var showJournalView: Bool = false // Show journal view
     @State private var isLoadingLibrary: Bool = false // Loading state for library affirmations
+    @State private var spinnerRotation: Double = 0 // Spinner rotation angle
     
     enum PracticeMode: String, CaseIterable {
         case affirmations = "Affirmations"
@@ -681,11 +682,18 @@ struct StartAffirmationsView: View {
     
     // Filter affirmations by selected category and search text
     private var filteredAffirmations: [Affirmation] {
-        var result = currentAffirmationPool
+        var result: [Affirmation]
         
-        // Filter by category if selected
-        if let category = selectedCategory {
-            result = result.filter { $0.category == category }
+        // Handle "Mine" category (user's saved affirmations)
+        if selectedCategory == "Mine" {
+            result = storage.savedAffirmations
+        } else {
+            result = currentAffirmationPool
+            
+            // Filter by category if selected (and not "Mine")
+            if let category = selectedCategory {
+                result = result.filter { $0.category == category }
+            }
         }
         
         // Filter by search text (searches both affirmation text and category name)
@@ -1159,9 +1167,10 @@ struct StartAffirmationsView: View {
                     SourceButton(
                         title: "All",
                         subtitle: isLoadingLibrary ? "Loading..." : "Browse all available affirmations",
-                        icon: isLoadingLibrary ? "circle.dashed" : "list.bullet",
+                        icon: isLoadingLibrary ? "arrow.triangle.2.circlepath" : "list.bullet",
                         color: .museAccentBlue,
-                        isDisabled: isLoadingLibrary
+                        isDisabled: isLoadingLibrary,
+                        isLoading: isLoadingLibrary
                     ) {
                         loadLibraryAffirmations()
                     }
@@ -1188,21 +1197,18 @@ struct StartAffirmationsView: View {
                 if isLoadingLibrary {
                     VStack(spacing: 16) {
                         ZStack {
-                            Circle()
-                                .stroke(Color.museAccentBlue.opacity(0.3), lineWidth: 3)
-                                .frame(width: 60, height: 60)
+                            // Use SwiftUI's native ProgressView for guaranteed animation
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .museAccentBlue))
+                                .scaleEffect(2.5)
                             
-                            Circle()
-                                .trim(from: 0, to: 0.7)
-                                .stroke(Color.museAccentBlue, lineWidth: 3)
-                                .frame(width: 60, height: 60)
-                                .rotationEffect(.degrees(isLoadingLibrary ? 360 : 0))
-                                .animation(.linear(duration: 1).repeatForever(autoreverses: false), value: isLoadingLibrary)
-                            
-                            Image(systemName: "brain.head.profile")
-                                .font(.system(size: 24))
-                                .foregroundColor(.museAccentBlue)
+                            // Brain icon in the center (offset slightly to not overlap spinner)
                         }
+                        .frame(width: 60, height: 60)
+                        
+                        Image(systemName: "brain.head.profile")
+                            .font(.system(size: 28))
+                            .foregroundColor(.museAccentBlue)
                         
                         Text("Loading your neural library...")
                             .font(.museBodyMedium())
@@ -1315,36 +1321,47 @@ struct StartAffirmationsView: View {
                     )
             )
             .clipShape(RoundedRectangle(cornerRadius: 12))
-            
-            // Categories Section
-            if !availableCategories.isEmpty {
+            // Categories Section (FlowLayout grid like Reminders page)
+            if !availableCategories.isEmpty || !storage.savedAffirmations.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Filter by Category")
+                    Text("Categories")
                         .font(.museHeadline())
                         .foregroundColor(.museSoftWhite)
                     
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            // All option
-                            CategoryPill(
-                                title: "All",
-                                isSelected: selectedCategory == nil,
+                    FlowLayout(spacing: 8) {
+                        // All option
+                        CategoryBubble(
+                            title: "All",
+                            isSelected: selectedCategory == nil,
+                            color: .museGradientStart
+                        ) {
+                            withAnimation(.spring(response: 0.3)) {
+                                selectedCategory = nil
+                            }
+                        }
+                        
+                        // Mine option (user's saved affirmations)
+                        if !storage.savedAffirmations.isEmpty {
+                            CategoryBubble(
+                                title: "Mine",
+                                isSelected: selectedCategory == "Mine",
+                                color: .museTeal
+                            ) {
+                                withAnimation(.spring(response: 0.3)) {
+                                    selectedCategory = "Mine"
+                                }
+                            }
+                        }
+                        
+                        // Dynamic categories from content
+                        ForEach(availableCategories, id: \.self) { category in
+                            CategoryBubble(
+                                title: category,
+                                isSelected: selectedCategory == category,
                                 color: .museGradientStart
                             ) {
                                 withAnimation(.spring(response: 0.3)) {
-                                    selectedCategory = nil
-                                }
-                            }
-                            
-                            ForEach(availableCategories, id: \.self) { category in
-                                CategoryPill(
-                                    title: category,
-                                    isSelected: selectedCategory == category,
-                                    color: .museGradientStart
-                                ) {
-                                    withAnimation(.spring(response: 0.3)) {
-                                        selectedCategory = category
-                                    }
+                                    selectedCategory = category
                                 }
                             }
                         }
@@ -1888,36 +1905,47 @@ struct StartAffirmationsView: View {
                     )
             )
             .clipShape(RoundedRectangle(cornerRadius: 12))
-            
-            // Categories Section
-            if !availableCategories.isEmpty {
+            // Categories Section (FlowLayout grid like Reminders page)
+            if !availableCategories.isEmpty || !storage.savedAffirmations.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Filter by Category")
+                    Text("Categories")
                         .font(.museHeadline())
                         .foregroundColor(.museSoftWhite)
                     
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            // All option
-                            CategoryPill(
-                                title: "All",
-                                isSelected: selectedCategory == nil,
+                    FlowLayout(spacing: 8) {
+                        // All option
+                        CategoryBubble(
+                            title: "All",
+                            isSelected: selectedCategory == nil,
+                            color: .museAccentBlue
+                        ) {
+                            withAnimation(.spring(response: 0.3)) {
+                                selectedCategory = nil
+                            }
+                        }
+                        
+                        // Mine option (user's saved affirmations)
+                        if !storage.savedAffirmations.isEmpty {
+                            CategoryBubble(
+                                title: "Mine",
+                                isSelected: selectedCategory == "Mine",
+                                color: .museTeal
+                            ) {
+                                withAnimation(.spring(response: 0.3)) {
+                                    selectedCategory = "Mine"
+                                }
+                            }
+                        }
+                        
+                        // Dynamic categories from content
+                        ForEach(availableCategories, id: \.self) { category in
+                            CategoryBubble(
+                                title: category,
+                                isSelected: selectedCategory == category,
                                 color: .museAccentBlue
                             ) {
                                 withAnimation(.spring(response: 0.3)) {
-                                    selectedCategory = nil
-                                }
-                            }
-                            
-                            ForEach(availableCategories, id: \.self) { category in
-                                CategoryPill(
-                                    title: category,
-                                    isSelected: selectedCategory == category,
-                                    color: .museAccentBlue
-                                ) {
-                                    withAnimation(.spring(response: 0.3)) {
-                                        selectedCategory = category
-                                    }
+                                    selectedCategory = category
                                 }
                             }
                         }
@@ -2348,19 +2376,30 @@ struct SourceButton: View {
     let color: Color
     var isDisabled: Bool = false
     var isComingSoon: Bool = false
+    var isLoading: Bool = false
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
             HStack(spacing: 16) {
-                Image(systemName: icon)
-                    .font(.system(size: 24))
-                    .foregroundColor(isDisabled ? .museLightGray : color)
-                    .frame(width: 50, height: 50)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(isDisabled ? Color.museMediumGray.opacity(0.3) : color.opacity(0.15))
-                    )
+                // Icon with optional spinning animation
+                Group {
+                    if isLoading {
+                        // Use native ProgressView for guaranteed animation
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: color))
+                            .scaleEffect(1.2)
+                    } else {
+                        Image(systemName: icon)
+                            .font(.system(size: 24))
+                            .foregroundColor(isDisabled ? .museLightGray : color)
+                    }
+                }
+                .frame(width: 50, height: 50)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(isDisabled ? Color.museMediumGray.opacity(0.3) : color.opacity(0.15))
+                )
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
@@ -2431,6 +2470,33 @@ struct CategoryPill: View {
         }
     }
 }
+
+// MARK: - Category Bubble (Reminders-style flowing capsule)
+struct CategoryBubble: View {
+    let title: String
+    let isSelected: Bool
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title.capitalized)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(isSelected ? .museSoftWhite : .museLightGray)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule()
+                        .fill(isSelected ? color.opacity(0.6) : Color.white.opacity(0.08))
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(isSelected ? color : Color.white.opacity(0.15), lineWidth: 1)
+                )
+        }
+    }
+}
+
 
 // MARK: - Affirmation Select Row
 struct AffirmationSelectRow: View {
@@ -2579,6 +2645,8 @@ struct AffirmationDisplayView: View {
     @State private var showVolumeSlider = false
     @State private var isStopped = false  // Flag to prevent scheduled tasks from running after stop
     @State private var isFinishingUp = false // Flag to let current affirmation finish before stopping
+    @State private var hasCalledComplete = false  // Flag to prevent double onComplete() calls
+    @State private var sessionAlreadySaved = false  // Flag to prevent double session saves
     @State private var isAnimatingGradient = false
     @State private var showControls = true
     @Environment(\.dismiss) private var dismiss
@@ -2960,7 +3028,8 @@ struct AffirmationDisplayView: View {
         
         // Save session IMMEDIATELY (before the delay) to avoid context issues
         let elapsed = Int(Date().timeIntervalSince(sessionStartTime))
-        if !completedAffirmations.isEmpty {
+        if !completedAffirmations.isEmpty && !sessionAlreadySaved {
+            sessionAlreadySaved = true  // Mark as saved to prevent double-save
             do {
                 let session = AffirmationSession(
                     date: Date(),
@@ -2980,8 +3049,9 @@ struct AffirmationDisplayView: View {
         }
         
         // Wait 5 seconds of silence before completing (view dismissal)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [self] in
-            guard !isStopped else { return } // Check if already stopped
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+            guard !isStopped && !hasCalledComplete else { return }
+            hasCalledComplete = true
             onComplete()
         }
     }
@@ -3009,6 +3079,12 @@ struct AffirmationDisplayView: View {
     private func stop() {
         print("🛑 AffirmationDisplayView: stop() called")
         
+        // Guard against re-entry and double onComplete calls
+        guard !hasCalledComplete else {
+            print("🛑 AffirmationDisplayView: stop() already completed, skipping")
+            return
+        }
+        
         // Set stopped flag FIRST to prevent any scheduled tasks from running
         isStopped = true
         
@@ -3019,12 +3095,14 @@ struct AffirmationDisplayView: View {
         timer?.invalidate()
         timer = nil
         
-        // Only save session if we actually started
-        guard !completedAffirmations.isEmpty || elapsedTime > 0 else {
+        // Only save session if we actually started and haven't already saved
+        guard (!completedAffirmations.isEmpty || elapsedTime > 0) && !sessionAlreadySaved else {
+            hasCalledComplete = true
             onComplete()
             return
         }
         
+        sessionAlreadySaved = true  // Mark as saved to prevent double-save
         let sessionDuration = Date().timeIntervalSince(sessionStartTime)
         let affirmationCount = completedAffirmations.count
         
@@ -3045,6 +3123,7 @@ struct AffirmationDisplayView: View {
             // Don't crash - the session just won't be saved
         }
         
+        hasCalledComplete = true
         onComplete()
     }
 }

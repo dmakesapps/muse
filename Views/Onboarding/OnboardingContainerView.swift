@@ -35,9 +35,13 @@ struct OnboardingContainerView: View {
                 case 4:
                     Screen4_BlockageSelector(
                         selectedBlockage: $selectedBlockage,
-                        onNext: { advance() },
+                        onNext: { 
+                            // For pre-defined blockages, use pre-selected affirmations
+                            // Skip screens 5 & 6 and go directly to calibration
+                            startCalibrationWithPrebuilt()
+                        },
                         onOther: { 
-                            // Skip to chat screen
+                            // Skip to chat screen for custom AI generation
                             withAnimation { currentPage = 10 }
                         }
                     )
@@ -86,6 +90,94 @@ struct OnboardingContainerView: View {
         }
     }
     
+    // MARK: - Pre-built Affirmations by Blockage Category
+    private func prebuiltAffirmationsForBlockage(_ blockage: String) -> [Affirmation] {
+        switch blockage {
+        case "Anxiety Loop":
+            return [
+                Affirmation(text: "My racing thoughts are slowing down with each breath.", category: "Anxiety Relief"),
+                Affirmation(text: "I release the need to predict every outcome.", category: "Anxiety Relief"),
+                Affirmation(text: "This feeling is temporary. I am safe right now.", category: "Anxiety Relief"),
+                Affirmation(text: "I trust my ability to handle whatever comes.", category: "Anxiety Relief"),
+                Affirmation(text: "My nervous system is calming. Peace is returning.", category: "Anxiety Relief")
+            ]
+        case "Scarcity Circuit":
+            return [
+                Affirmation(text: "There is more than enough for me and everyone.", category: "Abundance"),
+                Affirmation(text: "Money flows to me easily and frequently.", category: "Abundance"),
+                Affirmation(text: "I release the fear that I won't have enough.", category: "Abundance"),
+                Affirmation(text: "Opportunities are everywhere. I see them now.", category: "Abundance"),
+                Affirmation(text: "I am worthy of financial abundance and success.", category: "Abundance")
+            ]
+        case "Imposter Syndrome":
+            return [
+                Affirmation(text: "I earned my place. I belong here.", category: "Confidence"),
+                Affirmation(text: "My unique perspective is exactly what's needed.", category: "Confidence"),
+                Affirmation(text: "I release the fear of being found out.", category: "Confidence"),
+                Affirmation(text: "I am qualified. My work speaks for itself.", category: "Confidence"),
+                Affirmation(text: "I deserve every success I've achieved.", category: "Confidence")
+            ]
+        case "Relationship Pattern":
+            return [
+                Affirmation(text: "I attract people who respect and value me.", category: "Relationships"),
+                Affirmation(text: "I release the patterns that no longer serve me.", category: "Relationships"),
+                Affirmation(text: "I deserve love that feels peaceful and safe.", category: "Relationships"),
+                Affirmation(text: "I recognize red flags early and honor my boundaries.", category: "Relationships"),
+                Affirmation(text: "My past does not define my future relationships.", category: "Relationships")
+            ]
+        case "Lack of Direction":
+            return [
+                Affirmation(text: "Clarity is coming. I trust my path is unfolding.", category: "Purpose"),
+                Affirmation(text: "One step forward is all I need right now.", category: "Purpose"),
+                Affirmation(text: "I release the pressure to have it all figured out.", category: "Purpose"),
+                Affirmation(text: "My intuition knows the way. I am listening.", category: "Purpose"),
+                Affirmation(text: "Every experience is guiding me to my purpose.", category: "Purpose")
+            ]
+        case "Self-Sabotage":
+            return [
+                Affirmation(text: "I am safe to succeed. I allow good things in.", category: "Self-Worth"),
+                Affirmation(text: "I release the patterns that hold me back.", category: "Self-Worth"),
+                Affirmation(text: "I deserve happiness and I choose it now.", category: "Self-Worth"),
+                Affirmation(text: "I am worthy of the success I'm creating.", category: "Self-Worth"),
+                Affirmation(text: "I stop running from my own greatness.", category: "Self-Worth")
+            ]
+        default:
+            return getFallbackAffirmations()
+        }
+    }
+    
+    // MARK: - Start Calibration with Pre-built Affirmations (skip AI)
+    private func startCalibrationWithPrebuilt() {
+        withAnimation { currentPage = 7 }
+        
+        // Get pre-built affirmations for selected blockage
+        let affirmations = prebuiltAffirmationsForBlockage(selectedBlockage ?? "")
+        self.generatedAffirmations = affirmations
+        
+        // Play the calibration animation sequence
+        let sequence = [
+            "Analyzing neural patterns...",
+            "Matching to your blockage profile...",
+            "Loading targeted affirmations...",
+            "Your session is ready."
+        ]
+        
+        var delay: TimeInterval = 0
+        for (index, text) in sequence.enumerated() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                withAnimation { self.calibrationText = text }
+                if index == sequence.count - 1 {
+                    // Advance to immersive preview after animation completes
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        self.advance()
+                    }
+                }
+            }
+            delay += 1.5
+        }
+    }
+    
+    // MARK: - Start Calibration with AI Generation (for "Other" chat flow)
     private func startCalibration() {
         withAnimation { currentPage = 7 }
         
@@ -100,10 +192,10 @@ struct OnboardingContainerView: View {
         var delay: TimeInterval = 0
         for (index, text) in sequence.enumerated() {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                withAnimation { calibrationText = text }
+                withAnimation { self.calibrationText = text }
                 if index == sequence.count - 1 {
                     // Generate the affirmations using AI
-                    generateAffirmations()
+                    self.generateAffirmations()
                 }
             }
             delay += 2.0
