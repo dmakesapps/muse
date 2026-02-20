@@ -10,5 +10,14 @@
     <string>Muse needs access to your microphone to listen to your responses.</string>
     <key>NSSpeechRecognitionUsageDescription</key>
     <string>Muse needs speech recognition to understand your words.</string>
+    <key>UILaunchScreen</key>
+    <dict>
+        <key>UIColorName</key>
+        <string>LaunchScreenBackground</string>
+        <key>UIImageName</key>
+        <string>AppLogo</string>
+        <key>UIImageRespectsSafeAreaInsets</key>
+        <true/>
+    </dict>
 </dict>
 </plist>

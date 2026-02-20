@@ -64,9 +64,9 @@ class ProgressService: ObservableObject {
         do {
             try context.save()
             loadProgress()
-            print("✅ ProgressService: Logged session - duration: \(duration)s, affirmations: \(affirmationCount)")
+            debugLog("✅ ProgressService: Logged session - duration: \(duration)s, affirmations: \(affirmationCount)")
         } catch {
-            print("❌ ProgressService: Error saving session: \(error)")
+            debugLog("❌ ProgressService: Error saving session: \(error)")
         }
     }
     
@@ -83,14 +83,14 @@ class ProgressService: ObservableObject {
         do {
             return try context.fetch(descriptor)
         } catch {
-            print("Error fetching sessions: \(error)")
+            debugLog("Error fetching sessions: \(error)")
             return []
         }
     }
     
     func getAllSessions() -> [AffirmationSession] {
         guard let modelContext = modelContext else { 
-            print("⚠️ ProgressService: modelContext is nil in getAllSessions")
+            debugLog("⚠️ ProgressService: modelContext is nil in getAllSessions")
             return [] 
         }
         
@@ -102,7 +102,7 @@ class ProgressService: ObservableObject {
             return try modelContext.fetch(descriptor)
         } catch {
             // Handle iCloud/CloudKit sync errors gracefully
-            print("⚠️ ProgressService: Error fetching all sessions: \(error.localizedDescription)")
+            debugLog("⚠️ ProgressService: Error fetching all sessions: \(error.localizedDescription)")
             // Return empty array instead of crashing
             return []
         }
@@ -195,7 +195,7 @@ class ProgressService: ObservableObject {
         // Update weekly data for the weekly progress row (Mon-Sun of current week)
         weeklyData = getSessionsForCurrentWeek()
         
-        print("📊 ProgressService: Loaded - sessions: \(totalSessions), currentStreak: \(currentStreak), longestStreak: \(longestStreak), todayCount: \(todaySessionCount)")
+        debugLog("📊 ProgressService: Loaded - sessions: \(totalSessions), currentStreak: \(currentStreak), longestStreak: \(longestStreak), todayCount: \(todaySessionCount)")
     }
     
     func getSessionsByDayOfWeek() -> [Int: Int] {
@@ -298,7 +298,7 @@ class ProgressService: ObservableObject {
         totalBreathworkTime += duration
         UserDefaults.standard.set(totalBreathworkSessions, forKey: breathworkSessionsKey)
         UserDefaults.standard.set(totalBreathworkTime, forKey: breathworkTimeKey)
-        print("✅ ProgressService: Logged breathwork session - duration: \(duration)s, total: \(totalBreathworkSessions)")
+        debugLog("✅ ProgressService: Logged breathwork session - duration: \(duration)s, total: \(totalBreathworkSessions)")
     }
     
     /// Log a frequency session
@@ -307,14 +307,14 @@ class ProgressService: ObservableObject {
         totalFrequencyTime += duration
         UserDefaults.standard.set(totalFrequencySessions, forKey: frequencySessionsKey)
         UserDefaults.standard.set(totalFrequencyTime, forKey: frequencyTimeKey)
-        print("✅ ProgressService: Logged frequency session - duration: \(duration)s, total: \(totalFrequencySessions)")
+        debugLog("✅ ProgressService: Logged frequency session - duration: \(duration)s, total: \(totalFrequencySessions)")
     }
     
     /// Log a journal entry
     func logJournalEntry() {
         totalJournalEntries += 1
         UserDefaults.standard.set(totalJournalEntries, forKey: journalEntriesKey)
-        print("✅ ProgressService: Logged journal entry, total: \(totalJournalEntries)")
+        debugLog("✅ ProgressService: Logged journal entry, total: \(totalJournalEntries)")
     }
     
     /// Get formatted time string

@@ -13,16 +13,16 @@ class ContentLoader {
             do {
                 let data = try Data(contentsOf: url)
                 let quotes = try JSONDecoder().decode([Quote].self, from: data)
-                print("✅ Loaded \(quotes.count) quotes from JSON")
+                debugLog("✅ Loaded \(quotes.count) quotes from JSON")
                 return quotes
             } catch {
-                print("❌ Error decoding quotes: \(error)")
+                debugLog("❌ Error decoding quotes: \(error)")
             }
         } else {
-            print("❌ Could not find quotes.json in bundle")
+            debugLog("❌ Could not find quotes.json in bundle")
             // Debug: Print bundle contents
             if let resourcePath = Bundle.main.resourcePath {
-                print("📁 Bundle path: \(resourcePath)")
+                debugLog("📁 Bundle path: \(resourcePath)")
             }
         }
         
@@ -37,13 +37,13 @@ class ContentLoader {
             do {
                 let data = try Data(contentsOf: url)
                 let affirmations = try JSONDecoder().decode([Affirmation].self, from: data)
-                print("✅ Loaded \(affirmations.count) affirmations from JSON")
+                debugLog("✅ Loaded \(affirmations.count) affirmations from JSON")
                 return affirmations
             } catch {
-                print("❌ Error decoding affirmations: \(error)")
+                debugLog("❌ Error decoding affirmations: \(error)")
             }
         } else {
-            print("❌ Could not find affirmations.json in bundle")
+            debugLog("❌ Could not find affirmations.json in bundle")
         }
         
         // Return default affirmations as fallback

@@ -65,7 +65,7 @@ struct ImmersiveAffirmationView: View {
             
             // PREFETCH THE FIRST ONE IMMEDIATELY
             if let first = sessionAffirmations.first {
-                print("🚀 ImmersiveAffirmationView: Prefetching first affirmation: \(first.text)")
+                debugLog("🚀 ImmersiveAffirmationView: Prefetching first affirmation: \(first.text)")
                 SpeechService.shared.prefetch(first.text)
             }
             
@@ -225,7 +225,7 @@ struct ImmersiveAffirmationView: View {
     
     private func playBellSound() {
         guard let url = Bundle.main.url(forResource: "bell321", withExtension: "mp3") else {
-            print("Bell sound not found: bell321.mp3")
+            debugLog("Bell sound not found: bell321.mp3")
             return
         }
         
@@ -234,7 +234,7 @@ struct ImmersiveAffirmationView: View {
             bellPlayer?.volume = 0.8
             bellPlayer?.play()
         } catch {
-            print("Error playing bell sound: \(error.localizedDescription)")
+            debugLog("Error playing bell sound: \(error.localizedDescription)")
         }
     }
 }

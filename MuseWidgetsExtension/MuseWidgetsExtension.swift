@@ -26,7 +26,7 @@ class SharedDataService {
         do {
             return try JSONDecoder().decode([WidgetQuote].self, from: data)
         } catch {
-            print("Error decoding quotes: \(error)")
+            debugLog("Error decoding quotes: \(error)")
             return []
         }
     }
@@ -40,7 +40,7 @@ class SharedDataService {
         do {
             return try JSONDecoder().decode([WidgetAffirmation].self, from: data)
         } catch {
-            print("Error decoding affirmations: \(error)")
+            debugLog("Error decoding affirmations: \(error)")
             return []
         }
     }

@@ -964,9 +964,9 @@ class NotificationService: ObservableObject {
         
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("❌ Test notification error: \(error)")
+                debugLog("❌ Test notification error: \(error)")
             } else {
-                print("✅ Test notification scheduled for 5 seconds from now")
+                debugLog("✅ Test notification scheduled for 5 seconds from now")
             }
         }
     }
@@ -1145,7 +1145,7 @@ class NotificationService: ObservableObject {
         let newIndex = (cycleIndex + (7 * affirmationNotificationCount)) % allContent.count
         UserDefaults.standard.set(newIndex, forKey: "affirmationCycleIndex")
         
-        print("📱 Scheduled \(7 * affirmationNotificationCount) affirmation notifications, cycling from index \(cycleIndex) to \(newIndex)")
+        debugLog("📱 Scheduled \(7 * affirmationNotificationCount) affirmation notifications, cycling from index \(cycleIndex) to \(newIndex)")
     }
     
     private func scheduleQuoteNotifications() {
@@ -1179,7 +1179,7 @@ class NotificationService: ObservableObject {
         let newIndex = (cycleIndex + (7 * quoteNotificationCount)) % allContent.count
         UserDefaults.standard.set(newIndex, forKey: "quoteCycleIndex")
         
-        print("📱 Scheduled \(7 * quoteNotificationCount) quote notifications, cycling from index \(cycleIndex) to \(newIndex)")
+        debugLog("📱 Scheduled \(7 * quoteNotificationCount) quote notifications, cycling from index \(cycleIndex) to \(newIndex)")
     }
     
     private func scheduleDailyContentNotification(identifier: String, title: String, body: String, index: Int, totalCount: Int, daysFromNow: Int) {
@@ -1217,7 +1217,7 @@ class NotificationService: ObservableObject {
             
             UNUserNotificationCenter.current().add(request) { error in
                 if let error = error {
-                    print("❌ Notification scheduling error: \(error)")
+                    debugLog("❌ Notification scheduling error: \(error)")
                 }
             }
         }
@@ -1230,7 +1230,7 @@ class NotificationService: ObservableObject {
         let lastRefresh = UserDefaults.standard.object(forKey: lastRefreshKey) as? Date ?? Date.distantPast
         
         if !Calendar.current.isDateInToday(lastRefresh) {
-            print("🔄 Refreshing daily notifications...")
+            debugLog("🔄 Refreshing daily notifications...")
             rescheduleContentNotifications()
             UserDefaults.standard.set(Date(), forKey: lastRefreshKey)
         }
