@@ -312,7 +312,7 @@ struct ChatBoxView: View {
         var crisisPrefix = ""
         if agentService.detectCrisis(in: userMessageText) {
             crisisPrefix = agentService.getCrisisResponse()
-            debugLog("🚨 Crisis detected - prepending resources")
+            print("🚨 Crisis detected - prepending resources")
         }
         
         // Detect feature intent (for potential deep linking)
@@ -353,7 +353,7 @@ struct ChatBoxView: View {
                     }
                     
                 case .failure(let error):
-                    debugLog("Error calling OpenRouter: \(error.localizedDescription)")
+                    print("Error calling OpenRouter: \(error.localizedDescription)")
                     
                     var errorText = "I'm having trouble connecting right now."
                     // Provide more specific feedback for common errors
@@ -543,11 +543,11 @@ class OpenRouterChatService: ObservableObject {
         // Debug: Log API key status (only first and last 4 chars for security)
         let key = OpenRouterConfig.apiKey
         if key.isEmpty {
-            debugLog("🔴 OpenRouter: API Key is EMPTY!")
+            print("🔴 OpenRouter: API Key is EMPTY!")
         } else {
             let prefix = String(key.prefix(10))
             let suffix = String(key.suffix(4))
-            debugLog("🟢 OpenRouter: API Key loaded: \(prefix)...\(suffix) (length: \(key.count))")
+            print("🟢 OpenRouter: API Key loaded: \(prefix)...\(suffix) (length: \(key.count))")
         }
         
         guard OpenRouterConfig.isConfigured else {
@@ -639,23 +639,23 @@ class OpenRouterChatService: ObservableObject {
         request.addValue("Muse", forHTTPHeaderField: "HTTP-Referer")
         request.addValue("Muse App", forHTTPHeaderField: "X-Title")
         
-        debugLog("🟣 Muse Chat: Sending request to \(model)...")
+        print("🟣 Muse Chat: Sending request to \(model)...")
         
         // CRITICAL: Set the request body! (This was missing before)
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: body)
             if let bodyString = String(data: request.httpBody!, encoding: .utf8) {
-                debugLog("📝 Request Body: \(bodyString)")
+                print("📝 Request Body: \(bodyString)")
             }
         } catch {
-            debugLog("🔴 Failed to serialize request body: \(error)")
+            print("🔴 Failed to serialize request body: \(error)")
             completion(.failure(error))
             return
         }
         
         URLSession.shared.dataTask(with: request) { [crisisPrefix] data, response, error in
             if let error = error {
-                debugLog("🔴 Muse Chat Error: \(error.localizedDescription)")
+                print("🔴 Muse Chat Error: \(error.localizedDescription)")
                 completion(.failure(error))
                 return
             }
@@ -667,7 +667,7 @@ class OpenRouterChatService: ObservableObject {
             
             // Log raw response for debugging
             if let rawString = String(data: data, encoding: .utf8) {
-                debugLog("🟣 Raw Response: \(rawString)")
+                print("🟣 Raw Response: \(rawString)")
             }
             
             // Check for HTTP errors
@@ -703,21 +703,21 @@ class OpenRouterChatService: ObservableObject {
                    let message = firstChoice["message"] as? [String: Any],
                    let content = message["content"] as? String {
                     
-                    debugLog("🟣 Muse Chat response received")
+                    print("🟣 Muse Chat response received")
                     
                     // Prepend crisis resources if crisis was detected
                     let finalResponse = crisisPrefix + content.trimmingCharacters(in: .whitespacesAndNewlines)
                     
                     completion(.success(finalResponse))
                 } else {
-                    debugLog("🔴 Muse Chat: Failed to parse response structure")
+                    print("🔴 Muse Chat: Failed to parse response structure")
                      if let rawString = String(data: data, encoding: .utf8) {
-                        debugLog("Raw Data was: \(rawString)")
+                        print("Raw Data was: \(rawString)")
                      }
                     completion(.failure(NSError(domain: "OpenRouterChatService", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])))
                 }
             } catch {
-                debugLog("JSON Parse Error: \(error)")
+                print("JSON Parse Error: \(error)")
                 completion(.failure(error)) // Use the actual serialization error
             }
         }.resume()

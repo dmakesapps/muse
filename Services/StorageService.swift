@@ -115,7 +115,7 @@ class StorageService: ObservableObject {
             sharedUserDefaults?.set(encoded, forKey: quotesKey)
             // Force widget refresh by updating timeline
             WidgetCenter.shared.reloadTimelines(ofKind: "QuoteWidget")
-            debugLog("✅ Saved \(savedQuotes.count) quotes to App Group and reloaded widget")
+            print("✅ Saved \(savedQuotes.count) quotes to App Group and reloaded widget")
         }
     }
     
@@ -164,7 +164,7 @@ class StorageService: ObservableObject {
             sharedUserDefaults?.set(encoded, forKey: affirmationsKey)
             // Force widget refresh by updating timeline
             WidgetCenter.shared.reloadTimelines(ofKind: "AffirmationWidget")
-            debugLog("✅ Saved \(savedAffirmations.count) affirmations to App Group and reloaded widget")
+            print("✅ Saved \(savedAffirmations.count) affirmations to App Group and reloaded widget")
         }
     }
     
@@ -228,7 +228,7 @@ class StorageService: ObservableObject {
     private func persistAIAffirmations() {
         if let encoded = try? JSONEncoder().encode(aiGeneratedAffirmations) {
             UserDefaults.standard.set(encoded, forKey: aiAffirmationsKey)
-            debugLog("✅ Saved \(aiGeneratedAffirmations.count) AI-generated affirmations")
+            print("✅ Saved \(aiGeneratedAffirmations.count) AI-generated affirmations")
         }
     }
     
@@ -287,7 +287,7 @@ class BackgroundMusicManager: ObservableObject {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
-            debugLog("Failed to set audio session: \(error)")
+            print("Failed to set audio session: \(error)")
         }
         
         // Add observers for app lifecycle
@@ -345,7 +345,7 @@ class BackgroundMusicManager: ObservableObject {
         }
         
         guard let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") else {
-            debugLog("Could not find sound file: \(fileName)")
+            print("Could not find sound file: \(fileName)")
             return
         }
         
@@ -364,7 +364,7 @@ class BackgroundMusicManager: ObservableObject {
                 audioPlayer?.play()
             }
         } catch {
-            debugLog("Could not create audio player: \(error)")
+            print("Could not create audio player: \(error)")
         }
     }
     
@@ -412,7 +412,7 @@ class BackgroundMusicManager: ObservableObject {
                 }
             }
         } catch {
-            debugLog("Failed to preview audio: \(error)")
+            print("Failed to preview audio: \(error)")
         }
     }
     

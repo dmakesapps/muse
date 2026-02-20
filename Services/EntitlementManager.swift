@@ -32,10 +32,10 @@ class EntitlementManager: NSObject, ObservableObject {
     private override init() {
         super.init()
         resetDailyCountsIfNeeded()
-        debugLog("✅ EntitlementManager: Initialized (Free tier with daily rate limits)")
-        debugLog("   Chat: \(currentChatCount)/\(maxDailyChatMessages)")
-        debugLog("   AI Gen: \(currentAIGenCount)/\(maxDailyAIGenerations)")
-        debugLog("   Journal: \(currentJournalCount)/\(maxDailyJournalInsights)")
+        print("✅ EntitlementManager: Initialized (Free tier with daily rate limits)")
+        print("   Chat: \(currentChatCount)/\(maxDailyChatMessages)")
+        print("   AI Gen: \(currentAIGenCount)/\(maxDailyAIGenerations)")
+        print("   Journal: \(currentJournalCount)/\(maxDailyJournalInsights)")
     }
     
     // MARK: - Current Counts
@@ -108,21 +108,21 @@ class EntitlementManager: NSObject, ObservableObject {
         resetDailyCountsIfNeeded()
         let newCount = currentChatCount + 1
         UserDefaults.standard.set(newCount, forKey: chatCountKey)
-        debugLog("💬 EntitlementManager: Chat message \(newCount)/\(maxDailyChatMessages)")
+        print("💬 EntitlementManager: Chat message \(newCount)/\(maxDailyChatMessages)")
     }
     
     func incrementAIGenerationCount() {
         resetDailyCountsIfNeeded()
         let newCount = currentAIGenCount + 1
         UserDefaults.standard.set(newCount, forKey: aiGenCountKey)
-        debugLog("🌟 EntitlementManager: AI generation \(newCount)/\(maxDailyAIGenerations)")
+        print("🌟 EntitlementManager: AI generation \(newCount)/\(maxDailyAIGenerations)")
     }
     
     func incrementJournalInsightCount() {
         resetDailyCountsIfNeeded()
         let newCount = currentJournalCount + 1
         UserDefaults.standard.set(newCount, forKey: journalCountKey)
-        debugLog("📓 EntitlementManager: Journal insight \(newCount)/\(maxDailyJournalInsights)")
+        print("📓 EntitlementManager: Journal insight \(newCount)/\(maxDailyJournalInsights)")
     }
     
     // MARK: - Alert Messaging
@@ -147,7 +147,7 @@ class EntitlementManager: NSObject, ObservableObject {
     // MARK: - Private Helpers
     
     private func showLimitReached(source: UsageLimitSource) {
-        debugLog("⚠️ EntitlementManager: Daily limit reached for \(source.rawValue)")
+        print("⚠️ EntitlementManager: Daily limit reached for \(source.rawValue)")
         self.usageLimitSource = source
         self.showUsageLimitAlert = true
     }
@@ -162,7 +162,7 @@ class EntitlementManager: NSObject, ObservableObject {
             UserDefaults.standard.set(0, forKey: aiGenCountKey)
             UserDefaults.standard.set(0, forKey: journalCountKey)
             UserDefaults.standard.set(today, forKey: lastResetDateKey)
-            debugLog("🔄 EntitlementManager: Daily usage counts reset")
+            print("🔄 EntitlementManager: Daily usage counts reset")
         }
     }
 }

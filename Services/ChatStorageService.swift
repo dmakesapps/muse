@@ -214,9 +214,9 @@ class ChatStorageService: ObservableObject {
         do {
             let data = try JSONEncoder().encode(chatSessions)
             UserDefaults.standard.set(data, forKey: sessionsKey)
-            debugLog("💬 Saved \(chatSessions.count) chat sessions")
+            print("💬 Saved \(chatSessions.count) chat sessions")
         } catch {
-            debugLog("❌ Failed to save chat sessions: \(error)")
+            print("❌ Failed to save chat sessions: \(error)")
         }
     }
     
@@ -230,9 +230,9 @@ class ChatStorageService: ObservableObject {
             chatSessions = try JSONDecoder().decode([StoredChatSession].self, from: data)
             // Sort by most recent first
             chatSessions.sort { $0.updatedAt > $1.updatedAt }
-            debugLog("💬 Loaded \(chatSessions.count) chat sessions")
+            print("💬 Loaded \(chatSessions.count) chat sessions")
         } catch {
-            debugLog("❌ Failed to load chat sessions: \(error)")
+            print("❌ Failed to load chat sessions: \(error)")
             chatSessions = []
         }
     }

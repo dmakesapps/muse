@@ -324,7 +324,7 @@ class ManifestPlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
-        } catch { debugLog("❌ Session error: \(error)") }
+        } catch { print("❌ Session error: \(error)") }
         
         // Load Voice
         if let url = Bundle.main.url(forResource: voiceFile, withExtension: "m4a") {
@@ -334,8 +334,8 @@ class ManifestPlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
                 voicePlayer?.prepareToPlay()
                 voicePlayer?.volume = voiceVolume
                 duration = voicePlayer?.duration ?? 1
-            } catch { debugLog("❌ Voice error: \(error)") }
-        } else { debugLog("❌ Voice file not found: \(voiceFile)") }
+            } catch { print("❌ Voice error: \(error)") }
+        } else { print("❌ Voice file not found: \(voiceFile)") }
         
         // Load Music
         // Try mp3 first, then m4a
@@ -348,8 +348,8 @@ class ManifestPlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
                 musicPlayer?.prepareToPlay()
                 musicPlayer?.numberOfLoops = -1 // Loop music
                 musicPlayer?.volume = musicVolume * 0.5 // Scale to 50% max
-            } catch { debugLog("❌ Music error: \(error)") }
-        } else { debugLog("❌ Music file not found: \(musicFile)") }
+            } catch { print("❌ Music error: \(error)") }
+        } else { print("❌ Music file not found: \(musicFile)") }
         
         play()
     }

@@ -809,7 +809,7 @@ struct JournalView: View {
                         EntitlementManager.shared.incrementJournalInsightCount()
                         parseApiResponse(rawResponse)
                     case .failure(let error):
-                        debugLog("Check-in API Error: \(error)")
+                        print("Check-in API Error: \(error)")
                         aiResponse = "I hear you, and I'm here for you."
                     }
                 }

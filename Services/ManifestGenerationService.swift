@@ -72,23 +72,23 @@ class ManifestAudioGenerator: ObservableObject {
     """
     
     func generate() {
-        debugLog("⚡️ ADMIN GENERATOR: Generate button pressed!")
+        print("⚡️ ADMIN GENERATOR: Generate button pressed!")
         
         guard !apiKey.isEmpty else {
-            debugLog("❌ ADMIN GENERATOR: No API Key found!")
+            print("❌ ADMIN GENERATOR: No API Key found!")
             progress = "Error: API Key missing"
             return
         }
         
         isGenerating = true
         progress = "Starting generation..."
-        debugLog("⚡️ ADMIN GENERATOR: Starting generation loop...")
+        print("⚡️ ADMIN GENERATOR: Starting generation loop...")
         
         Task {
             do {
                 // 1. Parse Script
                 let segments = parseScript(script)
-                debugLog("⚡️ ADMIN GENERATOR: Parsed \(segments.count) segments.")
+                print("⚡️ ADMIN GENERATOR: Parsed \(segments.count) segments.")
                 var audioFiles: [URL] = []
                 
                 // 2. Process each segment
@@ -116,7 +116,7 @@ class ManifestAudioGenerator: ObservableObject {
                 let finalURL = try await stitchAudio(segments: segments)
                 
                 progress = "✅ DONE! Saved to: \(finalURL.path)"
-                debugLog("✅ MANIFEST AUDIO SAVED TO: \(finalURL.path)")
+                print("✅ MANIFEST AUDIO SAVED TO: \(finalURL.path)")
                 isGenerating = false
                 
             } catch {

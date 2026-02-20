@@ -28,18 +28,18 @@ class SpeechRecognizer: NSObject, ObservableObject {
                 switch authStatus {
                 case .authorized:
                     self?.isAuthorized = true
-                    debugLog("🎤 SpeechRecognizer: Authorized")
+                    print("🎤 SpeechRecognizer: Authorized")
                 case .denied:
                     self?.isAuthorized = false
                     self?.error = "Speech recognition permission denied"
-                    debugLog("🚫 SpeechRecognizer: Denied")
+                    print("🚫 SpeechRecognizer: Denied")
                 case .restricted:
                     self?.isAuthorized = false
                     self?.error = "Speech recognition restricted on this device"
-                    debugLog("🚫 SpeechRecognizer: Restricted")
+                    print("🚫 SpeechRecognizer: Restricted")
                 case .notDetermined:
                     self?.isAuthorized = false
-                    debugLog("❓ SpeechRecognizer: Not Determined")
+                    print("❓ SpeechRecognizer: Not Determined")
                 @unknown default:
                     self?.isAuthorized = false
                 }
@@ -76,7 +76,7 @@ class SpeechRecognizer: NSObject, ObservableObject {
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
             self.error = "Audio session failed setup"
-            debugLog("❌ SpeechRecognizer: Audio session setup error: \(error)")
+            print("❌ SpeechRecognizer: Audio session setup error: \(error)")
             return
         }
         
@@ -135,13 +135,13 @@ class SpeechRecognizer: NSObject, ObservableObject {
             self.error = nil // Clear errors
         }
         
-        debugLog("🎤 SpeechRecognizer: Started recording")
+        print("🎤 SpeechRecognizer: Started recording")
     }
     
     private func resetSilenceTimer() {
         silenceTimer?.invalidate()
         silenceTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { [weak self] _ in
-            debugLog("🤫 SpeechRecognizer: Silence detected, stopping recording...")
+            print("🤫 SpeechRecognizer: Silence detected, stopping recording...")
             self?.stopRecording()
         }
     }
@@ -151,7 +151,7 @@ class SpeechRecognizer: NSObject, ObservableObject {
         do {
             try audioEngine.start()
         } catch {
-            debugLog("❌ SpeechRecognizer: Audio engine start error: \(error)")
+            print("❌ SpeechRecognizer: Audio engine start error: \(error)")
         }
     }
     
@@ -159,7 +159,7 @@ class SpeechRecognizer: NSObject, ObservableObject {
         audioEngine.stop()
         recognitionRequest?.endAudio()
         isRecording = false
-        debugLog("🛑 SpeechRecognizer: Stopped recording")
+        print("🛑 SpeechRecognizer: Stopped recording")
         
         // Reset audio session to playback with mixing to restore full volume to background music
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])

@@ -572,11 +572,11 @@ class AffirmationGenerationService {
             return
         }
         
-        debugLog("🌟 Generating \(count) personalized affirmations...")
+        print("🌟 Generating \(count) personalized affirmations...")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                debugLog("🔴 Generation error: \(error.localizedDescription)")
+                print("🔴 Generation error: \(error.localizedDescription)")
                 completion(.failure(error))
                 return
             }
@@ -588,7 +588,7 @@ class AffirmationGenerationService {
             
             // Log raw response
             if let rawString = String(data: data, encoding: .utf8) {
-                debugLog("🌟 Raw response: \(rawString)")
+                print("🌟 Raw response: \(rawString)")
             }
             
             // Parse the response
@@ -605,7 +605,7 @@ class AffirmationGenerationService {
                     if affirmations.isEmpty {
                         completion(.failure(NSError(domain: "AffirmationGeneration", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to parse affirmations from response"])))
                     } else {
-                        debugLog("🌟 Successfully generated \(affirmations.count) affirmations")
+                        print("🌟 Successfully generated \(affirmations.count) affirmations")
                         completion(.success(affirmations))
                     }
                 } else {

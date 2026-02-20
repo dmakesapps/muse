@@ -267,7 +267,7 @@ struct ImmersiveFrequenciesView: View {
         }
         
         guard let audioUrl = url else {
-            debugLog("❌ Frequency audio file not found: \(frequency.audioFileName)")
+            print("❌ Frequency audio file not found: \(frequency.audioFileName)")
             // Still allow the view to work without audio for now
             return
         }
@@ -287,7 +287,7 @@ struct ImmersiveFrequenciesView: View {
             // Auto-play
             play()
         } catch {
-            debugLog("❌ Error setting up frequency audio: \(error)")
+            print("❌ Error setting up frequency audio: \(error)")
         }
     }
     

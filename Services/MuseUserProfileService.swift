@@ -97,9 +97,9 @@ class MuseUserProfileService: ObservableObject {
         do {
             let data = try JSONEncoder().encode(profile)
             UserDefaults.standard.set(data, forKey: profileKey)
-            debugLog("📋 User profile saved")
+            print("📋 User profile saved")
         } catch {
-            debugLog("❌ Failed to save user profile: \(error)")
+            print("❌ Failed to save user profile: \(error)")
         }
     }
     
@@ -110,9 +110,9 @@ class MuseUserProfileService: ObservableObject {
         
         do {
             profile = try JSONDecoder().decode(MuseUserProfile.self, from: data)
-            debugLog("📋 User profile loaded")
+            print("📋 User profile loaded")
         } catch {
-            debugLog("❌ Failed to load user profile: \(error)")
+            print("❌ Failed to load user profile: \(error)")
         }
     }
     

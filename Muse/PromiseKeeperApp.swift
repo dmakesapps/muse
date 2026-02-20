@@ -53,22 +53,22 @@ struct MuseApp: App {
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            debugLog("⚠️ MuseApp: Failed to create ModelContainer: \(error)")
-            debugLog("⚠️ MuseApp: Attempting to delete and recreate database...")
+            print("⚠️ MuseApp: Failed to create ModelContainer: \(error)")
+            print("⚠️ MuseApp: Attempting to delete and recreate database...")
             
             // Delete and recreate
             do {
                 try FileManager.default.removeItem(at: localStoreURL)
                 try? FileManager.default.removeItem(at: localStoreURL.appendingPathExtension("wal"))
                 try? FileManager.default.removeItem(at: localStoreURL.appendingPathExtension("shm"))
-                debugLog("✅ MuseApp: Deleted old database, creating fresh one...")
+                print("✅ MuseApp: Deleted old database, creating fresh one...")
                 return try ModelContainer(for: schema, configurations: [modelConfiguration])
             } catch {
-                debugLog("❌ MuseApp: Failed to recreate database: \(error)")
+                print("❌ MuseApp: Failed to recreate database: \(error)")
             }
             
             // Last resort: use in-memory storage
-            debugLog("⚠️ MuseApp: Falling back to in-memory storage")
+            print("⚠️ MuseApp: Falling back to in-memory storage")
             let inMemoryConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             do {
                 return try ModelContainer(for: schema, configurations: [inMemoryConfig])

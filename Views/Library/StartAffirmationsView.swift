@@ -165,7 +165,7 @@ struct ImmersiveBreathworkView: View {
                     player.volume = 1.0 // adjusted volume
                     phasePlayers[phase] = player
                 } catch {
-                    debugLog("Could not load sound \(filename): \(error)")
+                    print("Could not load sound \(filename): \(error)")
                 }
             }
         }
@@ -220,7 +220,7 @@ struct ImmersiveBreathworkView: View {
         }
 
         .onAppear {
-            debugLog("💨 ImmersiveBreathworkView appeared with pattern: \(pattern.rawValue)")
+            print("💨 ImmersiveBreathworkView appeared with pattern: \(pattern.rawValue)")
             BackgroundMusicManager.shared.isInImmersiveMode = true
             UIApplication.shared.isIdleTimerDisabled = true
             preloadSounds()
@@ -2860,11 +2860,11 @@ struct AffirmationDisplayView: View {
     
     // MARK: - Session Control
     private func start() {
-        debugLog("🚀 AffirmationDisplayView: start() called")
-        debugLog("🚀 AffirmationDisplayView: affirmations count = \(affirmations.count)")
+        print("🚀 AffirmationDisplayView: start() called")
+        print("🚀 AffirmationDisplayView: affirmations count = \(affirmations.count)")
         
         guard !affirmations.isEmpty else {
-            debugLog("⚠️ AffirmationDisplayView: No affirmations! Completing...")
+            print("⚠️ AffirmationDisplayView: No affirmations! Completing...")
             onComplete()
             return
         }
@@ -2884,7 +2884,7 @@ struct AffirmationDisplayView: View {
         randomizedAffirmations = affirmations
         currentIndex = 0
         
-        debugLog("🚀 AffirmationDisplayView: First affirmation: \(randomizedAffirmations.first?.text.prefix(30) ?? "none")...")
+        print("🚀 AffirmationDisplayView: First affirmation: \(randomizedAffirmations.first?.text.prefix(30) ?? "none")...")
         
         // Start background music with fade in
         musicManager.play(fadeInDuration: 2.0)
@@ -2895,7 +2895,7 @@ struct AffirmationDisplayView: View {
         }
         
         // Start speaking the first affirmation
-        debugLog("🚀 AffirmationDisplayView: Calling speakCurrentAffirmation()...")
+        print("🚀 AffirmationDisplayView: Calling speakCurrentAffirmation()...")
         speakCurrentAffirmation()
         
         // Overall session timer
@@ -2910,23 +2910,23 @@ struct AffirmationDisplayView: View {
     }
     
     private func speakCurrentAffirmation() {
-        debugLog("🎤 speakCurrentAffirmation() called, currentIndex = \(currentIndex)")
+        print("🎤 speakCurrentAffirmation() called, currentIndex = \(currentIndex)")
         
         // Check if session was stopped
         guard !isStopped else {
-            debugLog("🛑 speakCurrentAffirmation: Session stopped, not speaking")
+            print("🛑 speakCurrentAffirmation: Session stopped, not speaking")
             return
         }
         
         guard currentIndex < randomizedAffirmations.count else {
-            debugLog("⚠️ speakCurrentAffirmation: Index out of bounds!")
+            print("⚠️ speakCurrentAffirmation: Index out of bounds!")
             return
         }
         
         currentPhase = .speaking
         let text = randomizedAffirmations[currentIndex].text
         
-        debugLog("🎤 Speaking text: \(text)")
+        print("🎤 Speaking text: \(text)")
         
         // Speak the affirmation using OpenAI TTS
         speechService.speak(text) {
@@ -2934,7 +2934,7 @@ struct AffirmationDisplayView: View {
             DispatchQueue.main.async {
                 // Check if stopped before transitioning
                 guard !isStopped else {
-                    debugLog("🛑 Speech complete but session stopped, not transitioning")
+                    print("🛑 Speech complete but session stopped, not transitioning")
                     return
                 }
                 
@@ -2946,7 +2946,7 @@ struct AffirmationDisplayView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + userRepeatDuration) {
                     // Check if stopped before auto-advancing
                     guard !isStopped else {
-                        debugLog("🛑 Auto-advance cancelled, session stopped")
+                        print("🛑 Auto-advance cancelled, session stopped")
                         return
                     }
                     if currentPhase == .yourTurn {
@@ -2960,13 +2960,13 @@ struct AffirmationDisplayView: View {
     private func transitionToNext() {
         // Check if session was stopped or needs to finish
         guard !isStopped else {
-            debugLog("🛑 transitionToNext: Session stopped, not transitioning")
+            print("🛑 transitionToNext: Session stopped, not transitioning")
             return
         }
         
         // If time is up, end the session now that the verification cycle is complete
         if isFinishingUp {
-            debugLog("🛑 Time is up! Finishing session gracefully after affirmation complete.")
+            print("🛑 Time is up! Finishing session gracefully after affirmation complete.")
             endSessionWithPadding()
             return
         }
@@ -2989,7 +2989,7 @@ struct AffirmationDisplayView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             // Check if stopped before continuing
             guard !isStopped else {
-                debugLog("🛑 Fade transition cancelled, session stopped")
+                print("🛑 Fade transition cancelled, session stopped")
                 return
             }
             
@@ -3035,9 +3035,9 @@ struct AffirmationDisplayView: View {
                 try modelContext.save()
                 // Refresh the shared ProgressService so all UI updates
                 ProgressService.shared.setModelContext(modelContext)
-                debugLog("✅ Session saved: \(elapsed)s, \(completedAffirmations.count) affirmations")
+                print("✅ Session saved: \(elapsed)s, \(completedAffirmations.count) affirmations")
             } catch {
-                debugLog("❌ Error saving session: \(error)")
+                print("❌ Error saving session: \(error)")
                 // Don't crash - the session just won't be saved
             }
         }
@@ -3071,11 +3071,11 @@ struct AffirmationDisplayView: View {
     }
     
     private func stop() {
-        debugLog("🛑 AffirmationDisplayView: stop() called")
+        print("🛑 AffirmationDisplayView: stop() called")
         
         // Guard against re-entry and double onComplete calls
         guard !hasCalledComplete else {
-            debugLog("🛑 AffirmationDisplayView: stop() already completed, skipping")
+            print("🛑 AffirmationDisplayView: stop() already completed, skipping")
             return
         }
         
@@ -3111,9 +3111,9 @@ struct AffirmationDisplayView: View {
             try modelContext.save()
             // Refresh the shared ProgressService so all UI updates
             ProgressService.shared.setModelContext(modelContext)
-            debugLog("✅ Session saved: \(Int(sessionDuration))s, \(affirmationCount) affirmations")
+            print("✅ Session saved: \(Int(sessionDuration))s, \(affirmationCount) affirmations")
         } catch {
-            debugLog("❌ Error saving session: \(error)")
+            print("❌ Error saving session: \(error)")
             // Don't crash - the session just won't be saved
         }
         
