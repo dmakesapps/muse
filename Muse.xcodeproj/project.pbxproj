@@ -15,7 +15,7 @@
 		724C1B5E2EF3E67B0052D8AE /* ManifestGenerationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */; };
 		724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */; };
 		724C1B682EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B672EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 */; };
-		725082702F076DFD00B5679E /* SuperwallKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7250826F2F076DFD00B5679E /* SuperwallKit */; };
+
 		726A39512EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394C2EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 */; };
 		726A39522EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A39492EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 */; };
 		726A39532EF795AA00BF8F8E /* 741hz-throat-chakra-balancing-fostering-honest-expressions-157686.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394F2EF795AA00BF8F8E /* 741hz-throat-chakra-balancing-fostering-honest-expressions-157686.mp3 */; };
@@ -193,7 +193,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				725082702F076DFD00B5679E /* SuperwallKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -414,7 +413,6 @@
 			);
 			name = Muse;
 			packageProductDependencies = (
-				7250826F2F076DFD00B5679E /* SuperwallKit */,
 			);
 			productName = Muse;
 			productReference = 72E262572EC68CF40080CF29 /* Muse.app */;
@@ -515,7 +513,6 @@
 			mainGroup = 72E2624E2EC68CF40080CF29;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				7250826E2F076DFD00B5679E /* XCRemoteSwiftPackageReference "Superwall-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 72E262582EC68CF40080CF29 /* Products */;
@@ -1036,24 +1033,7 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		7250826E2F076DFD00B5679E /* XCRemoteSwiftPackageReference "Superwall-iOS" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/superwall/Superwall-iOS";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.11.2;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
 
-/* Begin XCSwiftPackageProductDependency section */
-		7250826F2F076DFD00B5679E /* SuperwallKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 7250826E2F076DFD00B5679E /* XCRemoteSwiftPackageReference "Superwall-iOS" */;
-			productName = SuperwallKit;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 72E2624F2EC68CF40080CF29 /* Project object */;
 }

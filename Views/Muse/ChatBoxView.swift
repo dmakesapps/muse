@@ -240,6 +240,14 @@ struct ChatBoxView: View {
         .onChange(of: chatStorage.currentSession?.id) { _, _ in
             loadCurrentSession()
         }
+        .alert(EntitlementManager.shared.limitAlertTitle, isPresented: Binding(
+            get: { EntitlementManager.shared.showUsageLimitAlert },
+            set: { EntitlementManager.shared.showUsageLimitAlert = $0 }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(EntitlementManager.shared.limitAlertMessage)
+        }
     }
     
     private func loadCurrentSession() {
@@ -270,6 +278,9 @@ struct ChatBoxView: View {
     private func sendMessage() {
         guard !messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         
+        // Check daily chat limit
+        guard EntitlementManager.shared.canSendChatMessage() else { return }
+        
         let userMessageText = messageText
         
         let userMessage = ChatMessage(
@@ -284,6 +295,9 @@ struct ChatBoxView: View {
         
         // Save user message to storage
         chatStorage.addMessage(userMessage.toStored())
+        
+        // Increment chat usage count
+        EntitlementManager.shared.incrementChatMessageCount()
         
         // Clear input
         messageText = ""

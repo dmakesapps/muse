@@ -1,178 +1,168 @@
-import Foundation
 import SwiftUI
-import Combine
-import SuperwallKit
 
-/// Manages user entitlements and feature access
-/// Freemium Logic:
-/// 1. 3 free immersive affirmation sessions total
-/// 2. AI Generation features require premium
-/// 3. All other features (browse, habits, etc.) are free
-/// 4. Integration point for Superwall
+// MARK: - Usage Limit Source (for UI messaging)
+enum UsageLimitSource: String {
+    case chatMessages = "chat_messages"
+    case aiGeneration = "ai_generation"
+    case journalInsights = "journal_insights"
+}
+
+// MARK: - EntitlementManager (Free Tier with Daily Rate Limits)
+/// Manages daily usage limits for AI-powered features.
+/// No paywall, no Superwall — just sustainable rate limiting.
 @MainActor
-class EntitlementManager: NSObject, ObservableObject, SuperwallDelegate {
+class EntitlementManager: NSObject, ObservableObject {
     static let shared = EntitlementManager()
     
+    // MARK: - Daily Limits
+    private let maxDailyChatMessages = 25
+    private let maxDailyAIGenerations = 5
+    private let maxDailyJournalInsights = 3
+    
     // MARK: - Published State
-    @Published var isPremium: Bool = false
-    @Published var freeSessionsUsed: Int = 0
-    @Published var showPaywall: Bool = false 
-    @Published var paywallSource: PaywallSource? = nil 
+    @Published var showUsageLimitAlert: Bool = false
+    @Published var usageLimitSource: UsageLimitSource? = nil
     
-    // MARK: - Configuration
-    private let maxFreeSessions = 7 // Total free immersive sessions before paywall
-    private let maxDailyAIGenerations = 50 
-    
-    // MARK: - Computed Properties
-    var remainingFreeSessions: Int {
-        max(0, maxFreeSessions - freeSessionsUsed)
-    }
-    
-    var hasUsedAllFreeSessions: Bool {
-        freeSessionsUsed >= maxFreeSessions
-    }
-    
-    // MARK: - Paywall & Lock Sources
-    enum PaywallSource: String {
-        case sessionLimit = "session_limit_reached"
-        case aiGeneration = "ai_generation_locked"
-        case settings = "settings_upgrade"
-        case dailyLimitReached = "fair_use_limit_reached" 
-        case onboarding = "onboarding_complete"
-    }
-    
-    private var isSuperwallConfigured = false
+    // MARK: - UserDefaults Keys
+    private let chatCountKey = "dailyChatMessageCount"
+    private let aiGenCountKey = "dailyAIGenerationCount"
+    private let journalCountKey = "dailyJournalInsightCount"
+    private let lastResetDateKey = "dailyUsageResetDate"
     
     private override init() {
         super.init()
-        loadSessionCount()
-        // Don't configure Superwall immediately - delay until needed
-        // This avoids the "Sign in to Apple Account" prompt on launch
+        resetDailyCountsIfNeeded()
+        print("✅ EntitlementManager: Initialized (Free tier with daily rate limits)")
+        print("   Chat: \(currentChatCount)/\(maxDailyChatMessages)")
+        print("   AI Gen: \(currentAIGenCount)/\(maxDailyAIGenerations)")
+        print("   Journal: \(currentJournalCount)/\(maxDailyJournalInsights)")
     }
     
-    /// Call this to ensure Superwall is configured before using it
-    func ensureSuperwallConfigured() {
-        guard !isSuperwallConfigured else { return }
-        isSuperwallConfigured = true
-        
-        let apiKey = "pk_NIuAHj9ov9Bnh1BvWBglk"
-        Superwall.configure(apiKey: apiKey)
-        Superwall.shared.delegate = self
-        print("🧱 EntitlementManager: Superwall configured")
+    // MARK: - Current Counts
+    private var currentChatCount: Int {
+        UserDefaults.standard.integer(forKey: chatCountKey)
     }
     
-    // MARK: - Persistence
-    private let freeSessionsKey = "freeSessionsUsed"
-    
-    private func loadSessionCount() {
-        freeSessionsUsed = UserDefaults.standard.integer(forKey: freeSessionsKey)
-        print("📊 EntitlementManager: Loaded \(freeSessionsUsed)/\(maxFreeSessions) free sessions used")
+    private var currentAIGenCount: Int {
+        UserDefaults.standard.integer(forKey: aiGenCountKey)
     }
     
-    private func saveSessionCount() {
-        UserDefaults.standard.set(freeSessionsUsed, forKey: freeSessionsKey)
+    private var currentJournalCount: Int {
+        UserDefaults.standard.integer(forKey: journalCountKey)
     }
     
-    // MARK: - SuperwallDelegate
-    
-    func subscriptionStatusDidChange(to status: SubscriptionStatus) {
-        print("💎 EntitlementManager: Subscription status changed to \(status)")
-        
-        if case .active = status {
-            self.isPremium = true
-        } else {
-            self.isPremium = false
-        }
+    // MARK: - Remaining Counts (for UI)
+    var remainingChatMessages: Int {
+        max(0, maxDailyChatMessages - currentChatCount)
     }
     
-    func handleSuperwallEvent(withInfo eventInfo: SuperwallEventInfo) {
-        // Optional: tracking logic
+    var remainingAIGenerations: Int {
+        max(0, maxDailyAIGenerations - currentAIGenCount)
     }
     
-    // MARK: - Public API
-    
-    /// Check if user can start an immersive session
-    /// Returns true if allowed, false if paywall should show
-    func canPlaySession() -> Bool {
-        if isPremium { return true }
-        
-        if freeSessionsUsed < maxFreeSessions {
-            return true
-        } else {
-            triggerPaywall(source: .sessionLimit)
-            return false
-        }
+    var remainingJournalInsights: Int {
+        max(0, maxDailyJournalInsights - currentJournalCount)
     }
     
-    /// Call this AFTER a session is completed to increment usage
-    func recordSessionPlayed() {
-        if !isPremium {
-            freeSessionsUsed += 1
-            saveSessionCount()
-            print("📊 EntitlementManager: Session recorded. \(freeSessionsUsed)/\(maxFreeSessions) free sessions used")
-        }
-    }
+    // MARK: - Can Use Checks
     
-    /// Check if user can use AI features (generation, chat)
-    func canUseAIFeatures() -> Bool {
-        if !isPremium {
-            triggerPaywall(source: .aiGeneration)
-            return false
-        }
-        if hasReachedDailyLimit() {
-            triggerPaywall(source: .dailyLimitReached)
+    /// Check if user can send a chat message. Always returns true (we increment after).
+    /// We allow the message to go through and just inform them when they're near/at the limit.
+    func canSendChatMessage() -> Bool {
+        resetDailyCountsIfNeeded()
+        if currentChatCount >= maxDailyChatMessages {
+            showLimitReached(source: .chatMessages)
             return false
         }
         return true
     }
     
-    func incrementAIGenerationCount() {
-        let defaults = UserDefaults.standard
-        let today = Calendar.current.startOfDay(for: Date())
-        if let lastDate = defaults.object(forKey: "lastFailedGenerationDate") as? Date,
-           !Calendar.current.isDate(lastDate, inSameDayAs: today) {
-            defaults.set(0, forKey: "dailyGenerationCount")
-        }
-        let currentCount = defaults.integer(forKey: "dailyGenerationCount")
-        defaults.set(currentCount + 1, forKey: "dailyGenerationCount")
-        defaults.set(today, forKey: "lastFailedGenerationDate")
-        print("📊 EntitlementManager: AI Generation used. Today: \(currentCount + 1)/\(maxDailyAIGenerations)")
-    }
-    
-    // MARK: - Internal Logic
-    
-    private func hasReachedDailyLimit() -> Bool {
-        let defaults = UserDefaults.standard
-        let today = Calendar.current.startOfDay(for: Date())
-        if let lastDate = defaults.object(forKey: "lastFailedGenerationDate") as? Date,
-           !Calendar.current.isDate(lastDate, inSameDayAs: today) {
-            defaults.set(0, forKey: "dailyGenerationCount")
+    /// Check if user can use AI features (affirmation generation).
+    func canUseAIFeatures() -> Bool {
+        resetDailyCountsIfNeeded()
+        if currentAIGenCount >= maxDailyAIGenerations {
+            showLimitReached(source: .aiGeneration)
             return false
         }
-        return defaults.integer(forKey: "dailyGenerationCount") >= maxDailyAIGenerations
+        return true
     }
     
-    func triggerPaywall(source: PaywallSource) {
-        print("💰 EntitlementManager: Requesting Paywall for \(source.rawValue)")
-        self.paywallSource = source
-        
-        // Ensure Superwall is configured before using it
-        ensureSuperwallConfigured()
-        
-        Superwall.shared.register(placement: source.rawValue) { [weak self] in
-             print("✅ Feature Block Executed")
-             self?.isPremium = true
+    /// Check if user can generate journal insights.
+    func canUseJournalInsights() -> Bool {
+        resetDailyCountsIfNeeded()
+        if currentJournalCount >= maxDailyJournalInsights {
+            showLimitReached(source: .journalInsights)
+            return false
+        }
+        return true
+    }
+    
+    /// Sessions are always allowed (no cost to us).
+    func canPlaySession() -> Bool {
+        return true
+    }
+    
+    // MARK: - Increment Usage
+    
+    func incrementChatMessageCount() {
+        resetDailyCountsIfNeeded()
+        let newCount = currentChatCount + 1
+        UserDefaults.standard.set(newCount, forKey: chatCountKey)
+        print("💬 EntitlementManager: Chat message \(newCount)/\(maxDailyChatMessages)")
+    }
+    
+    func incrementAIGenerationCount() {
+        resetDailyCountsIfNeeded()
+        let newCount = currentAIGenCount + 1
+        UserDefaults.standard.set(newCount, forKey: aiGenCountKey)
+        print("🌟 EntitlementManager: AI generation \(newCount)/\(maxDailyAIGenerations)")
+    }
+    
+    func incrementJournalInsightCount() {
+        resetDailyCountsIfNeeded()
+        let newCount = currentJournalCount + 1
+        UserDefaults.standard.set(newCount, forKey: journalCountKey)
+        print("📓 EntitlementManager: Journal insight \(newCount)/\(maxDailyJournalInsights)")
+    }
+    
+    // MARK: - Alert Messaging
+    
+    var limitAlertTitle: String {
+        "Daily Limit Reached"
+    }
+    
+    var limitAlertMessage: String {
+        switch usageLimitSource {
+        case .chatMessages:
+            return "You've used all \(maxDailyChatMessages) chat messages for today. Your limit resets at midnight — come back tomorrow! 🌙"
+        case .aiGeneration:
+            return "You've created \(maxDailyAIGenerations) AI affirmation sets today. Your limit resets at midnight — come back tomorrow! ✨"
+        case .journalInsights:
+            return "You've used all \(maxDailyJournalInsights) journal AI insights for today. Your limit resets at midnight — come back tomorrow! 📝"
+        case .none:
+            return "You've reached your daily limit. Come back tomorrow!"
         }
     }
     
-    func debugTogglePremium() {
-        isPremium.toggle()
-        print("🔧 EntitlementManager: Premium status set to \(isPremium)")
+    // MARK: - Private Helpers
+    
+    private func showLimitReached(source: UsageLimitSource) {
+        print("⚠️ EntitlementManager: Daily limit reached for \(source.rawValue)")
+        self.usageLimitSource = source
+        self.showUsageLimitAlert = true
     }
     
-    func debugResetFreeSessions() {
-        freeSessionsUsed = 0
-        saveSessionCount()
-        print("🔧 EntitlementManager: Free sessions reset to 0")
+    private func resetDailyCountsIfNeeded() {
+        let today = Calendar.current.startOfDay(for: Date())
+        let lastReset = UserDefaults.standard.object(forKey: lastResetDateKey) as? Date ?? .distantPast
+        let lastResetDay = Calendar.current.startOfDay(for: lastReset)
+        
+        if today > lastResetDay {
+            UserDefaults.standard.set(0, forKey: chatCountKey)
+            UserDefaults.standard.set(0, forKey: aiGenCountKey)
+            UserDefaults.standard.set(0, forKey: journalCountKey)
+            UserDefaults.standard.set(today, forKey: lastResetDateKey)
+            print("🔄 EntitlementManager: Daily usage counts reset")
+        }
     }
 }

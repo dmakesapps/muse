@@ -766,6 +766,9 @@ struct JournalView: View {
     }
     
     private func submitGroundingResponse(isSkip: Bool) {
+        // Check daily journal insight limit
+        guard EntitlementManager.shared.canUseJournalInsights() else { return }
+        
         withAnimation {
             checkInStep = 3 // Move to Reflection screen
             isSendingResponse = true
@@ -802,6 +805,8 @@ struct JournalView: View {
                     isSendingResponse = false
                     switch result {
                     case .success(let rawResponse):
+                        // Increment journal insight count on success
+                        EntitlementManager.shared.incrementJournalInsightCount()
                         parseApiResponse(rawResponse)
                     case .failure(let error):
                         print("Check-in API Error: \(error)")

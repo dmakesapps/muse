@@ -182,11 +182,6 @@ struct ImmersiveAffirmationView: View {
     
     // MARK: - Actions
     private func handleSessionComplete() {
-        // Record session for freemium tracking (skip onboarding)
-        if !isOnboarding {
-            EntitlementManager.shared.recordSessionPlayed()
-        }
-        
         if isAIGenerated {
             // Show save prompt for AI-generated affirmations
             withAnimation(.easeInOut(duration: 0.3)) {

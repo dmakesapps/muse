@@ -797,9 +797,7 @@ struct StartAffirmationsView: View {
                 
                 if selectedMode == .affirmations && selectedSource != nil && canStart {
                     Button(action: {
-                        if entitlementManager.canPlaySession() {
-                            isActive = true
-                        }
+                        isActive = true
                     }) {
                         HStack(spacing: 12) {
                             Image(systemName: "play.fill")
@@ -855,16 +853,10 @@ struct StartAffirmationsView: View {
         .fullScreenCover(isPresented: $showJournalView) {
             JournalView()
         }
-        .alert(isPresented: $entitlementManager.showPaywall) {
-            Alert(
-                title: Text("Upgrade to Premium"),
-                message: Text(entitlementManager.paywallSource == .aiGeneration ? "Unlock personalized AI affirmations with Premium." : "You've reached your free weekly limit. Upgrade for unlimited sessions."),
-                primaryButton: .default(Text("Upgrade"), action: {
-                    // Placeholder for Superwall
-                    print("Show Superwall")
-                }),
-                secondaryButton: .cancel()
-            )
+        .alert(entitlementManager.limitAlertTitle, isPresented: $entitlementManager.showUsageLimitAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(entitlementManager.limitAlertMessage)
         }
     }
     
@@ -1188,7 +1180,7 @@ struct StartAffirmationsView: View {
                         subtitle: "Create personalized affirmations",
                         icon: "sparkles",
                         color: .museTeal,
-                        isDisabled: false, // We keep it enabled to trigger the paywall on tap
+                        isDisabled: false, // Enabled; daily rate limit checked on tap
                         isComingSoon: false
                     ) {
                         if entitlementManager.canUseAIFeatures() {
@@ -1688,12 +1680,7 @@ struct StartAffirmationsView: View {
                         // Start Session button (when selections made or random enabled)
                         if useRandom || !selectedAffirmations.isEmpty {
                             Button(action: {
-                                if entitlementManager.canPlaySession() {
-                                    if useRandom {
-                                        selectedAffirmations = Set(storage.aiGeneratedAffirmations.map { $0.id })
-                                    }
-                                    isActive = true
-                                }
+                                isActive = true
                             }) {
                                 HStack(spacing: 12) {
                                     Image(systemName: "play.fill")

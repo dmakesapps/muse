@@ -58,12 +58,12 @@ struct OnboardingContainerView: View {
                     Screen8_ImmersivePreview(
                         affirmations: generatedAffirmations,
                         onComplete: { 
-                            // Always go directly to paywall after immersive
+                            // Go to welcome screen after immersive preview
                             withAnimation { currentPage = 9 }
                         }
                     )
                 case 9:
-                    Screen9_Paywall(onFinish: { completeOnboarding() })
+                    Screen9_Welcome(onFinish: { completeOnboarding() })
                 case 10:
                     // "Other" AI Chat Flow
                     Screen_OtherChat(
@@ -650,56 +650,121 @@ struct Screen8_ImmersivePreview: View {
     }
 }
 
-struct Screen9_Paywall: View {
+struct Screen9_Welcome: View {
     var onFinish: () -> Void
     
+    private let features: [(icon: String, title: String, subtitle: String, color: Color)] = [
+        ("waveform.path.ecg", "Immersive Affirmations", "Spoken sessions with binaural audio", .museAccentBlue),
+        ("sparkles", "AI-Powered Creation", "Generate personalized affirmations", .museTeal),
+        ("wind", "Guided Breathwork", "Box breathing & custom patterns", .museSuccessGreen),
+        ("waveform", "Healing Frequencies", "432Hz, 528Hz & solfeggio tones", .purple),
+        ("eye.fill", "Manifest", "Vision tape guided visualization", .orange),
+        ("book.fill", "AI Journal", "Write & gain AI-powered insights", .pink),
+    ]
+    
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 20) {
             Spacer()
             
-            Image(systemName: "lock.open.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.museTeal)
+            // Celebration icon
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [.museTeal.opacity(0.3), .clear],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 80
+                        )
+                    )
+                    .frame(width: 140, height: 140)
+                
+                Image(systemName: "sparkles")
+                    .font(.system(size: 56, weight: .light))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.museTeal, .museAccentBlue],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .symbolEffect(.pulse.wholeSymbol, options: .repeating)
+            }
             
-            Text("You Just Built Your First\nNeural Pathway")
+            Text("You're All Set!")
                 .font(.museDisplayMedium())
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
             
-            VStack(alignment: .leading, spacing: 16) {
-                featureRow("Create 7 custom sessions")
-                featureRow("Activate 432Hz frequencies")
-                featureRow("Manifest with Vision Tapes")
-                featureRow("Track mental shifts")
+            Text("Your personal wellness toolkit is ready")
+                .font(.museBodyMedium())
+                .foregroundColor(.museLightGray)
+                .multilineTextAlignment(.center)
+            
+            // Feature grid
+            VStack(spacing: 12) {
+                ForEach(Array(features.enumerated()), id: \.offset) { index, feature in
+                    HStack(spacing: 14) {
+                        Image(systemName: feature.icon)
+                            .font(.system(size: 18, weight: .medium))
+                            .foregroundColor(feature.color)
+                            .frame(width: 36, height: 36)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(feature.color.opacity(0.15))
+                            )
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(feature.title)
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundColor(.museSoftWhite)
+                            Text(feature.subtitle)
+                                .font(.system(size: 12, weight: .regular, design: .rounded))
+                                .foregroundColor(.museLightGray)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.museSuccessGreen.opacity(0.8))
+                            .font(.system(size: 16))
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.museDarkGray.opacity(0.4))
+                    )
+                }
             }
-            .padding(.horizontal, 40)
-            .padding(.vertical, 20)
+            .padding(.horizontal, 24)
+            .padding(.top, 8)
             
             Spacer()
             
-            Button("Start Free Trial") {
-                EntitlementManager.shared.triggerPaywall(source: .onboarding)
-                // Assuming success/close leads to finish
-                // In production, listen for Superwall delegate
-                onFinish()
+            Button(action: { onFinish() }) {
+                HStack(spacing: 10) {
+                    Text("Let's Begin")
+                        .font(.museButtonLarge())
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .foregroundColor(.museSoftWhite)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 18)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(
+                            LinearGradient(
+                                colors: [.museGradientStart, .museGradientEnd],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                )
             }
-            .buttonStyle(MusePrimaryButtonStyle())
             .padding(.horizontal, 32)
-            
-            Button("Maybe Later") {
-                onFinish()
-            }
-            .font(.caption)
-            .foregroundColor(.museLightGray)
-            .padding(.bottom, 40)
-        }
-    }
-    
-    func featureRow(_ text: String) -> some View {
-        HStack {
-            Image(systemName: "checkmark")
-                .foregroundColor(.museSuccessGreen)
-            Text(text).foregroundColor(.white)
+            .padding(.bottom, 50)
         }
     }
 }
