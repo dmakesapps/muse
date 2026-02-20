@@ -14,34 +14,6 @@
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
-		<key>MuseWidgetsExtensionExtension.xcscheme_^#shared#^_</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>1</integer>
-		</dict>
-	</dict>
-	<key>SuppressBuildableAutocreation</key>
-	<dict>
-		<key>72D9F6752EECADF10029FA80</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>72E262562EC68CF40080CF29</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>72E262652EC68CF60080CF29</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>72E2626F2EC68CF60080CF29</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
 	</dict>
 </dict>
 </plist>

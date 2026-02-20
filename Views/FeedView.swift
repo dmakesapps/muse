@@ -731,7 +731,11 @@ struct MixPopupView: View {
                 MyAffirmationsView()
             }
             .sheet(item: $selectedCategory) { category in
-                CategoryAffirmationsView(category: category)
+                if selectedTab == .affirmation {
+                    CategoryAffirmationsView(category: category)
+                } else {
+                    CategoryQuotesView(category: category)
+                }
             }
         }
     }
@@ -860,6 +864,144 @@ struct CategoryAffirmationRow: View {
                 Image(systemName: isSaved ? "heart.fill" : "heart")
                     .font(.system(size: 20))
                     .foregroundColor(isSaved ? .museGradientStart : .museLightGray)
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color.museDarkGray)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.museMediumGray.opacity(0.3), lineWidth: 1)
+                )
+        )
+    }
+}
+
+// MARK: - Category Quotes View
+struct CategoryQuotesView: View {
+    let category: String
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var storage = StorageService.shared
+    @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
+    
+    // Get quotes for this category
+    private var quotes: [Quote] {
+        ContentLoader.shared.loadQuotes().filter { $0.category == category }
+    }
+    
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                MuseBackgroundView(selectedBackground: selectedBackground)
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Header
+                    HStack {
+                        Button(action: { dismiss() }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.museSoftWhite)
+                                .frame(width: 32, height: 32)
+                                .background(
+                                    Circle()
+                                        .fill(Color.museDarkGray)
+                                )
+                        }
+                        
+                        Spacer()
+                        
+                        Text(category)
+                            .font(.museHeadline())
+                            .foregroundColor(.museSoftWhite)
+                        
+                        Spacer()
+                        
+                        // Invisible spacer for balance
+                        Color.clear.frame(width: 32, height: 32)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .padding(.bottom, 16)
+                    
+                    // Quotes count
+                    Text("\(quotes.count) quotes")
+                        .font(.museCaption())
+                        .foregroundColor(.museLightGray)
+                        .padding(.bottom, 16)
+                    
+                    if quotes.isEmpty {
+                        Spacer()
+                        VStack(spacing: 16) {
+                            Image(systemName: "quote.bubble")
+                                .font(.system(size: 48))
+                                .foregroundColor(.museLightGray.opacity(0.5))
+                            
+                            Text("No quotes in this category")
+                                .font(.museBodyMedium())
+                                .foregroundColor(.museLightGray)
+                        }
+                        Spacer()
+                    } else {
+                        ScrollView {
+                            LazyVStack(spacing: 12) {
+                                ForEach(quotes) { quote in
+                                    CategoryQuoteRow(
+                                        quote: quote,
+                                        isSaved: storage.isQuoteSaved(quote),
+                                        onSave: {
+                                            if storage.isQuoteSaved(quote) {
+                                                storage.removeQuote(quote)
+                                            } else {
+                                                storage.saveQuote(quote)
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.bottom, 100)
+                        }
+                    }
+                }
+            }
+            .navigationBarHidden(true)
+        }
+    }
+}
+
+// MARK: - Category Quote Row
+struct CategoryQuoteRow: View {
+    let quote: Quote
+    let isSaved: Bool
+    let onSave: () -> Void
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("\"\(quote.text)\"")
+                    .font(.museBodyMedium())
+                    .foregroundColor(.museSoftWhite)
+                    .fixedSize(horizontal: false, vertical: true)
+                
+                if !quote.author.isEmpty {
+                    Text("— \(quote.author)")
+                        .font(.system(size: 13, weight: .regular, design: .serif))
+                        .foregroundColor(.museLightGray)
+                }
+
+                Text(quote.category.uppercased())
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.museTeal)
+            }
+            
+            Spacer()
+            
+            Button(action: onSave) {
+                Image(systemName: isSaved ? "heart.fill" : "heart")
+                    .font(.system(size: 20))
+                    .foregroundColor(isSaved ? .museTeal : .museLightGray)
             }
         }
         .padding(16)
