@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E00400022EF88DF800EB49D3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E00400012EF88DF800EB49D3 /* PrivacyInfo.xcprivacy */; };
 		720DF7282EF88AAF00EB49D2 /* APIKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720DF7272EF88AAF00EB49D2 /* APIKeys.swift */; };
 		720DF72A2EF88DF800EB49D2 /* AIAffirmationsChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720DF7292EF88DF800EB49D2 /* AIAffirmationsChatView.swift */; };
 		72305A062EF717AB003A8399 /* ChatStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72305A052EF717AB003A8399 /* ChatStorageService.swift */; };
@@ -15,7 +14,6 @@
 		724C1B5E2EF3E67B0052D8AE /* ManifestGenerationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C1B5D2EF3E67B0052D8AE /* ManifestGenerationService.swift */; };
 		724C1B602EF3EAC10052D8AE /* manifest_5min.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B5F2EF3EAC10052D8AE /* manifest_5min.m4a */; };
 		724C1B682EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 724C1B672EF4DA530052D8AE /* soul-of-the-earth_10min.mp3 */; };
-
 		726A39512EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394C2EF795AA00BF8F8E /* 432-hz-tune-in-with-nature-156265.mp3 */; };
 		726A39522EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A39492EF795AA00BF8F8E /* 285-hz-tissue-and-organ-healing-156262.mp3 */; };
 		726A39532EF795AA00BF8F8E /* 741hz-throat-chakra-balancing-fostering-honest-expressions-157686.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 726A394F2EF795AA00BF8F8E /* 741hz-throat-chakra-balancing-fostering-honest-expressions-157686.mp3 */; };
@@ -69,6 +67,7 @@
 		DDDD00032EF6000000000002 /* ImmersiveFrequenciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */; };
 		E00100022EF88DF800EB49D2 /* EntitlementManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00100012EF88DF800EB49D2 /* EntitlementManager.swift */; };
 		E00200022EF88DF800EB49D2 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00200012EF88DF800EB49D2 /* OnboardingContainerView.swift */; };
+		E00400022EF88DF800EB49D3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E00400012EF88DF800EB49D3 /* PrivacyInfo.xcprivacy */; };
 		EEEE00012EF7000000000001 /* LocalSecrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE00002EF7000000000001 /* LocalSecrets.swift */; };
 		FFFF00052EF9000000000005 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00012EF9000000000001 /* JournalView.swift */; };
 		FFFF00062EF9000000000006 /* ChatHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00022EF9000000000002 /* ChatHistoryView.swift */; };
@@ -114,7 +113,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		E00400012EF88DF800EB49D3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		720DF7272EF88AAF00EB49D2 /* APIKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKeys.swift; sourceTree = "<group>"; };
 		720DF7292EF88DF800EB49D2 /* AIAffirmationsChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAffirmationsChatView.swift; sourceTree = "<group>"; };
 		72305A052EF717AB003A8399 /* ChatStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatStorageService.swift; sourceTree = "<group>"; };
@@ -182,6 +180,7 @@
 		DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveFrequenciesView.swift; sourceTree = "<group>"; };
 		E00100012EF88DF800EB49D2 /* EntitlementManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementManager.swift; sourceTree = "<group>"; };
 		E00200012EF88DF800EB49D2 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
+		E00400012EF88DF800EB49D3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		EEEE00002EF7000000000001 /* LocalSecrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSecrets.swift; sourceTree = "<group>"; };
 		FFFF00012EF9000000000001 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
 		FFFF00022EF9000000000002 /* ChatHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryView.swift; sourceTree = "<group>"; };
@@ -800,21 +799,23 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Muse/Muse.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Muse/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Muse;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.Muse;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -830,21 +831,23 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Muse/Muse.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 1.1;
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Muse/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Muse;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.Muse;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1030,8 +1033,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-
 	};
 	rootObject = 72E2624F2EC68CF40080CF29 /* Project object */;
 }

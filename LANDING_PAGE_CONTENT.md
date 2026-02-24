@@ -29,20 +29,20 @@ By using the App, you agree to the collection and use of information in accordan
 - Session progress and streaks
 - Custom habits and goals
 
-**Data Processed Through Third-Party Services:**
-- AI chat conversations (processed via OpenRouter/Google Gemini)
-- Text-to-speech requests (processed via OpenAI)
+**Data Processed Through Third-Party AI Services (with Explicit Consent):**
+- **AI Guided Chat**: When you use the "Create with AI" feature, the text responses you provide to our guided questions are transmitted to third-party AI processors (Google Gemini via OpenRouter) to generate personalized affirmations.
+- **Text-to-Speech**: When you listen to affirmations, the text is sent to OpenAI's TTS API to synthesize human-like speech.
 
-We do NOT collect, store, or have access to your personal data on our servers. All your personal content remains on your device.
+We do NOT collect, store, or have access to your personal identifiers (name, email, device ID) on our servers or share them with these services. Only the specific affirmation-related text is transmitted for processing.
 
-### 3. How We Use Your Information
+### 3. How We Use and Share Your Information
 
-Your data is used solely to:
-- Provide personalized affirmations and quotes
-- Track your wellness journey and progress
-- Enable AI-powered coaching conversations
-- Deliver notification reminders you configure
-- Improve your overall app experience
+Your data is used solely to provide and improve the App's services. We share data with third-party AI services under the following strict conditions:
+
+- **Specific Purpose**: Data is shared only to generate or synthesize the content you specifically request.
+- **Disclosure & Consent**: We disclose who the data is sent to (OpenRouter, Google, and OpenAI) and obtain your explicit consent via an in-app notice before any data is transmitted to these AI services.
+- **No Training Use**: We utilize enterprise-tier API agreements ensure our third-party partners are prohibited from using your transmitted data to train their global AI models.
+- **Identity Protection**: We do not transmit personal personal identity data (PII) to these services.
 
 We do not sell, rent, or share your personal information with third parties for marketing purposes.
 

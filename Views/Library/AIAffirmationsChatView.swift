@@ -9,6 +9,8 @@ struct AIAffirmationsChatView: View {
     @StateObject private var storage = StorageService.shared
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     
+    @AppStorage("hasConsentedToAIDataSharing") private var hasConsentedToAIDataSharing = false
+    
     // Chat state
     @State private var currentQuestionIndex = 0
     @State private var userAnswers: [String] = []
@@ -74,78 +76,10 @@ struct AIAffirmationsChatView: View {
                 // Header
                 headerView
                 
-                // Chat content
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        VStack(spacing: 20) {
-                            // Introduction
-                            aiMessageBubble(
-                                "Hi! I'm going to ask you a few questions to create personalized affirmations just for you. Muse uses AI (OpenAI & Google Gemini) to process your goals securely. Your data is protected and never used for training. Take your time with each answer. 💫"
-                            )
-                            .id("intro")
-                            
-                            // Questions and answers
-                            ForEach(0..<min(currentQuestionIndex + 1, questions.count), id: \.self) { index in
-                                questionAnswerPair(index: index)
-                                    .id("qa-\(index)")
-                            }
-                            
-                            // Typing indicator
-                            if isTyping {
-                                HStack {
-                                    TypingIndicator()
-                                    Spacer()
-                                }
-                                .padding(.leading, 20)
-                                .id("typing")
-                            }
-                            
-                            // Generate button (after all questions answered)
-                            if allQuestionsAnswered && !isGenerating && generatedAffirmations.isEmpty {
-                                generateButton
-                                    .id("generate")
-                            }
-                            
-                            // Loading state
-                            if isGenerating {
-                                generatingView
-                                    .id("generating")
-                            }
-                            
-                            // Error message
-                            if let error = errorMessage {
-                                errorView(error)
-                                    .id("error")
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 20)
-                        .padding(.bottom, 120)
-                    }
-                    .onChange(of: currentQuestionIndex) { _, _ in
-                        withAnimation {
-                            proxy.scrollTo("qa-\(currentQuestionIndex)", anchor: .bottom)
-                        }
-                    }
-                    .onChange(of: isTyping) { _, newValue in
-                        if newValue {
-                            withAnimation {
-                                proxy.scrollTo("typing", anchor: .bottom)
-                            }
-                        }
-                    }
-                    .onChange(of: allQuestionsAnswered) { _, newValue in
-                        if newValue {
-                            withAnimation {
-                                proxy.scrollTo("generate", anchor: .bottom)
-                            }
-                        }
-                    }
-                }
-                
-                // Input area (only show if not all questions answered)
-                if !allQuestionsAnswered && !isGenerating {
-                    inputArea
+                if !hasConsentedToAIDataSharing {
+                    privacyDisclosureView
+                } else {
+                    chatContent
                 }
             }
         }
@@ -162,6 +96,76 @@ struct AIAffirmationsChatView: View {
         }
         .onTapGesture {
             isInputFocused = false
+        }
+    }
+    
+    private var chatContent: some View {
+        VStack(spacing: 0) {
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Introduction
+                        aiMessageBubble(
+                            "Hi! I'm going to ask you a few questions to create personalized affirmations just for you. Muse uses AI (OpenAI & Google Gemini) to process your goals securely. Your data is protected and never used for training. Take your time with each answer. 💫"
+                        )
+                        .id("intro")
+                        
+                        // Questions and answers
+                        ForEach(0..<min(currentQuestionIndex + 1, questions.count), id: \.self) { index in
+                            questionAnswerPair(index: index)
+                                .id("qa-\(index)")
+                        }
+                        
+                        // Typing indicator
+                        if isTyping {
+                            HStack {
+                                TypingIndicator()
+                                Spacer()
+                            }
+                            .padding(.leading, 20)
+                            .id("typing")
+                        }
+                        
+                        // Generate button (after all questions answered)
+                        if allQuestionsAnswered && !isGenerating && generatedAffirmations.isEmpty {
+                            generateButton
+                                .id("generate")
+                        }
+                        
+                        // Loading state
+                        if isGenerating {
+                            generatingView
+                                .id("generating")
+                        }
+                        
+                        // Error message
+                        if let error = errorMessage {
+                            errorView(error)
+                                .id("error")
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 20)
+                    .padding(.bottom, 120)
+                }
+                .onChange(of: currentQuestionIndex) { _, _ in
+                    withAnimation {
+                        proxy.scrollTo("qa-\(currentQuestionIndex)", anchor: .bottom)
+                    }
+                }
+                .onChange(of: isTyping) { _, newValue in
+                    if newValue {
+                        withAnimation {
+                            proxy.scrollTo("typing", anchor: .bottom)
+                        }
+                    }
+                }
+            }
+            
+            // Input area (only show if not all questions answered)
+            if !allQuestionsAnswered && !isGenerating {
+                inputArea
+            }
         }
     }
     
@@ -271,12 +275,17 @@ struct AIAffirmationsChatView: View {
             Text(text)
                 .font(.system(size: 16, weight: .regular, design: .rounded))
                 .foregroundColor(.white)
-                .lineSpacing(4)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
                 .background(
                     RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(hex: "2C2C2E"))
+                        .fill(
+                            LinearGradient(
+                                colors: [.museAccentBlue.opacity(0.8), .museAccentBlue],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
                 )
                 .frame(maxWidth: UIScreen.main.bounds.width * 0.75, alignment: .trailing)
         }
@@ -285,83 +294,60 @@ struct AIAffirmationsChatView: View {
     // MARK: - Input Area
     private var inputArea: some View {
         VStack(spacing: 0) {
-            // Gradient fade
-            LinearGradient(
-                colors: [.clear, Color.museDeepNavy.opacity(0.8)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: 20)
+            Divider()
+                .background(Color.white.opacity(0.1))
             
-            HStack(alignment: .bottom, spacing: 12) {
-                // Text input
-                ZStack(alignment: .leading) {
-                    if currentAnswer.isEmpty {
-                        Text(questions[safe: currentQuestionIndex]?.placeholder ?? "Type your answer...")
-                            .font(.system(size: 16, weight: .regular, design: .rounded))
-                            .foregroundColor(.museLightGray.opacity(0.6))
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                    }
-                    
-                    TextField("", text: $currentAnswer, axis: .vertical)
-                        .font(.system(size: 16, weight: .regular, design: .rounded))
-                        .foregroundColor(.museSoftWhite)
-                        .lineLimit(1...5)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
-                        .focused($isInputFocused)
-                }
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.museDarkGray)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.museLightGray.opacity(0.3), lineWidth: 1)
-                        )
-                )
+            HStack(spacing: 12) {
+                TextField(questions[safe: currentQuestionIndex]?.placeholder ?? "Type your answer...", text: $currentAnswer)
+                    .font(.museBodyMedium())
+                    .foregroundColor(.museSoftWhite)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 24)
+                            .fill(Color.white.opacity(0.08))
+                    )
+                    .focused($isInputFocused)
+                    .submitLabel(.send)
+                    .onSubmit(submitAnswer)
                 
-                // Send button
                 Button(action: submitAnswer) {
                     Image(systemName: "arrow.up.circle.fill")
-                        .font(.system(size: 36))
+                        .font(.system(size: 32))
                         .foregroundColor(currentAnswer.isEmpty ? .museLightGray : .museAccentBlue)
                 }
                 .disabled(currentAnswer.isEmpty)
             }
             .padding(.horizontal, 16)
-            .padding(.bottom, 30)
-            .background(Color.museDeepNavy.opacity(0.9))
+            .padding(.vertical, 12)
+            .background(.ultraThinMaterial)
         }
     }
     
     // MARK: - Generate Button
     private var generateButton: some View {
-        VStack(spacing: 16) {
-            aiMessageBubble("Perfect! I have everything I need. Ready to create your personalized affirmations?", icon: "sparkles")
-            
-            Button(action: generateAffirmations) {
-                HStack(spacing: 12) {
-                    Image(systemName: "wand.and.stars")
-                        .font(.system(size: 18, weight: .semibold))
-                    Text("Generate \(affirmationCount) Affirmations")
-                        .font(.museButtonLarge())
-                }
-                .foregroundColor(.museSoftWhite)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 18)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.museDarkGray.opacity(0.6))
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(.ultraThinMaterial)
-                        )
-                        .pulsingRainbowBorder()
-                )
+        Button(action: generateAffirmations) {
+            HStack {
+                Image(systemName: "sparkles")
+                Text("Generate Personalized Affirmations")
+                    .font(.museButtonMedium())
             }
-            .padding(.horizontal, 20)
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(
+                        LinearGradient(
+                            colors: [.museGradientStart, .blue],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .shadow(color: .blue.opacity(0.3), radius: 10, x: 0, y: 5)
+            )
         }
+        .padding(.top, 20)
     }
     
     // MARK: - Generating View
@@ -456,7 +442,7 @@ struct AIAffirmationsChatView: View {
                 
                 switch result {
                 case .success(let affirmations):
-                    // Increment Daily Usage Count (Entitlement Check)
+                    // Increment Daily Usage Count
                     EntitlementManager.shared.incrementAIGenerationCount()
                     
                     generatedAffirmations = affirmations
@@ -501,6 +487,112 @@ struct AIAffirmationsChatView: View {
         """
         
         return prompt
+    }
+    
+    // MARK: - Privacy Disclosure
+    private var privacyDisclosureView: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                Image(systemName: "hand.raised.fill")
+                    .font(.system(size: 50))
+                    .foregroundColor(.museAccentBlue)
+                    .padding(.top, 40)
+                
+                Text("AI Privacy Notice")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundColor(.museSoftWhite)
+                
+                VStack(alignment: .leading, spacing: 20) {
+                    disclosureRow(
+                        icon: "cloud.fill",
+                        title: "Data Transmission",
+                        description: "Your answers will be sent to our AI partners (including OpenAI and Google Gemini via OpenRouter) to generate your affirmations."
+                    )
+                    
+                    disclosureRow(
+                        icon: "lock.shield.fill",
+                        title: "No Personal Identity",
+                        description: "We do not send your name, email, or any account details. Only the text responses you provide are shared."
+                    )
+                    
+                    disclosureRow(
+                        icon: "doc.text.fill",
+                        title: "Not Used for Training",
+                        description: "Our API agreements ensure your personal data is not used to train global AI models."
+                    )
+                    
+                    disclosureRow(
+                        icon: "eye.slash.fill",
+                        title: "On-Device Storage",
+                        description: "Once generated, your affirmations are stored locally on your device. We do not keep copies of your chat history on our servers."
+                    )
+                }
+                .padding(.horizontal, 20)
+                
+                Text("By continuing, you consent to sharing your input with these third-party AI services for the purpose of creating your personalized content.")
+                    .font(.museCaption())
+                    .foregroundColor(.museLightGray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 30)
+                
+                Button(action: {
+                    withAnimation {
+                        hasConsentedToAIDataSharing = true
+                    }
+                }) {
+                    Text("I Consent & Continue")
+                        .font(.museButtonMedium())
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(Color.museAccentBlue)
+                        )
+                }
+                .padding(.horizontal, 30)
+                .padding(.top, 10)
+                
+                Button(action: {
+                    if let url = URL(string: "https://museapp.us/privacy") {
+                        UIApplication.shared.open(url)
+                    }
+                }) {
+                    Text("Read Full Privacy Policy")
+                        .font(.museCaption())
+                        .foregroundColor(.museAccentBlue)
+                        .underline()
+                }
+                .padding(.bottom, 8)
+                
+                Button(action: { dismiss() }) {
+                    Text("Cancel")
+                        .font(.museBodyMedium())
+                        .foregroundColor(.museLightGray)
+                }
+                .padding(.bottom, 40)
+            }
+            .padding(.horizontal, 10)
+        }
+    }
+    
+    private func disclosureRow(icon: String, title: String, description: String) -> some View {
+        HStack(alignment: .top, spacing: 16) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundColor(.museAccentBlue)
+                .frame(width: 24)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.museHeadline())
+                    .foregroundColor(.museSoftWhite)
+                Text(description)
+                    .font(.system(size: 14))
+                    .foregroundColor(.museLightGray)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 }
 
@@ -586,11 +678,6 @@ class AffirmationGenerationService {
                 return
             }
             
-            // Log raw response
-            if let rawString = String(data: data, encoding: .utf8) {
-                print("🌟 Raw response: \(rawString)")
-            }
-            
             // Parse the response
             do {
                 if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -599,13 +686,11 @@ class AffirmationGenerationService {
                    let message = firstChoice["message"] as? [String: Any],
                    let content = message["content"] as? String {
                     
-                    // Parse the affirmations from the content
                     let affirmations = self.parseAffirmations(from: content)
                     
                     if affirmations.isEmpty {
                         completion(.failure(NSError(domain: "AffirmationGeneration", code: 500, userInfo: [NSLocalizedDescriptionKey: "Failed to parse affirmations from response"])))
                     } else {
-                        print("🌟 Successfully generated \(affirmations.count) affirmations")
                         completion(.success(affirmations))
                     }
                 } else {
@@ -618,13 +703,11 @@ class AffirmationGenerationService {
     }
     
     private func parseAffirmations(from content: String) -> [Affirmation] {
-        // Clean up the content - remove markdown code blocks if present
         var cleanContent = content
             .replacingOccurrences(of: "```json", with: "")
             .replacingOccurrences(of: "```", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Try to parse as JSON array
         if let data = cleanContent.data(using: .utf8),
            let array = try? JSONSerialization.jsonObject(with: data) as? [String] {
             return array.map { text in
@@ -632,13 +715,11 @@ class AffirmationGenerationService {
             }
         }
         
-        // Fallback: try to extract affirmations line by line
         let lines = content
             .components(separatedBy: .newlines)
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty && ($0.hasPrefix("\"") || $0.hasPrefix("I ") || $0.hasPrefix("- ")) }
             .map { line -> String in
-                // Clean up the line
                 var cleaned = line
                 if cleaned.hasPrefix("- ") { cleaned = String(cleaned.dropFirst(2)) }
                 if cleaned.hasPrefix("\"") { cleaned = String(cleaned.dropFirst()) }
