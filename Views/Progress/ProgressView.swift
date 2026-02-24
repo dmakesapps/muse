@@ -1879,7 +1879,7 @@ struct PrivacyPolicyView: View {
                         .font(.system(size: 28, weight: .bold))
                         .foregroundColor(.museSoftWhite)
                     
-                    Text("Last Updated: December 26, 2024")
+                    Text("Last Updated: February 23, 2026")
                         .font(.system(size: 14))
                         .foregroundColor(.museLightGray)
                     
@@ -1920,9 +1920,14 @@ We do not sell, rent, or share your personal information with third parties for 
                         policySection(title: "4. Third-Party Services", content: """
 Muse integrates with the following third-party services:
 
-**OpenRouter (AI Chat):** When you use the AI chat feature, your messages are sent to OpenRouter's API which routes to Google Gemini. These conversations may be processed according to their privacy policies.
+**OpenRouter (AI Chat):** When you use the AI chat feature, your messages and local personalization context (goals, challenges, recent progress) are sent to OpenRouter's API, which currently routes to Google Gemini. This is used to provide empathetic, context-aware coaching.
 
-**OpenAI (Text-to-Speech):** When you use voice features, text is sent to OpenAI for speech synthesis.
+**OpenAI (Text-to-Speech):** When you use voice features, text is sent to OpenAI's TTS API for speech synthesis.
+
+We explicitly disclose that:
+• We share your **chat history** and **personalization profile** with these providers.
+• This data is sent **solely** for processing and returning AI responses.
+• These providers are prohibited from using your data to train their models for other users (per our API enterprise agreements).
 
 We recommend reviewing the privacy policies of these services:
 • OpenRouter: openrouter.ai/privacy
@@ -2003,7 +2008,7 @@ struct TermsOfServiceView: View {
                         .font(.system(size: 28, weight: .bold))
                         .foregroundColor(.museSoftWhite)
                     
-                    Text("Last Updated: December 26, 2024")
+                    Text("Last Updated: February 23, 2026")
                         .font(.system(size: 14))
                         .foregroundColor(.museLightGray)
                     
@@ -2120,11 +2125,11 @@ struct EULAView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("End User License Agreement")
+                    Text("End User License Agreement (EULA)")
                         .font(.system(size: 28, weight: .bold))
                         .foregroundColor(.museSoftWhite)
                     
-                    Text("Last Updated: December 26, 2024")
+                    Text("Last Updated: February 23, 2026")
                         .font(.system(size: 14))
                         .foregroundColor(.museLightGray)
                     

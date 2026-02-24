@@ -2860,7 +2860,7 @@
     "category": "Resilience"
   },
   {
-    "text": "I am antifragile\u2014I get better under stress.",
+    "text": "I am antifragile—I get better under stress.",
     "category": "Resilience"
   },
   {
@@ -3834,5 +3834,481 @@
   {
     "text": "I am a living testimony that hope is never lost.",
     "category": "Hope"
+  },
+  {
+    "text": "My actions have a positive ripple effect.",
+    "category": "Impact"
+  },
+  {
+    "text": "I am making a difference in the world.",
+    "category": "Impact"
+  },
+  {
+    "text": "My presence makes this world a better place.",
+    "category": "Impact"
+  },
+  {
+    "text": "I leave a positive mark wherever I go.",
+    "category": "Impact"
+  },
+  {
+    "text": "I am influential in a positive way.",
+    "category": "Impact"
+  },
+  {
+    "text": "My contribution is valuable and needed.",
+    "category": "Impact"
+  },
+  {
+    "text": "I am creating a legacy of kindness.",
+    "category": "Impact"
+  },
+  {
+    "text": "I manifest positive change through my effort.",
+    "category": "Impact"
+  },
+  {
+    "text": "I am meant to do great things.",
+    "category": "Impact"
+  },
+  {
+    "text": "I am fueled by passion and purpose.",
+    "category": "Motivation"
+  },
+  {
+    "text": "I am driven to achieve my highest potential.",
+    "category": "Motivation"
+  },
+  {
+    "text": "Every step forward is a step toward my dreams.",
+    "category": "Motivation"
+  },
+  {
+    "text": "I wake up with determination and go to bed with satisfaction.",
+    "category": "Motivation"
+  },
+  {
+    "text": "I am the architect of my own motivation.",
+    "category": "Motivation"
+  },
+  {
+    "text": "I push myself because no one else is going to do it for me.",
+    "category": "Motivation"
+  },
+  {
+    "text": "I am disciplined, focused, and ready for action.",
+    "category": "Motivation"
+  },
+  {
+    "text": "Challenges fuel my drive to succeed.",
+    "category": "Motivation"
+  },
+  {
+    "text": "I am capable of amazing things when I stay committed.",
+    "category": "Motivation"
+  },
+  {
+    "text": "I honor my time by focusing on what truly matters.",
+    "category": "Priorities"
+  },
+  {
+    "text": "I am clear about my goals and my path.",
+    "category": "Priorities"
+  },
+  {
+    "text": "I say no to distractions and yes to my progress.",
+    "category": "Priorities"
+  },
+  {
+    "text": "My energy is directed toward my highest priorities.",
+    "category": "Priorities"
+  },
+  {
+    "text": "I align my daily actions with my long-term vision.",
+    "category": "Priorities"
+  },
+  {
+    "text": "I am intentional with how I spend my day.",
+    "category": "Priorities"
+  },
+  {
+    "text": "I focus on the essential and let go of the rest.",
+    "category": "Priorities"
+  },
+  {
+    "text": "My priorities reflect my values and my heart.",
+    "category": "Priorities"
+  },
+  {
+    "text": "I am in control of my schedule and my focus.",
+    "category": "Priorities"
+  },
+  {
+    "text": "Rest is a productive part of my growth.",
+    "category": "Rest"
+  },
+  {
+    "text": "I allow myself the space to simply be.",
+    "category": "Rest"
+  },
+  {
+    "text": "I recharge my spirit through intentional stillness.",
+    "category": "Rest"
+  },
+  {
+    "text": "My body and mind deserve deep, restorative rest.",
+    "category": "Rest"
+  },
+  {
+    "text": "I release the weight of the day and embrace calm.",
+    "category": "Rest"
+  },
+  {
+    "text": "Resting is not quitting; it is replenishing.",
+    "category": "Rest"
+  },
+  {
+    "text": "I find peace in the quiet moments of the day.",
+    "category": "Rest"
+  },
+  {
+    "text": "I am worthy of total relaxation.",
+    "category": "Rest"
+  },
+  {
+    "text": "My worth is not defined by my productivity.",
+    "category": "Rest"
+  },
+  {
+    "text": "I trust the inner wisdom that guides me.",
+    "category": "Wisdom"
+  },
+  {
+    "text": "I am open to the lessons that every experience brings.",
+    "category": "Wisdom"
+  },
+  {
+    "text": "My intuition is a powerful source of truth.",
+    "category": "Wisdom"
+  },
+  {
+    "text": "I make decisions from a place of clarity and insight.",
+    "category": "Wisdom"
+  },
+  {
+    "text": "I learn and grow from every challenge I face.",
+    "category": "Wisdom"
+  },
+  {
+    "text": "I am a student of life, always evolving.",
+    "category": "Wisdom"
+  },
+  {
+    "text": "Wisdom flows through me in every thought and action.",
+    "category": "Wisdom"
+  },
+  {
+    "text": "I honor the quiet voice within my soul.",
+    "category": "Wisdom"
+  },
+  {
+    "text": "I am gaining clarity with every step I take.",
+    "category": "Wisdom"
+  },
+  {
+    "text": "I extend kindness to myself and everyone I meet.",
+    "category": "Compassion"
+  },
+  {
+    "text": "I see the light in others and honor it.",
+    "category": "Compassion"
+  },
+  {
+    "text": "My heart is open to the needs of the world.",
+    "category": "Compassion"
+  },
+  {
+    "text": "I choose empathy over judgment.",
+    "category": "Compassion"
+  },
+  {
+    "text": "I am a source of comfort and understanding.",
+    "category": "Compassion"
+  },
+  {
+    "text": "I practice patience and love toward all beings.",
+    "category": "Compassion"
+  },
+  {
+    "text": "Kindness is my natural response to all situations.",
+    "category": "Compassion"
+  },
+  {
+    "text": "I am a vessel for compassion and healing.",
+    "category": "Compassion"
+  },
+  {
+    "text": "I create harmony in all areas of my life.",
+    "category": "Balance"
+  },
+  {
+    "text": "I am grounded and centered in my daily walk.",
+    "category": "Balance"
+  },
+  {
+    "text": "I find balance between work, play, and rest.",
+    "category": "Balance"
+  },
+  {
+    "text": "I honor both my needs and the needs of others.",
+    "category": "Balance"
+  },
+  {
+    "text": "My life is a flow of steady, balanced energy.",
+    "category": "Balance"
+  },
+  {
+    "text": "I am at peace with the ebb and flow of life.",
+    "category": "Balance"
+  },
+  {
+    "text": "I choose moderation and stability in all things.",
+    "category": "Balance"
+  },
+  {
+    "text": "I am free to be my most authentic self.",
+    "category": "Freedom"
+  },
+  {
+    "text": "I release all chains that hold back my spirit.",
+    "category": "Freedom"
+  },
+  {
+    "text": "I walk in the light of my own liberty.",
+    "category": "Freedom"
+  },
+  {
+    "text": "I am the master of my own destiny.",
+    "category": "Freedom"
+  },
+  {
+    "text": "I choose freedom over fear every single day.",
+    "category": "Freedom"
+  },
+  {
+    "text": "My spirit is boundless and full of life.",
+    "category": "Freedom"
+  },
+  {
+    "text": "I am liberated from the expectations of others.",
+    "category": "Freedom"
+  },
+  {
+    "text": "I trust the timing of my life.",
+    "category": "Patience"
+  },
+  {
+    "text": "I am patient with my progress and my journey.",
+    "category": "Patience"
+  },
+  {
+    "text": "I find peace in the waiting and strength in the process.",
+    "category": "Patience"
+  },
+  {
+    "text": "Everything is unfolding exactly as it should.",
+    "category": "Patience"
+  },
+  {
+    "text": "I breathe through the wait and trust the outcome.",
+    "category": "Patience"
+  },
+  {
+    "text": "Patience is a source of inner power for me.",
+    "category": "Patience"
+  },
+  {
+    "text": "I release the need to rush and embrace the now.",
+    "category": "Patience"
+  },
+  {
+    "text": "I am connected to the infinite wisdom of the universe.",
+    "category": "Spirituality"
+  },
+  {
+    "text": "My soul is in alignment with my divine purpose.",
+    "category": "Spirituality"
+  },
+  {
+    "text": "I am a spiritual being having a human experience.",
+    "category": "Spirituality"
+  },
+  {
+    "text": "I find divinity in the simple moments of life.",
+    "category": "Spirituality"
+  },
+  {
+    "text": "I trust the higher power that guides my path.",
+    "category": "Spirituality"
+  },
+  {
+    "text": "My spirit is nourished by the beauty of creation.",
+    "category": "Spirituality"
+  },
+  {
+    "text": "I am one with the energy of love and light.",
+    "category": "Spirituality"
+  },
+  {
+    "text": "My body is a miracle and I treat it with love.",
+    "category": "Body Positivity"
+  },
+  {
+    "text": "I celebrate the strength and resilience of my body.",
+    "category": "Body Positivity"
+  },
+  {
+    "text": "I am beautiful exactly as I am right now.",
+    "category": "Body Positivity"
+  },
+  {
+    "text": "My worth is not determined by the number on a scale.",
+    "category": "Body Positivity"
+  },
+  {
+    "text": "I nourish my body with healthy thoughts and food.",
+    "category": "Body Positivity"
+  },
+  {
+    "text": "Every curve and line on my body tells a story of life.",
+    "category": "Body Positivity"
+  },
+  {
+    "text": "I am a channel for infinite creative energy.",
+    "category": "Creativity"
+  },
+  {
+    "text": "My imagination is a playground of endless possibilities.",
+    "category": "Creativity"
+  },
+  {
+    "text": "I express my unique self through my creations.",
+    "category": "Creativity"
+  },
+  {
+    "text": "I trust my creative instincts and flow.",
+    "category": "Creativity"
+  },
+  {
+    "text": "Creativity flows through me with ease and joy.",
+    "category": "Creativity"
+  },
+  {
+    "text": "I am an artist of my own life.",
+    "category": "Creativity"
+  },
+  {
+    "text": "I am strong enough to handle whatever comes my way.",
+    "category": "Strength"
+  },
+  {
+    "text": "My inner strength is greater than my external challenges.",
+    "category": "Strength"
+  },
+  {
+    "text": "I find power in my vulnerability and my truth.",
+    "category": "Strength"
+  },
+  {
+    "text": "I am a warrior of light and resilience.",
+    "category": "Strength"
+  },
+  {
+    "text": "My strength grows with every obstacle I overcome.",
+    "category": "Strength"
+  },
+  {
+    "text": "I am anchored in my own enduring power.",
+    "category": "Strength"
+  },
+  {
+    "text": "My business is a reflection of my passion and skill.",
+    "category": "Business"
+  },
+  {
+    "text": "I attract ideal opportunities and collaborations.",
+    "category": "Business"
+  },
+  {
+    "text": "I am confident in my professional value and vision.",
+    "category": "Business"
+  },
+  {
+    "text": "Success flows to me through my dedicated effort.",
+    "category": "Business"
+  },
+  {
+    "text": "I am a leader in my field, creating positive impact.",
+    "category": "Business"
+  },
+  {
+    "text": "I am safe, secure, and protected at all times.",
+    "category": "Security"
+  },
+  {
+    "text": "I feel a deep sense of stability in my world.",
+    "category": "Security"
+  },
+  {
+    "text": "I am anchored in the safety of my own being.",
+    "category": "Security"
+  },
+  {
+    "text": "I trust that I am always being taken care of.",
+    "category": "Security"
+  },
+  {
+    "text": "My heart is at peace, knowing I am protected.",
+    "category": "Security"
+  },
+  {
+    "text": "I treat myself with the same kindness I give others.",
+    "category": "Self-Compassion"
+  },
+  {
+    "text": "I am gentle with myself when things are hard.",
+    "category": "Self-Compassion"
+  },
+  {
+    "text": "I forgive myself for my mistakes and move forward.",
+    "category": "Self-Compassion"
+  },
+  {
+    "text": "I am my own best friend and greatest supporter.",
+    "category": "Self-Compassion"
+  },
+  {
+    "text": "I see the silver lining in every situation.",
+    "category": "Positivity"
+  },
+  {
+    "text": "My positive attitude attracts positive events.",
+    "category": "Positivity"
+  },
+  {
+    "text": "I am a magnet for joy and good vibrations.",
+    "category": "Positivity"
+  },
+  {
+    "text": "I honor the full spectrum of my emotions with grace.",
+    "category": "Emotional Health"
+  },
+  {
+    "text": "I am manifesting the life of my dreams with clarity.",
+    "category": "Manifestation"
+  },
+  {
+    "text": "I release all tension and invite absolute calm.",
+    "category": "Stress Relief"
   }
 ]

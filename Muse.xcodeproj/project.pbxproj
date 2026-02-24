@@ -48,7 +48,7 @@
 		72E262DA2EC68E040080CF29 /* AffirmationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262DB2EC68E040080CF29 /* AffirmationSession.swift */; };
 		72E262DC2EC68E040080CF29 /* ProgressService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262DD2EC68E040080CF29 /* ProgressService.swift */; };
 		72E262DF2EC68E040080CF29 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262DE2EC68E040080CF29 /* FeedView.swift */; };
-		72E262E12EC68E040080CF29 /* PromiseKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262E02EC68E040080CF29 /* PromiseKeeperApp.swift */; };
+		72E262E12EC68E040080CF29 /* MuseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E262E02EC68E040080CF29 /* MuseApp.swift */; };
 		72E73EBF2EF0BE9F009D3CDB /* forestbirds.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72E73EBC2EF0BE9F009D3CDB /* forestbirds.mp3 */; };
 		72E73EC02EF0BE9F009D3CDB /* rain.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72E73EBD2EF0BE9F009D3CDB /* rain.mp3 */; };
 		72E73EC12EF0BE9F009D3CDB /* river.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 72E73EBE2EF0BE9F009D3CDB /* river.mp3 */; };
@@ -158,7 +158,7 @@
 		72E262DB2EC68E040080CF29 /* AffirmationSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AffirmationSession.swift; sourceTree = "<group>"; };
 		72E262DD2EC68E040080CF29 /* ProgressService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressService.swift; sourceTree = "<group>"; };
 		72E262DE2EC68E040080CF29 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
-		72E262E02EC68E040080CF29 /* PromiseKeeperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromiseKeeperApp.swift; sourceTree = "<group>"; };
+		72E262E02EC68E040080CF29 /* MuseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseApp.swift; sourceTree = "<group>"; };
 		72E73EBC2EF0BE9F009D3CDB /* forestbirds.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = forestbirds.mp3; sourceTree = "<group>"; };
 		72E73EBD2EF0BE9F009D3CDB /* rain.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = rain.mp3; sourceTree = "<group>"; };
 		72E73EBE2EF0BE9F009D3CDB /* river.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = river.mp3; sourceTree = "<group>"; };
@@ -252,7 +252,7 @@
 				724C1B5A2EF3BF150052D8AE /* Info.plist */,
 				E00400012EF88DF800EB49D3 /* PrivacyInfo.xcprivacy */,
 				72EFBB082EEE3E5C00C40084 /* Muse.entitlements */,
-				72E262E02EC68E040080CF29 /* PromiseKeeperApp.swift */,
+				72E262E02EC68E040080CF29 /* MuseApp.swift */,
 			);
 			path = Muse;
 			sourceTree = "<group>";
@@ -592,7 +592,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72E262E12EC68E040080CF29 /* PromiseKeeperApp.swift in Sources */,
+				72E262E12EC68E040080CF29 /* MuseApp.swift in Sources */,
 				72E2629E2EC68E040080CF29 /* ContentView.swift in Sources */,
 				72E262DF2EC68E040080CF29 /* FeedView.swift in Sources */,
 				72E262A52EC68E040080CF29 /* Theme.swift in Sources */,
@@ -862,7 +862,7 @@
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.MuseTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -881,7 +881,7 @@
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.MuseTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -898,7 +898,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.MuseUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -915,7 +915,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.MuseUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -943,7 +943,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.Muse.MuseWidgetsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -971,7 +971,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.Muse.MuseWidgetsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

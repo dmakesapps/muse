@@ -2,6 +2,7 @@ import SwiftUI
 
 struct OnboardingContainerView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
+    @AppStorage("hasAgreedToAI") private var hasAgreedToAI: Bool = false
     
     // State for the User's Journey
     @State private var currentPage: Int = 1
@@ -29,10 +30,15 @@ struct OnboardingContainerView: View {
                 case 1:
                     Screen1_Splash(onNext: { advance() })
                 case 2:
-                    Screen2_ScienceHook(onNext: { advance() })
+                    Screen_PrivacyDisclosure(onNext: { 
+                        hasAgreedToAI = true
+                        advance() 
+                    })
                 case 3:
-                    Screen3_Mechanism(onNext: { advance() })
+                    Screen2_ScienceHook(onNext: { advance() })
                 case 4:
+                    Screen3_Mechanism(onNext: { advance() })
+                case 5:
                     Screen4_BlockageSelector(
                         selectedBlockage: $selectedBlockage,
                         onNext: { 
@@ -42,35 +48,35 @@ struct OnboardingContainerView: View {
                         },
                         onOther: { 
                             // Skip to chat screen for custom AI generation
-                            withAnimation { currentPage = 10 }
+                            withAnimation { currentPage = 11 }
                         }
                     )
-                case 5:
-                    Screen5_Specificity(selectedBlockage: selectedBlockage, text: $specificityInput, onNext: { advance() })
                 case 6:
+                    Screen5_Specificity(selectedBlockage: selectedBlockage, text: $specificityInput, onNext: { advance() })
+                case 7:
                     Screen6_DesiredState(text: $desiredStateInput, onNext: { 
                         // Trigger generation then advance
                         startCalibration()
                     })
-                case 7:
-                    Screen7_Calibration(statusText: $calibrationText)
                 case 8:
+                    Screen7_Calibration(statusText: $calibrationText)
+                case 9:
                     Screen8_ImmersivePreview(
                         affirmations: generatedAffirmations,
                         onComplete: { 
                             // Go to welcome screen after immersive preview
-                            withAnimation { currentPage = 9 }
+                            withAnimation { currentPage = 10 }
                         }
                     )
-                case 9:
-                    Screen9_Welcome(onFinish: { completeOnboarding() })
                 case 10:
+                    Screen9_Welcome(onFinish: { completeOnboarding() })
+                case 11:
                     // "Other" AI Chat Flow
                     Screen_OtherChat(
                         onAffirmationsReady: { affirmations in
                             self.generatedAffirmations = affirmations
                             // Go directly to immersive preview, skip calibration (chat IS the calibration)
-                            withAnimation { currentPage = 8 }
+                            withAnimation { currentPage = 9 }
                         }
                     )
                 default:
@@ -148,7 +154,7 @@ struct OnboardingContainerView: View {
     
     // MARK: - Start Calibration with Pre-built Affirmations (skip AI)
     private func startCalibrationWithPrebuilt() {
-        withAnimation { currentPage = 7 }
+        withAnimation { currentPage = 8 }
         
         // Get pre-built affirmations for selected blockage
         let affirmations = prebuiltAffirmationsForBlockage(selectedBlockage ?? "")
@@ -179,7 +185,7 @@ struct OnboardingContainerView: View {
     
     // MARK: - Start Calibration with AI Generation (for "Other" chat flow)
     private func startCalibration() {
-        withAnimation { currentPage = 7 }
+        withAnimation { currentPage = 8 }
         
         // Simulate the AI Neural work
         let sequence = [
@@ -260,6 +266,109 @@ struct OnboardingContainerView: View {
 }
 
 // MARK: - PHASE 1: THE HOOK
+
+struct Screen_PrivacyDisclosure: View {
+    var onNext: () -> Void
+    @State private var showPolicy = false
+    
+    var body: some View {
+        VStack(spacing: 24) {
+            Spacer()
+            
+            // Privacy Shield Icon
+            ZStack {
+                Circle()
+                    .fill(Color.museAccentBlue.opacity(0.1))
+                    .frame(width: 100, height: 100)
+                
+                Image(systemName: "hand.raised.shield.fill")
+                    .font(.system(size: 44))
+                    .foregroundColor(.museAccentBlue)
+            }
+            
+            VStack(spacing: 16) {
+                Text("Your Privacy & AI")
+                    .font(.museDisplayMedium())
+                    .foregroundColor(.white)
+                
+                VStack(alignment: .leading, spacing: 16) {
+                    DisclosureItem(
+                        icon: "brain.head.profile",
+                        title: "Personalized for You",
+                        description: "To create your neural pathway, Muse uses AI to analyze your goals and challenges."
+                    )
+                    
+                    DisclosureItem(
+                        icon: "network",
+                        title: "Secure Processing",
+                        description: "Your data is sent securely to OpenAI and OpenRouter (Google Gemini) solely for generation."
+                    )
+                    
+                    DisclosureItem(
+                        icon: "lock.shield",
+                        title: "Private & Protected",
+                        description: "Your data is never used to train global AI models. You remain in control."
+                    )
+                }
+                .padding(.horizontal, 24)
+            }
+            
+            Spacer()
+            
+            VStack(spacing: 16) {
+                Button(action: { showPolicy = true }) {
+                    Text("Read our full Privacy Policy")
+                        .font(.caption)
+                        .foregroundColor(.museTeal)
+                        .underline()
+                }
+                
+                Button(action: onNext) {
+                    Text("I Agree & Continue")
+                }
+                .buttonStyle(MusePrimaryButtonStyle())
+            }
+            .padding(.horizontal, 32)
+            .padding(.bottom, 50)
+        }
+        .sheet(isPresented: $showPolicy) {
+            NavigationStack {
+                PrivacyPolicyView()
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") { showPolicy = false }
+                        }
+                    }
+            }
+            .preferredColorScheme(.dark)
+        }
+    }
+}
+
+struct DisclosureItem: View {
+    let icon: String
+    let title: String
+    let description: String
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 16) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundColor(.museTeal)
+                .frame(width: 24)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(.white)
+                Text(description)
+                    .font(.system(size: 14))
+                    .foregroundColor(.museLightGray)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+}
 
 struct Screen1_Splash: View {
     var onNext: () -> Void

@@ -80,7 +80,7 @@ struct AIAffirmationsChatView: View {
                         VStack(spacing: 20) {
                             // Introduction
                             aiMessageBubble(
-                                "Hi! I'm going to ask you a few questions to create personalized affirmations just for you. Take your time with each answer. 💫"
+                                "Hi! I'm going to ask you a few questions to create personalized affirmations just for you. Muse uses AI (OpenAI & Google Gemini) to process your goals securely. Your data is protected and never used for training. Take your time with each answer. 💫"
                             )
                             .id("intro")
                             
