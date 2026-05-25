@@ -523,7 +523,7 @@ class AffirmationGenerationService {
     static let shared = AffirmationGenerationService()
     
     private let endpoint = "https://openrouter.ai/api/v1/chat/completions"
-    private let model = "google/gemini-2.0-flash-001"
+    private let model = "google/gemini-3.1-flash-lite"
     
     private init() {}
     

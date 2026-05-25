@@ -508,8 +508,8 @@ struct OpenRouterConfig {
 class OpenRouterChatService: ObservableObject {
     static let shared = OpenRouterChatService()
     
-    // Using Google Gemini 2.0 Flash (001) as requested
-    private let model = "google/gemini-2.0-flash-001"
+    // Using Google Gemini 3.1 Flash Lite via OpenRouter
+    private let model = "google/gemini-3.1-flash-lite"
     private let endpoint = "https://openrouter.ai/api/v1/chat/completions"
     
     private init() {}
