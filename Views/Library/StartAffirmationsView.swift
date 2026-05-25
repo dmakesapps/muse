@@ -624,7 +624,7 @@ struct StartAffirmationsView: View {
     @State private var selectedSource: AffirmationSource? = nil
     @State private var selectedAffirmations: Set<UUID> = []
     @State private var useRandom: Bool = false
-    @State private var selectedCategory: String? = nil
+    @State private var selectedCategories: Set<String> = []
     @State private var duration: AffirmationDuration = .oneMinute
     @State private var isActive = false
     @State private var activeBreathworkPattern: BreathingPattern? // Use item for sheet logic
@@ -687,20 +687,25 @@ struct StartAffirmationsView: View {
         return Array(Set(categories)).sorted()
     }
     
-    // Filter affirmations by selected category and search text
+    // Filter affirmations by selected categories and search text
     private var filteredAffirmations: [Affirmation] {
-        var result: [Affirmation]
-        
-        // Handle "Mine" category (user's saved affirmations)
-        if selectedCategory == "Mine" {
-            result = storage.savedAffirmations
-        } else {
+        var result: [Affirmation] = []
+
+        if selectedCategories.isEmpty {
             result = currentAffirmationPool
-            
-            // Filter by category if selected (and not "Mine")
-            if let category = selectedCategory {
-                result = result.filter { $0.category == category }
+        } else {
+            if selectedCategories.contains("Mine") {
+                result.append(contentsOf: storage.savedAffirmations)
             }
+
+            let otherCategories = selectedCategories.filter { $0 != "Mine" }
+            if !otherCategories.isEmpty {
+                let otherAffirmations = currentAffirmationPool.filter { otherCategories.contains($0.category) }
+                result.append(contentsOf: otherAffirmations)
+            }
+
+            var seenIds = Set<UUID>()
+            result = result.filter { seenIds.insert($0.id).inserted }
         }
         
         // Filter by search text (searches both affirmation text and category name)
@@ -1238,7 +1243,7 @@ struct StartAffirmationsView: View {
                     selectedSource = nil
                     selectedAffirmations.removeAll()
                     useRandom = false
-                    selectedCategory = nil
+                    selectedCategories.removeAll()
                     searchText = ""
                     isAffirmationsListCollapsed = false
                 }
@@ -1270,7 +1275,7 @@ struct StartAffirmationsView: View {
                         Text("Random")
                             .font(.museHeadline())
                             .foregroundColor(.museSoftWhite)
-                        Text("Cycle through all \(selectedCategory != nil ? "in category" : "saved")")
+                        Text("Cycle through all \(selectedCategories.isEmpty ? "saved" : "in selected categories")")
                             .font(.museCaption())
                             .foregroundColor(.museLightGray)
                     }
@@ -1339,11 +1344,12 @@ struct StartAffirmationsView: View {
                         // All option
                         CategoryBubble(
                             title: "All",
-                            isSelected: selectedCategory == nil,
+                            isSelected: selectedCategories.isEmpty,
                             color: .museGradientStart
                         ) {
                             withAnimation(.spring(response: 0.3)) {
-                                selectedCategory = nil
+                                selectedCategories.removeAll()
+                                useRandom = false
                             }
                         }
                         
@@ -1351,12 +1357,10 @@ struct StartAffirmationsView: View {
                         if !storage.savedAffirmations.isEmpty {
                             CategoryBubble(
                                 title: "Mine",
-                                isSelected: selectedCategory == "Mine",
+                                isSelected: selectedCategories.contains("Mine"),
                                 color: .museTeal
                             ) {
-                                withAnimation(.spring(response: 0.3)) {
-                                    selectedCategory = "Mine"
-                                }
+                                toggleCategory("Mine")
                             }
                         }
                         
@@ -1364,12 +1368,10 @@ struct StartAffirmationsView: View {
                         ForEach(availableCategories, id: \.self) { category in
                             CategoryBubble(
                                 title: category,
-                                isSelected: selectedCategory == category,
+                                isSelected: selectedCategories.contains(category),
                                 color: .museGradientStart
                             ) {
-                                withAnimation(.spring(response: 0.3)) {
-                                    selectedCategory = category
-                                }
+                                toggleCategory(category)
                             }
                         }
                     }
@@ -1822,7 +1824,7 @@ struct StartAffirmationsView: View {
                     selectedSource = nil
                     selectedAffirmations.removeAll()
                     useRandom = false
-                    selectedCategory = nil
+                    selectedCategories.removeAll()
                     searchText = ""
                     isAffirmationsListCollapsed = false
                 }
@@ -1854,7 +1856,7 @@ struct StartAffirmationsView: View {
                         Text("Random")
                             .font(.museHeadline())
                             .foregroundColor(.museSoftWhite)
-                        Text("Cycle through all \(selectedCategory != nil ? "in category" : "available")")
+                        Text("Cycle through all \(selectedCategories.isEmpty ? "available" : "in selected categories")")
                             .font(.museCaption())
                             .foregroundColor(.museLightGray)
                     }
@@ -1923,11 +1925,12 @@ struct StartAffirmationsView: View {
                         // All option
                         CategoryBubble(
                             title: "All",
-                            isSelected: selectedCategory == nil,
+                            isSelected: selectedCategories.isEmpty,
                             color: .museAccentBlue
                         ) {
                             withAnimation(.spring(response: 0.3)) {
-                                selectedCategory = nil
+                                selectedCategories.removeAll()
+                                useRandom = false
                             }
                         }
                         
@@ -1935,12 +1938,10 @@ struct StartAffirmationsView: View {
                         if !storage.savedAffirmations.isEmpty {
                             CategoryBubble(
                                 title: "Mine",
-                                isSelected: selectedCategory == "Mine",
+                                isSelected: selectedCategories.contains("Mine"),
                                 color: .museTeal
                             ) {
-                                withAnimation(.spring(response: 0.3)) {
-                                    selectedCategory = "Mine"
-                                }
+                                toggleCategory("Mine")
                             }
                         }
                         
@@ -1948,12 +1949,10 @@ struct StartAffirmationsView: View {
                         ForEach(availableCategories, id: \.self) { category in
                             CategoryBubble(
                                 title: category,
-                                isSelected: selectedCategory == category,
+                                isSelected: selectedCategories.contains(category),
                                 color: .museAccentBlue
                             ) {
-                                withAnimation(.spring(response: 0.3)) {
-                                    selectedCategory = category
-                                }
+                                toggleCategory(category)
                             }
                         }
                     }
@@ -2098,11 +2097,33 @@ struct StartAffirmationsView: View {
         }
     }
     
+    private func toggleCategory(_ category: String) {
+        withAnimation(.spring(response: 0.3)) {
+            if selectedCategories.contains(category) {
+                selectedCategories.remove(category)
+            } else {
+                selectedCategories.insert(category)
+            }
+
+            if !selectedCategories.isEmpty {
+                useRandom = true
+                selectedAffirmations.removeAll()
+            } else {
+                useRandom = false
+            }
+        }
+    }
+
     private func toggleSelection(_ affirmation: Affirmation) {
-        if selectedAffirmations.contains(affirmation.id) {
-            selectedAffirmations.remove(affirmation.id)
-        } else {
-            selectedAffirmations.insert(affirmation.id)
+        withAnimation(.spring(response: 0.3)) {
+            if selectedAffirmations.contains(affirmation.id) {
+                selectedAffirmations.remove(affirmation.id)
+            } else {
+                selectedAffirmations.insert(affirmation.id)
+            }
+
+            // Manual picks should override random mode.
+            useRandom = false
         }
     }
     

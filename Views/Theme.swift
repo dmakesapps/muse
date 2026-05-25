@@ -7,11 +7,13 @@ extension Color {
     // MARK: - Primary Colors
     static let museDeepNavy = Color(hex: "1A1A1D")      // Main backgrounds
     static let museSoftWhite = Color(hex: "F5F5F7")     // Primary text
-    static let museAccentBlue = Color(hex: "007AFF")   // CTAs, tab selection
+    static let museLogoBlue = Color(hex: "0968D4")      // Brand blue from app logo
+    static let museLogoBlueLight = Color(hex: "2F8DFF") // Lifted highlight for gradients/glow
+    static let museAccentBlue = museLogoBlue            // CTAs, tab selection
     
     // MARK: - Gradient Colors
-    static let museGradientStart = Color(hex: "6B4CE6") // Premium gradient start
-    static let museGradientEnd = Color(hex: "4A90E2")  // Premium gradient end
+    static let museGradientStart = museLogoBlue         // Premium gradient start
+    static let museGradientEnd = museLogoBlueLight      // Premium gradient end
     
     // MARK: - Secondary Colors
     static let museDarkGray = Color(hex: "2C2C2E")      // Card backgrounds
@@ -21,7 +23,7 @@ extension Color {
     static let musePremiumGold = Color(hex: "FFD700")   // Premium badge
     static let museTeal = Color(hex: "5AC8FA")          // AI-generated content
     static let musePurple = Color(hex: "AF52DE")        // Accents
-    static let musePink = Color(hex: "FF2D55")          // Energetic accents
+    static let musePink = museLogoBlueLight             // Legacy alias for warm accent usages
     static let museOrange = Color(hex: "FF9500")        // Alerts/Warmth
     
     // MARK: - Convenience Colors
@@ -73,14 +75,14 @@ extension View {
                 .stroke(
                     LinearGradient(
                         colors: [
-                            Color(hex: "FF3B30"), // Red
-                            Color(hex: "FF9500"), // Orange
-                            Color(hex: "FFCC00"), // Yellow
-                            Color(hex: "34C759"), // Green
-                            Color(hex: "00C7BE"), // Teal
-                            Color(hex: "007AFF"), // Blue
-                            Color(hex: "AF52DE"), // Purple
-                            Color(hex: "FF2D55")  // Pink
+                            Color.museLogoBlue,
+                            Color.museGradientEnd,
+                            Color.museTeal,
+                            Color.museGradientEnd,
+                            Color.museLogoBlue,
+                            Color.musePurple,
+                            Color.museTeal,
+                            Color.museLogoBlue
                         ],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
@@ -196,15 +198,15 @@ struct PulsingRainbowBorderModifier: ViewModifier {
                     ZStack {
                         AngularGradient(
                             gradient: Gradient(colors: [
-                                Color(hex: "FF3B30"), // Red
-                                Color(hex: "FF9500"), // Orange
-                                Color(hex: "FFCC00"), // Yellow
-                                Color(hex: "34C759"), // Green
-                                Color(hex: "00C7BE"), // Teal
-                                Color(hex: "007AFF"), // Blue
-                                Color(hex: "AF52DE"), // Purple
-                                Color(hex: "FF2D55"), // Pink
-                                Color(hex: "FF3B30")  // Red (loop)
+                                Color.museLogoBlue,
+                                Color.museGradientEnd,
+                                Color.museTeal,
+                                Color.museGradientEnd,
+                                Color.museLogoBlue,
+                                Color.musePurple,
+                                Color.museTeal,
+                                Color.museLogoBlueLight,
+                                Color.museLogoBlue
                             ]),
                             center: .center
                         )
