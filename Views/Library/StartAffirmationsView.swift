@@ -639,6 +639,7 @@ struct StartAffirmationsView: View {
     @State private var showJournalView: Bool = false // Show journal view
     @State private var isLoadingLibrary: Bool = false // Loading state for library affirmations
     @State private var spinnerRotation: Double = 0 // Spinner rotation angle
+    @State private var pendingPremiumSessionStart = false
     
     enum PracticeMode: String, CaseIterable {
         case affirmations = "Affirmations"
@@ -802,9 +803,7 @@ struct StartAffirmationsView: View {
                 
                 if selectedMode == .affirmations && selectedSource != nil && canStart {
                     Button(action: {
-                        if entitlementManager.canPlaySession() {
-                            isActive = true
-                        }
+                        attemptSessionStart()
                     }) {
                         HStack(spacing: 12) {
                             Image(systemName: "play.fill")
@@ -860,16 +859,15 @@ struct StartAffirmationsView: View {
         .fullScreenCover(isPresented: $showJournalView) {
             JournalView()
         }
-        .alert(isPresented: $entitlementManager.showPaywall) {
-            Alert(
-                title: Text("Upgrade to Premium"),
-                message: Text(entitlementManager.paywallSource == .aiGeneration ? "Unlock personalized AI affirmations with Premium." : "You've reached your free weekly limit. Upgrade for unlimited sessions."),
-                primaryButton: .default(Text("Upgrade"), action: {
-                    // Placeholder for Superwall
-                    print("Show Superwall")
-                }),
-                secondaryButton: .cancel()
-            )
+        .onChange(of: entitlementManager.isPremium) { _, isPremium in
+            guard isPremium, pendingPremiumSessionStart else { return }
+            pendingPremiumSessionStart = false
+            isActive = true
+        }
+        .onChange(of: entitlementManager.showPaywall) { _, isShowingPaywall in
+            if !isShowingPaywall && !entitlementManager.isPremium {
+                pendingPremiumSessionStart = false
+            }
         }
     }
     
@@ -1690,11 +1688,10 @@ struct StartAffirmationsView: View {
                         // Start Session button (when selections made or random enabled)
                         if useRandom || !selectedAffirmations.isEmpty {
                             Button(action: {
-                                if entitlementManager.canPlaySession() {
+                                attemptSessionStart {
                                     if useRandom {
                                         selectedAffirmations = Set(storage.aiGeneratedAffirmations.map { $0.id })
                                     }
-                                    isActive = true
                                 }
                             }) {
                                 HStack(spacing: 12) {
@@ -2124,6 +2121,16 @@ struct StartAffirmationsView: View {
 
             // Manual picks should override random mode.
             useRandom = false
+        }
+    }
+
+    private func attemptSessionStart(prepareSelection: (() -> Void)? = nil) {
+        prepareSelection?()
+        pendingPremiumSessionStart = true
+
+        if entitlementManager.canPlaySession() {
+            pendingPremiumSessionStart = false
+            isActive = true
         }
     }
     

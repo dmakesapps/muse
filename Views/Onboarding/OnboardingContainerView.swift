@@ -2,6 +2,7 @@ import SwiftUI
 
 struct OnboardingContainerView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
+    @EnvironmentObject private var entitlementManager: EntitlementManager
     
     // State for the User's Journey
     @State private var currentPage: Int = 1
@@ -58,12 +59,9 @@ struct OnboardingContainerView: View {
                     Screen8_ImmersivePreview(
                         affirmations: generatedAffirmations,
                         onComplete: { 
-                            // Always go directly to paywall after immersive
-                            withAnimation { currentPage = 9 }
+                            entitlementManager.triggerPaywall(source: .onboarding)
                         }
                     )
-                case 9:
-                    Screen9_Paywall(onFinish: { completeOnboarding() })
                 case 10:
                     // "Other" AI Chat Flow
                     Screen_OtherChat(
@@ -81,6 +79,11 @@ struct OnboardingContainerView: View {
         }
         .onAppear {
             BackgroundMusicManager.shared.startIfNeeded()
+        }
+        .onChange(of: entitlementManager.shouldCompleteOnboarding) { _, shouldComplete in
+            guard shouldComplete else { return }
+            entitlementManager.consumeOnboardingCompletionRequest()
+            completeOnboarding()
         }
     }
     
@@ -647,60 +650,6 @@ struct Screen8_ImmersivePreview: View {
             isOnboarding: true, // Don't count towards free session limit
             onComplete: onComplete
         )
-    }
-}
-
-struct Screen9_Paywall: View {
-    var onFinish: () -> Void
-    
-    var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
-            
-            Image(systemName: "lock.open.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.museTeal)
-            
-            Text("You Just Built Your First\nNeural Pathway")
-                .font(.museDisplayMedium())
-                .foregroundColor(.white)
-                .multilineTextAlignment(.center)
-            
-            VStack(alignment: .leading, spacing: 16) {
-                featureRow("Create 7 custom sessions")
-                featureRow("Activate 432Hz frequencies")
-                featureRow("Manifest with Vision Tapes")
-                featureRow("Track mental shifts")
-            }
-            .padding(.horizontal, 40)
-            .padding(.vertical, 20)
-            
-            Spacer()
-            
-            Button("Start Free Trial") {
-                EntitlementManager.shared.triggerPaywall(source: .onboarding)
-                // Assuming success/close leads to finish
-                // In production, listen for Superwall delegate
-                onFinish()
-            }
-            .buttonStyle(MusePrimaryButtonStyle())
-            .padding(.horizontal, 32)
-            
-            Button("Maybe Later") {
-                onFinish()
-            }
-            .font(.caption)
-            .foregroundColor(.museLightGray)
-            .padding(.bottom, 40)
-        }
-    }
-    
-    func featureRow(_ text: String) -> some View {
-        HStack {
-            Image(systemName: "checkmark")
-                .foregroundColor(.museSuccessGreen)
-            Text(text).foregroundColor(.white)
-        }
     }
 }
 

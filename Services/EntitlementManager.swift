@@ -1,27 +1,29 @@
 import Foundation
 import SwiftUI
-import Combine
-import SuperwallKit
+import RevenueCat
 
 /// Manages user entitlements and feature access
 /// Freemium Logic:
 /// 1. 3 free immersive affirmation sessions total
 /// 2. AI Generation features require premium
 /// 3. All other features (browse, habits, etc.) are free
-/// 4. Integration point for Superwall
+/// 4. RevenueCat CustomerInfo is the premium source of truth
 @MainActor
-class EntitlementManager: NSObject, ObservableObject, SuperwallDelegate {
+final class EntitlementManager: NSObject, ObservableObject, PurchasesDelegate {
     static let shared = EntitlementManager()
     
     // MARK: - Published State
     @Published var isPremium: Bool = false
     @Published var freeSessionsUsed: Int = 0
-    @Published var showPaywall: Bool = false 
-    @Published var paywallSource: PaywallSource? = nil 
+    @Published var showPaywall: Bool = false
+    @Published var paywallSource: PaywallSource? = nil
+    @Published var shouldCompleteOnboarding: Bool = false
     
     // MARK: - Configuration
     private let maxFreeSessions = 7 // Total free immersive sessions before paywall
-    private let maxDailyAIGenerations = 50 
+    private let maxDailyAIGenerations = 50
+    private let freeSessionsKey = "freeSessionsUsed"
+    private var isRevenueCatConfigured = false
     
     // MARK: - Computed Properties
     var remainingFreeSessions: Int {
@@ -37,33 +39,20 @@ class EntitlementManager: NSObject, ObservableObject, SuperwallDelegate {
         case sessionLimit = "session_limit_reached"
         case aiGeneration = "ai_generation_locked"
         case settings = "settings_upgrade"
-        case dailyLimitReached = "fair_use_limit_reached" 
+        case dailyLimitReached = "fair_use_limit_reached"
         case onboarding = "onboarding_complete"
     }
-    
-    private var isSuperwallConfigured = false
+
+    var isPaywallConfigured: Bool {
+        !Self.revenueCatAPIKey.isEmpty && !Self.premiumEntitlementID.isEmpty
+    }
     
     private override init() {
         super.init()
         loadSessionCount()
-        // Don't configure Superwall immediately - delay until needed
-        // This avoids the "Sign in to Apple Account" prompt on launch
-    }
-    
-    /// Call this to ensure Superwall is configured before using it
-    func ensureSuperwallConfigured() {
-        guard !isSuperwallConfigured else { return }
-        isSuperwallConfigured = true
-        
-        let apiKey = "pk_NIuAHj9ov9Bnh1BvWBglk"
-        Superwall.configure(apiKey: apiKey)
-        Superwall.shared.delegate = self
-        print("🧱 EntitlementManager: Superwall configured")
     }
     
     // MARK: - Persistence
-    private let freeSessionsKey = "freeSessionsUsed"
-    
     private func loadSessionCount() {
         freeSessionsUsed = UserDefaults.standard.integer(forKey: freeSessionsKey)
         print("📊 EntitlementManager: Loaded \(freeSessionsUsed)/\(maxFreeSessions) free sessions used")
@@ -73,20 +62,40 @@ class EntitlementManager: NSObject, ObservableObject, SuperwallDelegate {
         UserDefaults.standard.set(freeSessionsUsed, forKey: freeSessionsKey)
     }
     
-    // MARK: - SuperwallDelegate
-    
-    func subscriptionStatusDidChange(to status: SubscriptionStatus) {
-        print("💎 EntitlementManager: Subscription status changed to \(status)")
-        
-        if case .active = status {
-            self.isPremium = true
-        } else {
-            self.isPremium = false
+    // MARK: - RevenueCat Configuration
+
+    func configureRevenueCatIfNeeded() {
+        guard !isRevenueCatConfigured else { return }
+        guard isPaywallConfigured else {
+            print("⚠️ EntitlementManager: RevenueCat is missing local configuration")
+            return
+        }
+
+        Purchases.logLevel = .debug
+        Purchases.configure(withAPIKey: Self.revenueCatAPIKey)
+        Purchases.shared.delegate = self
+        isRevenueCatConfigured = true
+        print("💎 EntitlementManager: RevenueCat configured")
+    }
+
+    func refreshCustomerInfo() {
+        configureRevenueCatIfNeeded()
+        guard isRevenueCatConfigured else { return }
+
+        Task {
+            do {
+                let customerInfo = try await Purchases.shared.customerInfo()
+                apply(customerInfo: customerInfo)
+            } catch {
+                print("⚠️ EntitlementManager: Failed to refresh customer info: \(error.localizedDescription)")
+            }
         }
     }
-    
-    func handleSuperwallEvent(withInfo eventInfo: SuperwallEventInfo) {
-        // Optional: tracking logic
+
+    nonisolated func purchases(_ purchases: Purchases, receivedUpdated customerInfo: CustomerInfo) {
+        Task { @MainActor in
+            self.apply(customerInfo: customerInfo)
+        }
     }
     
     // MARK: - Public API
@@ -95,13 +104,9 @@ class EntitlementManager: NSObject, ObservableObject, SuperwallDelegate {
     /// Returns true if allowed, false if paywall should show
     func canPlaySession() -> Bool {
         if isPremium { return true }
-        
-        if freeSessionsUsed < maxFreeSessions {
-            return true
-        } else {
-            triggerPaywall(source: .sessionLimit)
-            return false
-        }
+
+        triggerPaywall(source: .sessionLimit)
+        return false
     }
     
     /// Call this AFTER a session is completed to increment usage
@@ -154,17 +159,49 @@ class EntitlementManager: NSObject, ObservableObject, SuperwallDelegate {
     
     func triggerPaywall(source: PaywallSource) {
         print("💰 EntitlementManager: Requesting Paywall for \(source.rawValue)")
-        self.paywallSource = source
-        
-        // Ensure Superwall is configured before using it
-        ensureSuperwallConfigured()
-        
-        Superwall.shared.register(placement: source.rawValue) { [weak self] in
-             print("✅ Feature Block Executed")
-             self?.isPremium = true
+        paywallSource = source
+        showPaywall = true
+        configureRevenueCatIfNeeded()
+    }
+
+    func handlePaywallDismissed(for source: PaywallSource?) {
+        print("💰 EntitlementManager: Paywall dismissed for \(source?.rawValue ?? "unknown")")
+        showPaywall = false
+        paywallSource = nil
+
+        if source == .onboarding {
+            shouldCompleteOnboarding = true
         }
     }
-    
+
+    func handlePurchaseCompleted(_ customerInfo: CustomerInfo, for source: PaywallSource?) {
+        apply(customerInfo: customerInfo)
+        handlePaywallDismissed(for: source)
+    }
+
+    func handleRestoreCompleted(_ customerInfo: CustomerInfo, for source: PaywallSource?) {
+        apply(customerInfo: customerInfo)
+        handlePaywallDismissed(for: source)
+    }
+
+    func restorePurchases(from source: PaywallSource? = nil) {
+        configureRevenueCatIfNeeded()
+        guard isRevenueCatConfigured else { return }
+
+        Task {
+            do {
+                let customerInfo = try await Purchases.shared.restorePurchases()
+                handleRestoreCompleted(customerInfo, for: source)
+            } catch {
+                print("⚠️ EntitlementManager: Restore failed: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func consumeOnboardingCompletionRequest() {
+        shouldCompleteOnboarding = false
+    }
+
     func debugTogglePremium() {
         isPremium.toggle()
         print("🔧 EntitlementManager: Premium status set to \(isPremium)")
@@ -174,5 +211,33 @@ class EntitlementManager: NSObject, ObservableObject, SuperwallDelegate {
         freeSessionsUsed = 0
         saveSessionCount()
         print("🔧 EntitlementManager: Free sessions reset to 0")
+    }
+
+    private func apply(customerInfo: CustomerInfo) {
+        let hasPremiumEntitlement = customerInfo.entitlements.active[Self.premiumEntitlementID]?.isActive == true
+        isPremium = hasPremiumEntitlement
+        print("💎 EntitlementManager: Premium entitlement \(Self.premiumEntitlementID) active = \(hasPremiumEntitlement)")
+    }
+
+    private static var revenueCatAPIKey: String {
+        let localValue = LocalSecrets.revenueCatPublicAPIKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !localValue.isEmpty {
+            return localValue
+        }
+
+        return ProcessInfo.processInfo.environment["REVENUECAT_API_KEY"]?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    }
+
+    private static var premiumEntitlementID: String {
+        let localValue = LocalSecrets.revenueCatEntitlementID.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !localValue.isEmpty {
+            return localValue
+        }
+
+        let environmentValue = ProcessInfo.processInfo.environment["REVENUECAT_ENTITLEMENT_ID"]?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return environmentValue?.isEmpty == false ? environmentValue! : "premium"
     }
 }

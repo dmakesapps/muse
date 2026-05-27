@@ -33,6 +33,7 @@ class SpeechService: NSObject, ObservableObject {
     
     // MARK: - Audio Player
     private var audioPlayer: AVAudioPlayer?
+    private var speechSynthesizer: AVSpeechSynthesizer?
     private var onSpeechComplete: (() -> Void)?
     private var currentSpeechId: UUID? // Track current speech request to handle cancellation
     
@@ -178,25 +179,20 @@ class SpeechService: NSObject, ObservableObject {
     
     /// Fallback: Use iOS native speech synthesis when OpenAI fails
     private func speakWithNativeSynthesis(_ text: String, speechId: UUID) {
+        speechSynthesizer?.stopSpeaking(at: .immediate)
+
         let synthesizer = AVSpeechSynthesizer()
+        synthesizer.delegate = self
+        speechSynthesizer = synthesizer
+
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
         utterance.rate = 0.5 // Slower for affirmations
         utterance.pitchMultiplier = 1.0
         utterance.volume = 1.0
         
-        // Use a simple completion handler via notification
         isSpeaking = true
         synthesizer.speak(utterance)
-        
-        // Estimate duration and complete after
-        let wordCount = text.split(separator: " ").count
-        let estimatedDuration = Double(wordCount) * 0.4 + 1.0  // ~0.4 sec per word + buffer
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + estimatedDuration) { [weak self] in
-            guard self?.currentSpeechId == speechId else { return }
-            self?.finishSpeech()
-        }
     }
     
     /// Generate speech using OpenAI TTS API
@@ -313,6 +309,7 @@ class SpeechService: NSObject, ObservableObject {
     private func finishSpeech() {
         isSpeaking = false
         currentlyPlayingText = nil
+        speechSynthesizer = nil
         
         let callback = onSpeechComplete
         onSpeechComplete = nil
@@ -329,6 +326,8 @@ class SpeechService: NSObject, ObservableObject {
         // Stop audio player
         audioPlayer?.stop()
         audioPlayer = nil
+        speechSynthesizer?.stopSpeaking(at: .immediate)
+        speechSynthesizer = nil
         
         // Reset state
         isSpeaking = false
@@ -421,5 +420,19 @@ extension SpeechService: AVAudioPlayerDelegate {
             }
             self.finishSpeech()
         }
+    }
+}
+
+// MARK: - AVSpeechSynthesizerDelegate
+extension SpeechService: AVSpeechSynthesizerDelegate {
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        print("🔊 SpeechService: speechSynthesizer didFinish")
+        DispatchQueue.main.async {
+            self.finishSpeech()
+        }
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        print("🔊 SpeechService: speechSynthesizer didCancel")
     }
 }
