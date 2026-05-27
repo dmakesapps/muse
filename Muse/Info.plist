@@ -10,5 +10,7 @@
     <string>Muse needs access to your microphone to listen to your responses.</string>
     <key>NSSpeechRecognitionUsageDescription</key>
     <string>Muse needs speech recognition to understand your words.</string>
+    <key>NSUserNotificationsUsageDescription</key>
+    <string>Muse sends daily affirmations, quotes, and session reminders you choose in the app.</string>
 </dict>
 </plist>

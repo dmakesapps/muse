@@ -18,7 +18,7 @@ struct OnboardingContainerView: View {
     var body: some View {
         ZStack {
             // Shared Background - Dark Navy (hide during immersive preview)
-            if currentPage != 8 {
+            if currentPage != 8 && currentPage != 10 {
                 MuseBackgroundView(selectedBackground: "backgroundjungle2")
                     .ignoresSafeArea()
                     .overlay(Color.black.opacity(0.3)) // Slight darken for text legibility
@@ -62,6 +62,12 @@ struct OnboardingContainerView: View {
                             entitlementManager.triggerPaywall(source: .onboarding, presenter: .onboarding)
                         }
                     )
+                case 9:
+                    Screen9_NotificationPrompt(
+                        blockage: selectedBlockage,
+                        onEnable: { requestNotificationsAndAdvance() },
+                        onSkip: { goToWidgetScreen() }
+                    )
                 case 10:
                     // "Other" AI Chat Flow
                     Screen_OtherChat(
@@ -70,6 +76,20 @@ struct OnboardingContainerView: View {
                             // Go directly to immersive preview, skip calibration (chat IS the calibration)
                             withAnimation { currentPage = 8 }
                         }
+                    )
+                case 11:
+                    Screen11_QuickNotificationSetup(
+                        affirmationCategories: notificationCategorySets.affirmations,
+                        quoteCategories: notificationCategorySets.quotes,
+                        onContinue: { goToWidgetScreen() },
+                        onSkip: { goToWidgetScreen() }
+                    )
+                case 12:
+                    Screen12_WidgetPrompt(
+                        sampleAffirmation: widgetSampleAffirmation,
+                        sampleQuote: widgetSampleQuote,
+                        sampleAuthor: widgetSampleAuthor,
+                        onContinue: { completeOnboarding() }
                     )
                 default:
                     EmptyView()
@@ -83,7 +103,9 @@ struct OnboardingContainerView: View {
         .onChange(of: entitlementManager.shouldCompleteOnboarding) { _, shouldComplete in
             guard shouldComplete else { return }
             entitlementManager.consumeOnboardingCompletionRequest()
-            completeOnboarding()
+            withAnimation(.easeInOut(duration: 0.5)) {
+                currentPage = 9
+            }
         }
         .paywallFullScreenCover(presenter: .onboarding)
     }
@@ -254,6 +276,49 @@ struct OnboardingContainerView: View {
             Affirmation(text: "I trust myself to handle whatever comes.", category: "Personalized"),
             Affirmation(text: "Peace flows through me naturally.", category: "Personalized")
         ]
+    }
+    
+    private var notificationCategorySets: (affirmations: Set<String>, quotes: Set<String>) {
+        OnboardingNotificationCategories.categories(
+            for: selectedBlockage,
+            generatedAffirmations: generatedAffirmations
+        )
+    }
+    
+    private var widgetSampleAffirmation: String {
+        generatedAffirmations.first?.text ?? "I am enough exactly as I am."
+    }
+    
+    private var widgetSampleQuote: String {
+        let quotes = ContentLoader.shared.loadQuotes()
+        if let match = quotes.first(where: { notificationCategorySets.quotes.contains($0.category) }) {
+            return match.text
+        }
+        return quotes.first?.text ?? "Peace comes from within."
+    }
+    
+    private var widgetSampleAuthor: String {
+        let quotes = ContentLoader.shared.loadQuotes()
+        if let match = quotes.first(where: { notificationCategorySets.quotes.contains($0.category) }) {
+            return match.author
+        }
+        return quotes.first?.author ?? "Buddha"
+    }
+    
+    private func requestNotificationsAndAdvance() {
+        NotificationService.shared.requestAuthorization { granted in
+            DispatchQueue.main.async {
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    currentPage = granted ? 11 : 12
+                }
+            }
+        }
+    }
+    
+    private func goToWidgetScreen() {
+        withAnimation(.easeInOut(duration: 0.5)) {
+            currentPage = 12
+        }
     }
     
     private func completeOnboarding() {

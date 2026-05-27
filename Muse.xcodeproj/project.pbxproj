@@ -71,6 +71,7 @@
 		DDDD00032EF6000000000002 /* ImmersiveFrequenciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */; };
 		E00100022EF88DF800EB49D2 /* EntitlementManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00100012EF88DF800EB49D2 /* EntitlementManager.swift */; };
 		E00200022EF88DF800EB49D2 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00200012EF88DF800EB49D2 /* OnboardingContainerView.swift */; };
+		OPP00012EFA200000000001 /* OnboardingPostPaywallScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = OPP00002EFA200000000001 /* OnboardingPostPaywallScreens.swift */; };
 		E00400022EF88DF800EB49D3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E00400012EF88DF800EB49D3 /* PrivacyInfo.xcprivacy */; };
 		EEEE00012EF7000000000001 /* LocalSecrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE00002EF7000000000001 /* LocalSecrets.swift */; };
 		FFFF00052EF9000000000005 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00012EF9000000000001 /* JournalView.swift */; };
@@ -186,6 +187,7 @@
 		DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveFrequenciesView.swift; sourceTree = "<group>"; };
 		E00100012EF88DF800EB49D2 /* EntitlementManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementManager.swift; sourceTree = "<group>"; };
 		E00200012EF88DF800EB49D2 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
+		OPP00002EFA200000000001 /* OnboardingPostPaywallScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPostPaywallScreens.swift; sourceTree = "<group>"; };
 		E00400012EF88DF800EB49D3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		EEEE00002EF7000000000001 /* LocalSecrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSecrets.swift; sourceTree = "<group>"; };
 		FFFF00012EF9000000000001 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
@@ -391,6 +393,7 @@
 			isa = PBXGroup;
 			children = (
 				E00200012EF88DF800EB49D2 /* OnboardingContainerView.swift */,
+				OPP00002EFA200000000001 /* OnboardingPostPaywallScreens.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -621,6 +624,7 @@
 				72E262DA2EC68E040080CF29 /* AffirmationSession.swift in Sources */,
 				E00100022EF88DF800EB49D2 /* EntitlementManager.swift in Sources */,
 				E00200022EF88DF800EB49D2 /* OnboardingContainerView.swift in Sources */,
+				OPP00012EFA200000000001 /* OnboardingPostPaywallScreens.swift in Sources */,
 				72305A062EF717AB003A8399 /* ChatStorageService.swift in Sources */,
 				72E262D12EC68E040080CF29 /* StorageService.swift in Sources */,
 				720DF72A2EF88DF800EB49D2 /* AIAffirmationsChatView.swift in Sources */,

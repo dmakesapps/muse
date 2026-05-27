@@ -176,10 +176,11 @@ struct FeedView: View {
                         ZStack {
                             // Left: Streak/Profile Button
                             if !isLandscape {
-                                HStack {
+                                HStack(alignment: .center) {
                                     StreakFireButton(streak: progressService.currentStreak, action: onProfileTap)
                                     Spacer()
                                 }
+                                .frame(height: 50)
                                 .padding(.horizontal, 16)
                             }
                             
@@ -219,16 +220,25 @@ struct FeedView: View {
                                 )
                             }
                             
-                            // Hamburger menu button (absolute right position)
+                            // Reserve space so centered tabs stay balanced
                             if !isLandscape {
-                                HStack {
+                                HStack(alignment: .center) {
                                     Spacer()
-                                    // LiquidMenu will be placed as an overlay on the root ZStack
-                                    // to ensure it doesn't affect layout
                                     Color.clear
-                                        .frame(width: 50, height: 50) 
+                                        .frame(width: 50, height: 50)
                                 }
+                                .frame(height: 50)
                                 .padding(.horizontal, 16)
+                            }
+                        }
+                        .overlay(alignment: .topTrailing) {
+                            if !isLandscape {
+                                LiquidMenu(
+                                    isOpen: $showHamburgerMenu,
+                                    onCategory: { showMixPopup = true },
+                                    onBackground: { showBackgroundPicker = true }
+                                )
+                                .padding(.trailing, 16)
                             }
                         }
                         .padding(.top, 10)
@@ -297,25 +307,6 @@ struct FeedView: View {
                         }
                     }
                     
-                    // Old Hamburger/Popup Removed - LiquidMenu handles it
-                    
-                    // Liquid Menu Overlay (Top-Right)
-                    // Placed here to be independent of layout flow (absolute position effect)
-                    if !isLandscape {
-                        VStack {
-                            HStack {
-                                Spacer()
-                                LiquidMenu(
-                                    isOpen: $showHamburgerMenu,
-                                    onCategory: { showMixPopup = true },
-                                    onBackground: { showBackgroundPicker = true }
-                                )
-                                .padding(.trailing, 16)
-                                .padding(.top, 16) // Adjust for top bar padding
-                            }
-                            Spacer()
-                        }
-                    }
                 }
             }
         }
@@ -555,68 +546,58 @@ struct AnyContentItem: Identifiable {
 // MARK: - Liquid Menu Component
 struct LiquidMenu: View {
     @Binding var isOpen: Bool
-    // Actions
     let onCategory: () -> Void
     let onBackground: () -> Void
     
-    // Animation properties
-    @Namespace private var animation
-    
-    // Config
     private let buttonSize: CGFloat = 50
     private let spacing: CGFloat = 16
     
     var body: some View {
-        ZStack(alignment: .top) {
-            // Options Stack (Behind the toggle button)
-            ZStack {
-                // Item 2: Background (Bottom-most)
-                LiquidMenuItem(icon: "paintbrush.fill", index: 2, isOpen: isOpen) {
-                    onBackground()
-                    withAnimation { isOpen = false }
-                }
-                
-                // Item 1: Categories (Top-most)
-                LiquidMenuItem(icon: "square.grid.2x2.fill", index: 1, isOpen: isOpen) {
-                    onCategory()
-                    withAnimation { isOpen = false }
-                }
-            }
-            .zIndex(0)
-            
-            // Main Toggle Button (Always on top)
+        VStack(alignment: .trailing, spacing: spacing) {
             Button(action: {
-                // Using a "bouncy" spring to feel like popping a bubble
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
                     isOpen.toggle()
                 }
             }) {
                 ZStack {
-                    // Glass Background - NOW A CAPSULE (Pill Shape)
-                    Capsule()
+                    Circle()
                         .fill(Color.black.opacity(0.3))
                         .background(.ultraThinMaterial)
-                        .clipShape(Capsule())
-                        .frame(width: 60, height: 40) // Pill dimensions
+                        .clipShape(Circle())
+                        .frame(width: buttonSize, height: buttonSize)
                         .shadow(color: .black.opacity(0.2), radius: 5, y: 5)
                         .overlay(
-                            Capsule()
-                                .stroke(Color.white.opacity(0.15), lineWidth: 1) // Fine outline like left button
+                            Circle()
+                                .stroke(Color.white.opacity(0.15), lineWidth: 1)
                         )
                     
-                    // Icon
                     Image(systemName: isOpen ? "xmark" : "line.3.horizontal")
-                        .font(.system(size: 18, weight: .medium)) // Slightly smaller to fit in 40pt height perfectly
+                        .font(.system(size: 18, weight: .medium))
                         .foregroundColor(.white)
                         .contentTransition(.symbolEffect(.replace))
-                        .rotationEffect(.degrees(isOpen ? 90 : 0))
                 }
             }
-            .zIndex(1)
+            .frame(width: buttonSize, height: buttonSize)
+            
+            if isOpen {
+                LiquidMenuItem(icon: "square.grid.2x2.fill", index: 0, isOpen: isOpen) {
+                    onCategory()
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                        isOpen = false
+                    }
+                }
+                .transition(.scale(scale: 0.6, anchor: .top).combined(with: .opacity))
+                
+                LiquidMenuItem(icon: "paintbrush.fill", index: 1, isOpen: isOpen) {
+                    onBackground()
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                        isOpen = false
+                    }
+                }
+                .transition(.scale(scale: 0.6, anchor: .top).combined(with: .opacity))
+            }
         }
-        // Ensure the expanded menu doesn't capture touches outside the buttons
-        // Adjusted frame calculation for 2 menu items
-        .frame(width: 60, height: isOpen ? (50 * 3) + (spacing * 2) : 40, alignment: .top)
+        .frame(width: buttonSize, alignment: .topTrailing)
     }
 }
 
@@ -626,46 +607,34 @@ struct LiquidMenuItem: View {
     let isOpen: Bool
     let action: () -> Void
     
-    // Spacing constants
     private let buttonSize: CGFloat = 50
-    private let spacing: CGFloat = 16
-    
-    var offset: CGFloat {
-        if !isOpen { return 0 }
-        return CGFloat(index) * (buttonSize + spacing)
-    }
     
     var body: some View {
         Button(action: action) {
             ZStack {
                 Circle()
-                    .fill(Color.black.opacity(0.3)) // Dark glass
+                    .fill(Color.black.opacity(0.3))
                     .background(.ultraThinMaterial)
                     .clipShape(Circle())
-                    .frame(width: 50, height: 50)
+                    .frame(width: buttonSize, height: buttonSize)
                     .overlay(
                         Circle().stroke(Color.white.opacity(0.15), lineWidth: 1)
                     )
-                    .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 3)
+                    .shadow(color: .black.opacity(0.2), radius: 5, y: 3)
                 
                 Image(systemName: icon)
                     .font(.system(size: 18))
                     .foregroundColor(.museSoftWhite)
             }
         }
-        .offset(y: offset)
-        // Physics-simulating spring animation
-        // "Heavy" liquid feel: items drop with a slight delay and bounce
+        .frame(width: buttonSize, height: buttonSize)
+        .opacity(isOpen ? 1 : 0)
+        .scaleEffect(isOpen ? 1 : 0.6)
         .animation(
-            .spring(response: 0.5, dampingFraction: 0.6)
-            .delay(isOpen ? Double(index) * 0.05 : 0),
+            .spring(response: 0.5, dampingFraction: 0.65)
+            .delay(Double(index) * 0.05),
             value: isOpen
         )
-        // Fade in/out
-        .opacity(isOpen ? 1 : 0)
-        // Scale up/down for "pop" effect
-        .scaleEffect(isOpen ? 1 : 0.5)
-        .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isOpen)
     }
 }
 
