@@ -58,8 +58,6 @@
 		AAAA00072EC6F00000000005 /* DJTAYEbackground.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00062EC6F00000000005 /* DJTAYEbackground.mp3 */; };
 		AAAA11112EFA000000000001 /* MuseAgentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA11102EFA000000000001 /* MuseAgentService.swift */; };
 		AAAA11132EFA000000000002 /* MuseUserProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA11122EFA000000000002 /* MuseUserProfileService.swift */; };
-		NNR00012EFA100000000001 /* NotificationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = NNR00002EFA100000000001 /* NotificationRouter.swift */; };
-		RCPS00012EFA10000000002 /* RevenueCatPaywallScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = RCPS00002EFA10000000002 /* RevenueCatPaywallScreen.swift */; };
 		BBBB00012EC7000000000001 /* MuseWidgetsExtensionBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00002EC7000000000001 /* MuseWidgetsExtensionBundle.swift */; };
 		BBBB00032EC7000000000002 /* MuseWidgetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00022EC7000000000002 /* MuseWidgetsExtension.swift */; };
 		BBBB00052EC7000000000003 /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00042EC7000000000003 /* AppIntent.swift */; };
@@ -71,12 +69,14 @@
 		DDDD00032EF6000000000002 /* ImmersiveFrequenciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */; };
 		E00100022EF88DF800EB49D2 /* EntitlementManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00100012EF88DF800EB49D2 /* EntitlementManager.swift */; };
 		E00200022EF88DF800EB49D2 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00200012EF88DF800EB49D2 /* OnboardingContainerView.swift */; };
-		OPP00012EFA200000000001 /* OnboardingPostPaywallScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = OPP00002EFA200000000001 /* OnboardingPostPaywallScreens.swift */; };
 		E00400022EF88DF800EB49D3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E00400012EF88DF800EB49D3 /* PrivacyInfo.xcprivacy */; };
 		EEEE00012EF7000000000001 /* LocalSecrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE00002EF7000000000001 /* LocalSecrets.swift */; };
 		FFFF00052EF9000000000005 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00012EF9000000000001 /* JournalView.swift */; };
 		FFFF00062EF9000000000006 /* ChatHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00022EF9000000000002 /* ChatHistoryView.swift */; };
 		FFFF00072EF9000000000007 /* ImmersiveManifestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF00032EF9000000000003 /* ImmersiveManifestView.swift */; };
+		NNR00012EFA100000000001 /* NotificationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = NNR00002EFA100000000001 /* NotificationRouter.swift */; };
+		OPP00012EFA200000000001 /* OnboardingPostPaywallScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = OPP00002EFA200000000001 /* OnboardingPostPaywallScreens.swift */; };
+		RCPS00012EFA10000000002 /* RevenueCatPaywallScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = RCPS00002EFA10000000002 /* RevenueCatPaywallScreen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -172,8 +172,6 @@
 		AAAA00062EC6F00000000005 /* DJTAYEbackground.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = DJTAYEbackground.mp3; sourceTree = "<group>"; };
 		AAAA11102EFA000000000001 /* MuseAgentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseAgentService.swift; sourceTree = "<group>"; };
 		AAAA11122EFA000000000002 /* MuseUserProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseUserProfileService.swift; sourceTree = "<group>"; };
-		NNR00002EFA100000000001 /* NotificationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRouter.swift; sourceTree = "<group>"; };
-		RCPS00002EFA10000000002 /* RevenueCatPaywallScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatPaywallScreen.swift; sourceTree = "<group>"; };
 		BBBB00002EC7000000000001 /* MuseWidgetsExtensionBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseWidgetsExtensionBundle.swift; sourceTree = "<group>"; };
 		BBBB00022EC7000000000002 /* MuseWidgetsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseWidgetsExtension.swift; sourceTree = "<group>"; };
 		BBBB00042EC7000000000003 /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
@@ -187,12 +185,14 @@
 		DDDD00022EF6000000000002 /* ImmersiveFrequenciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveFrequenciesView.swift; sourceTree = "<group>"; };
 		E00100012EF88DF800EB49D2 /* EntitlementManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementManager.swift; sourceTree = "<group>"; };
 		E00200012EF88DF800EB49D2 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
-		OPP00002EFA200000000001 /* OnboardingPostPaywallScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPostPaywallScreens.swift; sourceTree = "<group>"; };
 		E00400012EF88DF800EB49D3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		EEEE00002EF7000000000001 /* LocalSecrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSecrets.swift; sourceTree = "<group>"; };
 		FFFF00012EF9000000000001 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
 		FFFF00022EF9000000000002 /* ChatHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryView.swift; sourceTree = "<group>"; };
 		FFFF00032EF9000000000003 /* ImmersiveManifestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveManifestView.swift; sourceTree = "<group>"; };
+		NNR00002EFA100000000001 /* NotificationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRouter.swift; sourceTree = "<group>"; };
+		OPP00002EFA200000000001 /* OnboardingPostPaywallScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPostPaywallScreens.swift; sourceTree = "<group>"; };
+		RCPS00002EFA10000000002 /* RevenueCatPaywallScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatPaywallScreen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -818,12 +818,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Muse/Muse.Debug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Muse/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Muse ";
+				INFOPLIST_KEY_CFBundleDisplayName = Muse;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -834,7 +834,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.02;
+				MARKETING_VERSION = 1.03;
 				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.Muse;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -850,12 +850,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Muse/Muse.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Muse/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Muse ";
+				INFOPLIST_KEY_CFBundleDisplayName = Muse;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -866,7 +866,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.02;
+				MARKETING_VERSION = 1.03;
 				PRODUCT_BUNDLE_IDENTIFIER = Ephesian28LLC.Muse;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -954,7 +954,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = MuseWidgetsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MuseWidgetsExtension/Info.plist;
@@ -982,7 +982,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = MuseWidgetsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 28D2M73B26;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MuseWidgetsExtension/Info.plist;

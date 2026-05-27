@@ -107,6 +107,12 @@ struct OnboardingContainerView: View {
                 currentPage = 9
             }
         }
+        .onChange(of: entitlementManager.isPremium) { _, isPremium in
+            guard isPremium, !hasCompletedOnboarding, currentPage == 8, !entitlementManager.showPaywall else { return }
+            withAnimation(.easeInOut(duration: 0.5)) {
+                currentPage = 9
+            }
+        }
         .paywallFullScreenCover(presenter: .onboarding)
     }
     
@@ -322,6 +328,7 @@ struct OnboardingContainerView: View {
     }
     
     private func completeOnboarding() {
+        entitlementManager.refreshCustomerInfo()
         withAnimation {
             hasCompletedOnboarding = true
         }

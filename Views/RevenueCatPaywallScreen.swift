@@ -102,13 +102,19 @@ struct RevenueCatPaywallScreen: View {
 
         paywall
             .onPurchaseCompleted { customerInfo in
-                resolvePaywall {
-                    entitlementManager.handlePurchaseCompleted(customerInfo, for: source)
+                guard !didResolvePaywall else { return }
+                didResolvePaywall = true
+                Task {
+                    await entitlementManager.completePurchase(from: customerInfo, for: source)
+                    dismiss()
                 }
             }
             .onRestoreCompleted { customerInfo in
-                resolvePaywall {
-                    entitlementManager.handleRestoreCompleted(customerInfo, for: source)
+                guard !didResolvePaywall else { return }
+                didResolvePaywall = true
+                Task {
+                    await entitlementManager.completePurchase(from: customerInfo, for: source)
+                    dismiss()
                 }
             }
             .onPurchaseFailure { error in

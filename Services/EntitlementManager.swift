@@ -180,7 +180,53 @@ final class EntitlementManager: NSObject, ObservableObject, PurchasesDelegate {
     }
 
     func handlePaywallDismissed(for source: PaywallSource?) {
+        guard showPaywall else {
+            print("💰 EntitlementManager: Paywall already dismissed, ignoring duplicate dismiss")
+            return
+        }
         print("💰 EntitlementManager: Paywall dismissed for \(source?.rawValue ?? "unknown")")
+        finalizePaywallDismissal(for: source)
+    }
+
+    /// Called after a successful purchase or restore. Refreshes CustomerInfo until premium is active, then dismisses the paywall.
+    func completePurchase(from customerInfo: CustomerInfo, for source: PaywallSource?) async {
+        apply(customerInfo: customerInfo)
+        configureRevenueCatIfNeeded()
+
+        if isRevenueCatConfigured, !isPremium {
+            for attempt in 1...5 {
+                try? await Task.sleep(nanoseconds: 400_000_000)
+                if let fresh = try? await Purchases.shared.customerInfo() {
+                    apply(customerInfo: fresh)
+                }
+                if isPremium {
+                    print("💎 EntitlementManager: Premium active after refresh attempt \(attempt)")
+                    break
+                }
+            }
+        }
+
+        if !isPremium {
+            let activeKeys = customerInfo.entitlements.active.keys.sorted()
+            print("⚠️ EntitlementManager: Purchase completed but entitlement '\(Self.premiumEntitlementID)' inactive. Active keys: \(activeKeys)")
+        }
+
+        finalizePaywallDismissal(for: source)
+    }
+
+    func handlePurchaseCompleted(_ customerInfo: CustomerInfo, for source: PaywallSource?) {
+        Task {
+            await completePurchase(from: customerInfo, for: source)
+        }
+    }
+
+    func handleRestoreCompleted(_ customerInfo: CustomerInfo, for source: PaywallSource?) {
+        Task {
+            await completePurchase(from: customerInfo, for: source)
+        }
+    }
+
+    private func finalizePaywallDismissal(for source: PaywallSource?) {
         showPaywall = false
         paywallSource = nil
         paywallPresenter = nil
@@ -188,16 +234,6 @@ final class EntitlementManager: NSObject, ObservableObject, PurchasesDelegate {
         if source == .onboarding {
             shouldCompleteOnboarding = true
         }
-    }
-
-    func handlePurchaseCompleted(_ customerInfo: CustomerInfo, for source: PaywallSource?) {
-        apply(customerInfo: customerInfo)
-        handlePaywallDismissed(for: source)
-    }
-
-    func handleRestoreCompleted(_ customerInfo: CustomerInfo, for source: PaywallSource?) {
-        apply(customerInfo: customerInfo)
-        handlePaywallDismissed(for: source)
     }
 
     func restorePurchases(from source: PaywallSource? = nil) {
@@ -230,9 +266,44 @@ final class EntitlementManager: NSObject, ObservableObject, PurchasesDelegate {
     }
 
     private func apply(customerInfo: CustomerInfo) {
-        let hasPremiumEntitlement = customerInfo.entitlements.active[Self.premiumEntitlementID]?.isActive == true
-        isPremium = hasPremiumEntitlement
-        print("💎 EntitlementManager: Premium entitlement \(Self.premiumEntitlementID) active = \(hasPremiumEntitlement)")
+        let hasPremium = resolvesPremium(from: customerInfo)
+        isPremium = hasPremium
+        print("💎 EntitlementManager: Premium (\(Self.premiumEntitlementID)) active = \(hasPremium)")
+    }
+
+    private func resolvesPremium(from customerInfo: CustomerInfo) -> Bool {
+        let configuredID = Self.premiumEntitlementID
+        let active = customerInfo.entitlements.active
+
+        if active[configuredID]?.isActive == true {
+            return true
+        }
+
+        for (key, entitlement) in active where entitlement.isActive {
+            if key.compare(configuredID, options: .caseInsensitive) == .orderedSame {
+                return true
+            }
+        }
+
+        let normalizedConfigured = normalizedEntitlementKey(configuredID)
+        for (key, entitlement) in active where entitlement.isActive {
+            if normalizedEntitlementKey(key) == normalizedConfigured {
+                return true
+            }
+        }
+
+        if active.values.contains(where: \.isActive) {
+            print("⚠️ EntitlementManager: Using active entitlement fallback: \(active.keys.sorted())")
+            return true
+        }
+
+        return false
+    }
+
+    private func normalizedEntitlementKey(_ key: String) -> String {
+        key.lowercased()
+            .replacingOccurrences(of: " ", with: "_")
+            .replacingOccurrences(of: "-", with: "_")
     }
 
     private static var revenueCatAPIKey: String {
@@ -254,6 +325,6 @@ final class EntitlementManager: NSObject, ObservableObject, PurchasesDelegate {
         let environmentValue = ProcessInfo.processInfo.environment["REVENUECAT_ENTITLEMENT_ID"]?
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
-        return environmentValue?.isEmpty == false ? environmentValue! : "premium"
+        return environmentValue?.isEmpty == false ? environmentValue! : "Muse Pro"
     }
 }
