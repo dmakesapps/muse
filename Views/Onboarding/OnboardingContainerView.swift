@@ -59,7 +59,7 @@ struct OnboardingContainerView: View {
                     Screen8_ImmersivePreview(
                         affirmations: generatedAffirmations,
                         onComplete: { 
-                            entitlementManager.triggerPaywall(source: .onboarding)
+                            entitlementManager.triggerPaywall(source: .onboarding, presenter: .onboarding)
                         }
                     )
                 case 10:
@@ -85,6 +85,7 @@ struct OnboardingContainerView: View {
             entitlementManager.consumeOnboardingCompletionRequest()
             completeOnboarding()
         }
+        .paywallFullScreenCover(presenter: .onboarding)
     }
     
     private func advance() {

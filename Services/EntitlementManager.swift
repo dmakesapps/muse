@@ -17,6 +17,7 @@ final class EntitlementManager: NSObject, ObservableObject, PurchasesDelegate {
     @Published var freeSessionsUsed: Int = 0
     @Published var showPaywall: Bool = false
     @Published var paywallSource: PaywallSource? = nil
+    @Published var paywallPresenter: PaywallPresenter? = nil
     @Published var shouldCompleteOnboarding: Bool = false
     
     // MARK: - Configuration
@@ -41,6 +42,13 @@ final class EntitlementManager: NSObject, ObservableObject, PurchasesDelegate {
         case settings = "settings_upgrade"
         case dailyLimitReached = "fair_use_limit_reached"
         case onboarding = "onboarding_complete"
+    }
+    
+    /// Which view hierarchy should present the paywall (only one at a time).
+    enum PaywallPresenter: String {
+        case feed
+        case practice
+        case onboarding
     }
 
     var isPaywallConfigured: Bool {
@@ -102,10 +110,16 @@ final class EntitlementManager: NSObject, ObservableObject, PurchasesDelegate {
     
     /// Check if user can start an immersive session
     /// Returns true if allowed, false if paywall should show
-    func canPlaySession() -> Bool {
+    func canPlaySession(presenter: PaywallPresenter = .practice) -> Bool {
         if isPremium { return true }
 
-        triggerPaywall(source: .sessionLimit)
+        triggerPaywall(source: .sessionLimit, presenter: presenter)
+        return false
+    }
+    
+    func requiresPremium(presenter: PaywallPresenter, source: PaywallSource = .sessionLimit) -> Bool {
+        if isPremium { return true }
+        triggerPaywall(source: source, presenter: presenter)
         return false
     }
     
@@ -119,13 +133,13 @@ final class EntitlementManager: NSObject, ObservableObject, PurchasesDelegate {
     }
     
     /// Check if user can use AI features (generation, chat)
-    func canUseAIFeatures() -> Bool {
+    func canUseAIFeatures(presenter: PaywallPresenter = .practice) -> Bool {
         if !isPremium {
-            triggerPaywall(source: .aiGeneration)
+            triggerPaywall(source: .aiGeneration, presenter: presenter)
             return false
         }
         if hasReachedDailyLimit() {
-            triggerPaywall(source: .dailyLimitReached)
+            triggerPaywall(source: .dailyLimitReached, presenter: presenter)
             return false
         }
         return true
@@ -157,9 +171,10 @@ final class EntitlementManager: NSObject, ObservableObject, PurchasesDelegate {
         return defaults.integer(forKey: "dailyGenerationCount") >= maxDailyAIGenerations
     }
     
-    func triggerPaywall(source: PaywallSource) {
-        print("💰 EntitlementManager: Requesting Paywall for \(source.rawValue)")
+    func triggerPaywall(source: PaywallSource, presenter: PaywallPresenter) {
+        print("💰 EntitlementManager: Requesting Paywall for \(source.rawValue) via \(presenter.rawValue)")
         paywallSource = source
+        paywallPresenter = presenter
         showPaywall = true
         configureRevenueCatIfNeeded()
     }
@@ -168,6 +183,7 @@ final class EntitlementManager: NSObject, ObservableObject, PurchasesDelegate {
         print("💰 EntitlementManager: Paywall dismissed for \(source?.rawValue ?? "unknown")")
         showPaywall = false
         paywallSource = nil
+        paywallPresenter = nil
 
         if source == .onboarding {
             shouldCompleteOnboarding = true

@@ -620,6 +620,10 @@ struct StartAffirmationsView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var entitlementManager: EntitlementManager
     @StateObject private var storage = StorageService.shared
+    
+    var initialPracticeMode: PracticeMode? = nil
+    var openJournalOnAppear: Bool = false
+    
     @State private var selectedMode: PracticeMode? = nil
     @State private var selectedSource: AffirmationSource? = nil
     @State private var selectedAffirmations: Set<UUID> = []
@@ -869,6 +873,19 @@ struct StartAffirmationsView: View {
                 pendingPremiumSessionStart = false
             }
         }
+        .onAppear {
+            guard entitlementManager.isPremium else {
+                entitlementManager.triggerPaywall(source: .sessionLimit, presenter: .practice)
+                return
+            }
+            if let initialPracticeMode {
+                selectedMode = initialPracticeMode
+            }
+            if openJournalOnAppear {
+                showJournalView = true
+            }
+        }
+        .paywallFullScreenCover(presenter: .practice)
     }
     
     private var headerTitle: String {
@@ -906,6 +923,7 @@ struct StartAffirmationsView: View {
                     color: .museGradientStart,
                     isDisabled: false
                 ) {
+                    guard entitlementManager.requiresPremium(presenter: .practice) else { return }
                     withAnimation(.spring(response: 0.3)) {
                         selectedMode = .affirmations
                     }
@@ -919,6 +937,7 @@ struct StartAffirmationsView: View {
                     color: .museTeal,
                     isDisabled: false
                 ) {
+                    guard entitlementManager.requiresPremium(presenter: .practice) else { return }
                     withAnimation(.spring(response: 0.3)) {
                         selectedMode = .breathwork
                     }
@@ -932,6 +951,7 @@ struct StartAffirmationsView: View {
                     color: Color(red: 0.6, green: 0.4, blue: 0.8),
                     isDisabled: false
                 ) {
+                    guard entitlementManager.requiresPremium(presenter: .practice) else { return }
                     withAnimation(.spring(response: 0.3)) {
                         selectedMode = .frequencies
                     }
@@ -945,6 +965,7 @@ struct StartAffirmationsView: View {
                     color: .purple,
                     isDisabled: false
                 ) {
+                    guard entitlementManager.requiresPremium(presenter: .practice) else { return }
                     showManifestView = true
                 }
                 
@@ -956,6 +977,7 @@ struct StartAffirmationsView: View {
                     color: .orange,
                     isDisabled: false
                 ) {
+                    guard entitlementManager.requiresPremium(presenter: .practice) else { return }
                     showJournalView = true
                 }
             }
@@ -1039,6 +1061,7 @@ struct StartAffirmationsView: View {
                         icon: "square",
                         color: .museAccentBlue
                     ) {
+                        guard entitlementManager.requiresPremium(presenter: .practice) else { return }
                         activeBreathworkPattern = .boxBreathing
                     }
                     
@@ -1048,6 +1071,7 @@ struct StartAffirmationsView: View {
                         icon: "moon.fill",
                         color: .museTeal
                     ) {
+                        guard entitlementManager.requiresPremium(presenter: .practice) else { return }
                         activeBreathworkPattern = .relaxation478
                     }
                     
@@ -1057,6 +1081,7 @@ struct StartAffirmationsView: View {
                         icon: "leaf.fill",
                         color: .green
                     ) {
+                        guard entitlementManager.requiresPremium(presenter: .practice) else { return }
                         activeBreathworkPattern = .calming46
                     }
                     
@@ -1066,6 +1091,7 @@ struct StartAffirmationsView: View {
                         icon: "bolt.fill",
                         color: .orange
                     ) {
+                        guard entitlementManager.requiresPremium(presenter: .practice) else { return }
                         activeBreathworkPattern = .energizing
                     }
                 }
@@ -1114,6 +1140,7 @@ struct StartAffirmationsView: View {
                         FrequencyButton(
                             frequency: frequency,
                             action: {
+                                guard entitlementManager.requiresPremium(presenter: .practice) else { return }
                                 activeFrequency = frequency
                             }
                         )
@@ -1194,7 +1221,7 @@ struct StartAffirmationsView: View {
                         isDisabled: false, // We keep it enabled to trigger the paywall on tap
                         isComingSoon: false
                     ) {
-                        if entitlementManager.canUseAIFeatures() {
+                        if entitlementManager.canUseAIFeatures(presenter: .practice) {
                             withAnimation(.spring(response: 0.3)) {
                                 selectedSource = .aiGenerated
                             }
@@ -2128,7 +2155,7 @@ struct StartAffirmationsView: View {
         prepareSelection?()
         pendingPremiumSessionStart = true
 
-        if entitlementManager.canPlaySession() {
+        if entitlementManager.canPlaySession(presenter: .practice) {
             pendingPremiumSessionStart = false
             isActive = true
         }

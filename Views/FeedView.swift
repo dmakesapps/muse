@@ -4,14 +4,19 @@ import SwiftData
 
 struct FeedView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var entitlementManager: EntitlementManager
     @StateObject private var progressService = ProgressService.shared
     @StateObject private var storage = StorageService.shared
     @State private var selectedCategory: ContentCategory = .affirmation
     @State private var currentIndex: Int = 0
+    @State private var feedContentOpacity: Double = 1.0
     let onProfileTap: () -> Void
     let onMessageTap: () -> Void
     @State private var showMixPopup = false
     @State private var showPracticePopup = false
+    @State private var practiceInitialMode: StartAffirmationsView.PracticeMode? = nil
+    @State private var practiceOpenJournal = false
+    @ObservedObject private var notificationRouter = NotificationRouter.shared
     @State private var selectedTagFilter: Set<String> = []  // Filter by specific tags
     @State private var showCategoryPicker = false
     @State private var showBackgroundPicker = false
@@ -138,6 +143,7 @@ struct FeedView: View {
                         get: { currentIndex },
                         set: { if let newValue = $0 { currentIndex = newValue } }
                     ))
+                    .opacity(feedContentOpacity)
                     //.ignoresSafeArea() // Already handled by parent GeometryReader
                     // Force ScrollView to recreate when category, filter, or orientation changes
                     .id("\(selectedCategory.rawValue)-\(selectedTagFilter.sorted().joined(separator: ","))-\(geometry.size.width)-\(geometry.size.height)")
@@ -231,11 +237,12 @@ struct FeedView: View {
                         
                         Spacer()
                     
-                        // Share and Heart buttons - centered
+                        // Share, Heart, and Randomize buttons - centered
                         // HIDDEN IN LANDSCAPE
                         if !isLandscape {
                             HStack(spacing: 32) {
                                 Button(action: {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                     if currentIndex < filteredContent.count {
                                         shareContent(filteredContent[currentIndex])
                                     }
@@ -246,6 +253,7 @@ struct FeedView: View {
                                 }
                                 
                                 Button(action: {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                     if currentIndex < filteredContent.count {
                                         let item = filteredContent[currentIndex]
                                         // Toggle save state
@@ -270,13 +278,21 @@ struct FeedView: View {
                                         .font(.system(size: 22))
                                         .foregroundColor(currentIndex < filteredContent.count && filteredContent[currentIndex].isSaved(storage: storage) ? .red : .museSoftWhite)
                                 }
+                                
+                                Button(action: jumpToRandomItem) {
+                                    Image(systemName: "shuffle")
+                                        .font(.system(size: 22))
+                                        .foregroundColor(.museSoftWhite)
+                                }
+                                .disabled(filteredContent.count <= 1 || feedContentOpacity < 1)
+                                .opacity(filteredContent.count <= 1 ? 0.4 : 1)
                             }
                             .padding(.bottom, 30)
                         }
                         
                         // Bottom - Only the Start button (centered)
                         if !isLandscape {
-                            LiquidStartButton(action: { showPracticePopup = true })
+                            LiquidStartButton(action: openPracticeOrPaywall)
                                 .padding(.bottom, 20)
                         }
                     }
@@ -306,8 +322,19 @@ struct FeedView: View {
         .sheet(isPresented: $showMixPopup) {
             MixPopupView()
         }
-        .sheet(isPresented: $showPracticePopup) {
-            PracticePopupView()
+        .sheet(isPresented: $showPracticePopup, onDismiss: {
+            practiceInitialMode = nil
+            practiceOpenJournal = false
+        }) {
+            PracticePopupView(
+                initialPracticeMode: practiceInitialMode,
+                openJournalOnAppear: practiceOpenJournal
+            )
+        }
+        .onChange(of: notificationRouter.pendingDestination) { _, destination in
+            guard let destination else { return }
+            applyNotificationDestination(destination)
+            notificationRouter.clearPending()
         }
         .sheet(isPresented: $showCategoryPicker) {
             CategoryPickerView(
@@ -315,7 +342,7 @@ struct FeedView: View {
                 selectedCategories: $selectedTagFilter,
                 contentType: selectedCategory
             )
-            .presentationDetents([.large]) // Start at top / full screen
+            .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showBackgroundPicker) {
@@ -326,14 +353,18 @@ struct FeedView: View {
         }
         .onAppear {
             progressService.setModelContext(modelContext)
-            // Load content from JSON files
             if quotes.isEmpty {
                 quotes = ContentLoader.shared.loadQuotes().shuffled()
             }
             if affirmations.isEmpty {
                 affirmations = ContentLoader.shared.loadAffirmations()
             }
+            if let destination = notificationRouter.pendingDestination {
+                applyNotificationDestination(destination)
+                notificationRouter.clearPending()
+            }
         }
+        .paywallFullScreenCover(presenter: .feed)
         .ignoresSafeArea(.keyboard) // Only ignore keyboard, but respect safe areas for the UI layer by default (since we didn't add .ignoresSafeArea(.all) to the root)
         // Note: The first GeometryReader HAS .ignoresSafeArea() attached to it, so it will bleed.
         // The second GeometryReader/VStack DOES NOT, so it will respect safe areas.
@@ -356,13 +387,115 @@ struct FeedView: View {
         }
     }
     
+    private static let appStoreShareURL = "https://apps.apple.com/us/app/muse-ai-daily-affirmations/id6759474866"
+    
     private func shareContent(_ item: AnyContentItem) {
-        let text = item.text
+        let text = """
+        \(item.text)
+        
+        I found this on Muse - AI Daily Affirmations check it out on the app store \(Self.appStoreShareURL)
+        """
         let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
         
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let rootViewController = windowScene.windows.first?.rootViewController {
             rootViewController.present(activityVC, animated: true)
+        }
+    }
+    
+    private func applyNotificationDestination(_ destination: NotificationRouter.Destination) {
+        switch destination {
+        case .affirmation(let text):
+            withAnimation(.spring(response: 0.3)) {
+                selectedCategory = .affirmation
+                selectedTagFilter.removeAll()
+            }
+            navigateToContent(matchingText: text, category: .affirmation)
+        case .quote(let text):
+            withAnimation(.spring(response: 0.3)) {
+                selectedCategory = .quote
+                selectedTagFilter.removeAll()
+            }
+            navigateToContent(matchingText: text, category: .quote)
+        case .practiceSession(let sessionType):
+            guard entitlementManager.isPremium else {
+                entitlementManager.triggerPaywall(source: .sessionLimit, presenter: .feed)
+                return
+            }
+            switch sessionType {
+            case .affirmations:
+                practiceInitialMode = .affirmations
+                practiceOpenJournal = false
+            case .breathwork:
+                practiceInitialMode = .breathwork
+                practiceOpenJournal = false
+            case .journaling:
+                practiceInitialMode = nil
+                practiceOpenJournal = true
+            }
+            showPracticePopup = true
+        }
+    }
+    
+    private func openPracticeOrPaywall() {
+        guard entitlementManager.isPremium else {
+            entitlementManager.triggerPaywall(source: .sessionLimit, presenter: .feed)
+            return
+        }
+        practiceInitialMode = nil
+        practiceOpenJournal = false
+        showPracticePopup = true
+    }
+    
+    private func navigateToContent(matchingText text: String, category: ContentCategory) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            let items: [AnyContentItem]
+            if category == .affirmation {
+                items = affirmations.map { AnyContentItem(affirmation: $0) }
+            } else {
+                items = quotes.map { AnyContentItem(quote: $0) }
+            }
+            
+            guard let index = items.firstIndex(where: { item in
+                if let affirmation = item.affirmation {
+                    return affirmation.text == text
+                }
+                if let quote = item.quote {
+                    return quote.text == text
+                }
+                return false
+            }) else { return }
+            
+            withAnimation(.spring(response: 0.35)) {
+                currentIndex = index
+            }
+        }
+    }
+    
+    private func jumpToRandomItem() {
+        let count = filteredContent.count
+        guard count > 1, feedContentOpacity >= 1.0 else { return }
+        
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        
+        var newIndex: Int
+        repeat {
+            newIndex = Int.random(in: 0..<count)
+        } while newIndex == currentIndex
+        
+        withAnimation(.easeOut(duration: 0.22)) {
+            feedContentOpacity = 0
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) {
+                currentIndex = newIndex
+            }
+            withAnimation(.easeIn(duration: 0.28)) {
+                feedContentOpacity = 1
+            }
         }
     }
 }
@@ -554,7 +687,7 @@ struct MixPopupView: View {
     // Helper States
     @State private var showFavorites = false
     @State private var showMyAffirmations = false
-    @State private var selectedCategory: String? = nil
+    @State private var selectedCategory: ExploreCategorySelection? = nil
     
     // Data
     private var affirmationCategories: [String] {
@@ -713,7 +846,12 @@ struct MixPopupView: View {
                                         title: category,
                                         icon: iconForCategory(category),
                                         isLocked: false,
-                                        action: { selectedCategory = category }
+                                        action: {
+                                            selectedCategory = ExploreCategorySelection(
+                                                category: category,
+                                                contentTab: selectedTab
+                                            )
+                                        }
                                     )
                                 }
                             }
@@ -730,28 +868,54 @@ struct MixPopupView: View {
             .sheet(isPresented: $showMyAffirmations) {
                 MyAffirmationsView()
             }
-            .sheet(item: $selectedCategory) { category in
-                CategoryAffirmationsView(category: category)
+            .sheet(item: $selectedCategory) { selection in
+                CategoryContentView(
+                    category: selection.category,
+                    contentTab: selection.contentTab
+                )
             }
         }
     }
 }
 
-// MARK: - String extension for sheet item
-extension String: @retroactive Identifiable {
-    public var id: String { self }
+// MARK: - Explore category selection (affirmations vs quotes)
+private struct ExploreCategorySelection: Identifiable {
+    let category: String
+    let contentTab: MixPopupView.ContentTab
+    
+    var id: String { "\(contentTab)-\(category)" }
 }
 
-// MARK: - Category Affirmations View
-struct CategoryAffirmationsView: View {
+// MARK: - Category Content View (affirmations or quotes)
+struct CategoryContentView: View {
     let category: String
+    let contentTab: MixPopupView.ContentTab
+    
     @Environment(\.dismiss) private var dismiss
     @StateObject private var storage = StorageService.shared
     @AppStorage("selectedBackground") private var selectedBackground: String = "backgroundjungle2"
     
-    // Get affirmations for this category
+    private var isQuote: Bool { contentTab == .quote }
+    
+    private var accentColor: Color {
+        isQuote ? .museTeal : .museAccentBlue
+    }
+    
     private var affirmations: [Affirmation] {
         ContentLoader.shared.loadAffirmations().filter { $0.category == category }
+    }
+    
+    private var quotes: [Quote] {
+        ContentLoader.shared.loadQuotes().filter { $0.category == category }
+    }
+    
+    private var itemCount: Int {
+        isQuote ? quotes.count : affirmations.count
+    }
+    
+    private var countLabel: String {
+        let noun = isQuote ? "quote" : "affirmation"
+        return "\(itemCount) \(itemCount == 1 ? noun : noun + "s")"
     }
     
     var body: some View {
@@ -761,77 +925,152 @@ struct CategoryAffirmationsView: View {
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
-                    // Header
-                    HStack {
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(.museSoftWhite)
-                                .frame(width: 32, height: 32)
-                                .background(
-                                    Circle()
-                                        .fill(Color.museDarkGray)
-                                )
-                        }
-                        
-                        Spacer()
-                        
-                        Text(category)
-                            .font(.museHeadline())
-                            .foregroundColor(.museSoftWhite)
-                        
-                        Spacer()
-                        
-                        // Invisible spacer for balance
-                        Color.clear.frame(width: 32, height: 32)
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 20)
-                    .padding(.bottom, 16)
+                    header
                     
-                    // Affirmations count
-                    Text("\(affirmations.count) affirmations")
+                    Text(countLabel)
                         .font(.museCaption())
-                        .foregroundColor(.museLightGray)
+                        .foregroundColor(accentColor.opacity(0.9))
                         .padding(.bottom, 16)
                     
-                    if affirmations.isEmpty {
-                        Spacer()
-                        VStack(spacing: 16) {
-                            Image(systemName: "text.quote")
-                                .font(.system(size: 48))
-                                .foregroundColor(.museLightGray.opacity(0.5))
-                            
-                            Text("No affirmations in this category")
-                                .font(.museBodyMedium())
-                                .foregroundColor(.museLightGray)
-                        }
-                        Spacer()
+                    if itemCount == 0 {
+                        emptyState
+                    } else if isQuote {
+                        quotesList
                     } else {
-                        ScrollView {
-                            LazyVStack(spacing: 12) {
-                                ForEach(affirmations) { affirmation in
-                                    CategoryAffirmationRow(
-                                        affirmation: affirmation,
-                                        isSaved: storage.isAffirmationSaved(affirmation),
-                                        onSave: {
-                                            if storage.isAffirmationSaved(affirmation) {
-                                                storage.removeAffirmation(affirmation)
-                                            } else {
-                                                storage.saveAffirmation(affirmation)
-                                            }
-                                        }
-                                    )
-                                }
-                            }
-                            .padding(.horizontal, 20)
-                            .padding(.bottom, 100)
-                        }
+                        affirmationsList
                     }
                 }
             }
             .navigationBarHidden(true)
         }
+    }
+    
+    private var header: some View {
+        HStack {
+            Button(action: { dismiss() }) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.museSoftWhite)
+                    .frame(width: 32, height: 32)
+                    .background(Circle().fill(Color.museDarkGray))
+            }
+            
+            Spacer()
+            
+            Text(category)
+                .font(.museHeadline())
+                .foregroundColor(.museSoftWhite)
+            
+            Spacer()
+            
+            Color.clear.frame(width: 32, height: 32)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
+        .padding(.bottom, 16)
+    }
+    
+    private var emptyState: some View {
+        VStack {
+            Spacer()
+            VStack(spacing: 16) {
+                Image(systemName: isQuote ? "quote.bubble" : "text.quote")
+                    .font(.system(size: 48))
+                    .foregroundColor(.museLightGray.opacity(0.5))
+                
+                Text("No \(isQuote ? "quotes" : "affirmations") in this category")
+                    .font(.museBodyMedium())
+                    .foregroundColor(.museLightGray)
+            }
+            Spacer()
+        }
+    }
+    
+    private var affirmationsList: some View {
+        ScrollView {
+            LazyVStack(spacing: 12) {
+                ForEach(affirmations) { affirmation in
+                    CategoryAffirmationRow(
+                        affirmation: affirmation,
+                        isSaved: storage.isAffirmationSaved(affirmation),
+                        onSave: {
+                            if storage.isAffirmationSaved(affirmation) {
+                                storage.removeAffirmation(affirmation)
+                            } else {
+                                storage.saveAffirmation(affirmation)
+                            }
+                        }
+                    )
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 100)
+        }
+    }
+    
+    private var quotesList: some View {
+        ScrollView {
+            LazyVStack(spacing: 12) {
+                ForEach(quotes) { quote in
+                    CategoryQuoteRow(
+                        quote: quote,
+                        isSaved: storage.isQuoteSaved(quote),
+                        onSave: {
+                            if storage.isQuoteSaved(quote) {
+                                storage.removeQuote(quote)
+                            } else {
+                                storage.saveQuote(quote)
+                            }
+                        }
+                    )
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 100)
+        }
+    }
+}
+
+// MARK: - Category Quote Row
+struct CategoryQuoteRow: View {
+    let quote: Quote
+    let isSaved: Bool
+    let onSave: () -> Void
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("\"\(quote.text)\"")
+                    .font(.museBodyMedium())
+                    .foregroundColor(.museSoftWhite)
+                    .fixedSize(horizontal: false, vertical: true)
+                
+                Text("— \(quote.author)")
+                    .font(.system(size: 14, weight: .regular, design: .serif))
+                    .foregroundColor(.museLightGray)
+                
+                Text(quote.category.uppercased())
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.museTeal)
+            }
+            
+            Spacer()
+            
+            Button(action: onSave) {
+                Image(systemName: isSaved ? "heart.fill" : "heart")
+                    .font(.system(size: 20))
+                    .foregroundColor(isSaved ? .museTeal : .museLightGray)
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color.museDarkGray)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.museMediumGray.opacity(0.3), lineWidth: 1)
+                )
+        )
     }
 }
 
@@ -1622,8 +1861,14 @@ struct FavoriteCard: View {
 
 // MARK: - Practice Popup View
 struct PracticePopupView: View {
+    var initialPracticeMode: StartAffirmationsView.PracticeMode? = nil
+    var openJournalOnAppear: Bool = false
+    
     var body: some View {
-        StartAffirmationsView()
+        StartAffirmationsView(
+            initialPracticeMode: initialPracticeMode,
+            openJournalOnAppear: openJournalOnAppear
+        )
     }
 }
 
@@ -1634,139 +1879,218 @@ struct CategoryPickerView: View {
     @Binding var selectedCategories: Set<String>
     let contentType: FeedView.ContentCategory
     
+    private var accentColor: Color {
+        contentType == .affirmation ? .museAccentBlue : .museTeal
+    }
+    
+    private var contentLabel: String {
+        contentType == .affirmation ? "Affirmations" : "Quotes"
+    }
+    
+    private var filterSummary: String {
+        if selectedCategories.isEmpty {
+            return "Showing all \(contentLabel.lowercased())"
+        }
+        let count = selectedCategories.count
+        return "\(count) \(count == 1 ? "category" : "categories") selected"
+    }
+    
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .top) {
-                Color.museDeepNavy
-                    .ignoresSafeArea()
+        ZStack {
+            Color.museDeepNavy.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                header
                 
-                VStack(spacing: 0) {
-                    // Header
-                    HStack {
-                        Button(action: { dismiss() }) {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(.museSoftWhite)
-                                .frame(width: 32, height: 32)
-                                .background(
-                                    Circle()
-                                        .fill(Color.museDarkGray)
-                                )
-                        }
-                        
-                        Spacer()
-                        
-                        Text("Filter by Category")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.museSoftWhite)
-                        
-                        Spacer()
-                        
-                        // Clear button
-                        if !selectedCategories.isEmpty {
-                            Button(action: { selectedCategories.removeAll() }) {
-                                Text("Clear")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(.museAccentBlue)
-                            }
-                        } else {
-                            Color.clear.frame(width: 40)
-                        }
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        categoryGroup
                     }
                     .padding(.horizontal, 20)
-                    .padding(.top, 20)
-                    .padding(.bottom, 16)
-                    
-                    // Show All Button
-                    Button(action: { selectedCategories.removeAll() }) {
-                        HStack {
-                            Image(systemName: "square.grid.2x2")
-                                .font(.system(size: 18))
-                                .foregroundColor(.museSoftWhite)
-                            
-                            Text("Show All \(contentType == .affirmation ? "Affirmations" : "Quotes")")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(.museSoftWhite)
-                            
-                            Spacer()
-                            
-                            if selectedCategories.isEmpty {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(.museAccentBlue)
-                            } else {
-                                Image(systemName: "circle")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(.museLightGray)
-                            }
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 14)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(selectedCategories.isEmpty ? Color.museAccentBlue.opacity(0.2) : Color.museDarkGray.opacity(0.5))
-                                .rainbowBorder()
-                        )
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 12)
-                    
-                    Divider()
-                        .background(Color.white.opacity(0.1))
-                        .padding(.bottom, 12)
-                    
-                    // Categories list
-                    ScrollView {
-                        LazyVStack(spacing: 8) {
-                            ForEach(categories, id: \.self) { category in
-                                CategoryRow(
-                                    category: category,
-                                    isSelected: selectedCategories.contains(category),
-                                    action: {
-                                        if selectedCategories.contains(category) {
-                                            selectedCategories.remove(category)
-                                        } else {
-                                            selectedCategories.insert(category)
-                                        }
-                                    }
-                                )
-                            }
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 40)
-                    }
+                    .padding(.top, 8)
+                    .padding(.bottom, 32)
                 }
             }
         }
     }
+    
+    private var header: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.museSoftWhite)
+                        .frame(width: 32, height: 32)
+                        .background(Circle().fill(Color.museDarkGray))
+                }
+                
+                Spacer()
+                
+                if !selectedCategories.isEmpty {
+                    Button("Clear") {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            selectedCategories.removeAll()
+                        }
+                    }
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(accentColor)
+                }
+            }
+            
+            VStack(spacing: 4) {
+                Text("Filter by Category")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundColor(.museSoftWhite)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Text(filterSummary)
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundColor(.museLightGray)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .padding(.bottom, 12)
+    }
+    
+    private var categoryGroup: some View {
+        VStack(spacing: 0) {
+            CategoryFilterRow(
+                title: "All \(contentLabel)",
+                icon: "square.grid.2x2.fill",
+                accentColor: accentColor,
+                isSelected: selectedCategories.isEmpty
+            ) {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    selectedCategories.removeAll()
+                }
+            }
+            
+            if !categories.isEmpty {
+                sectionDivider
+                
+                ForEach(Array(categories.enumerated()), id: \.element) { index, category in
+                    CategoryFilterRow(
+                        title: category,
+                        icon: categoryIcon(for: category),
+                        accentColor: accentColor,
+                        isSelected: selectedCategories.contains(category)
+                    ) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            toggleCategory(category)
+                        }
+                    }
+                    
+                    if index < categories.count - 1 {
+                        rowDivider
+                    }
+                }
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.museDarkGray.opacity(0.55))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                )
+        )
+    }
+    
+    private var sectionDivider: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.08))
+            .frame(height: 1)
+            .padding(.leading, 58)
+    }
+    
+    private var rowDivider: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.06))
+            .frame(height: 1)
+            .padding(.leading, 58)
+    }
+    
+    private func toggleCategory(_ category: String) {
+        if selectedCategories.contains(category) {
+            selectedCategories.remove(category)
+        } else {
+            selectedCategories.insert(category)
+        }
+    }
+    
+    private func categoryIcon(for category: String) -> String {
+        switch category.lowercased() {
+        case "self-love", "self-worth", "self-care", "self-acceptance": return "heart.fill"
+        case "confidence", "wisdom": return "star.fill"
+        case "inner peace", "peace", "calm": return "leaf.fill"
+        case "gratitude": return "hands.clap.fill"
+        case "strength", "resilience", "motivation": return "bolt.fill"
+        case "love", "relationships": return "heart.circle.fill"
+        case "growth", "transformation", "purpose": return "arrow.up.right.circle.fill"
+        case "mental health", "healing", "wellness": return "brain.head.profile"
+        case "abundance", "success": return "sparkles"
+        case "courage": return "flame.fill"
+        case "faith", "hope": return "hand.raised.fill"
+        case "positivity", "happiness": return "sun.max.fill"
+        case "anxiety": return "wind"
+        case "acceptance", "authenticity": return "checkmark.seal.fill"
+        case "awakening", "balance": return "circle.hexagongrid.fill"
+        case "business", "career": return "briefcase.fill"
+        default: return "sparkle"
+        }
+    }
 }
 
-// Subview to reduce compiler complexity
-private struct CategoryRow: View {
-    let category: String
+private struct CategoryFilterRow: View {
+    let title: String
+    let icon: String
+    let accentColor: Color
     let isSelected: Bool
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
-            HStack {
-                Text(category)
-                    .font(.system(size: 16))
+            HStack(spacing: 14) {
+                Image(systemName: icon)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(isSelected ? .white : accentColor)
+                    .frame(width: 34, height: 34)
+                    .background(
+                        Circle()
+                            .fill(isSelected ? accentColor : accentColor.opacity(0.18))
+                    )
+                
+                Text(title)
+                    .font(.system(size: 16, weight: isSelected ? .semibold : .regular))
                     .foregroundColor(.museSoftWhite)
+                    .multilineTextAlignment(.leading)
                 
-                Spacer()
+                Spacer(minLength: 8)
                 
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 20))
-                    .foregroundColor(isSelected ? .museAccentBlue : .museLightGray.opacity(0.5))
+                ZStack {
+                    Circle()
+                        .stroke(isSelected ? accentColor : Color.museMediumGray, lineWidth: 1.5)
+                        .frame(width: 22, height: 22)
+                    
+                    if isSelected {
+                        Circle()
+                            .fill(accentColor)
+                            .frame(width: 22, height: 22)
+                        
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.white)
+                    }
+                }
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? Color.museAccentBlue.opacity(0.15) : Color.museDarkGray.opacity(0.3))
-            )
+            .padding(.horizontal, 16)
+            .padding(.vertical, 11)
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
     }
 }
 
@@ -1991,7 +2315,10 @@ struct LiquidStartButton: View {
     @State private var rotation: Double = 0
     
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            action()
+        }) {
             ZStack {
                 // 1. Alive Aura (Background Glow) - Kept the cool effect but subtler
                 Circle()

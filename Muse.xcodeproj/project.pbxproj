@@ -58,6 +58,8 @@
 		AAAA00072EC6F00000000005 /* DJTAYEbackground.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00062EC6F00000000005 /* DJTAYEbackground.mp3 */; };
 		AAAA11112EFA000000000001 /* MuseAgentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA11102EFA000000000001 /* MuseAgentService.swift */; };
 		AAAA11132EFA000000000002 /* MuseUserProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA11122EFA000000000002 /* MuseUserProfileService.swift */; };
+		NNR00012EFA100000000001 /* NotificationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = NNR00002EFA100000000001 /* NotificationRouter.swift */; };
+		RCPS00012EFA10000000002 /* RevenueCatPaywallScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = RCPS00002EFA10000000002 /* RevenueCatPaywallScreen.swift */; };
 		BBBB00012EC7000000000001 /* MuseWidgetsExtensionBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00002EC7000000000001 /* MuseWidgetsExtensionBundle.swift */; };
 		BBBB00032EC7000000000002 /* MuseWidgetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00022EC7000000000002 /* MuseWidgetsExtension.swift */; };
 		BBBB00052EC7000000000003 /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBB00042EC7000000000003 /* AppIntent.swift */; };
@@ -169,6 +171,8 @@
 		AAAA00062EC6F00000000005 /* DJTAYEbackground.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = DJTAYEbackground.mp3; sourceTree = "<group>"; };
 		AAAA11102EFA000000000001 /* MuseAgentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseAgentService.swift; sourceTree = "<group>"; };
 		AAAA11122EFA000000000002 /* MuseUserProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseUserProfileService.swift; sourceTree = "<group>"; };
+		NNR00002EFA100000000001 /* NotificationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRouter.swift; sourceTree = "<group>"; };
+		RCPS00002EFA10000000002 /* RevenueCatPaywallScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatPaywallScreen.swift; sourceTree = "<group>"; };
 		BBBB00002EC7000000000001 /* MuseWidgetsExtensionBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseWidgetsExtensionBundle.swift; sourceTree = "<group>"; };
 		BBBB00022EC7000000000002 /* MuseWidgetsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuseWidgetsExtension.swift; sourceTree = "<group>"; };
 		BBBB00042EC7000000000003 /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
@@ -287,6 +291,7 @@
 				EEEE00002EF7000000000001 /* LocalSecrets.swift */,
 				AAAA11102EFA000000000001 /* MuseAgentService.swift */,
 				AAAA11122EFA000000000002 /* MuseUserProfileService.swift */,
+				NNR00002EFA100000000001 /* NotificationRouter.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -295,6 +300,7 @@
 			isa = PBXGroup;
 			children = (
 				72E262902EC68E040080CF29 /* ContentView.swift */,
+				RCPS00002EFA10000000002 /* RevenueCatPaywallScreen.swift */,
 				72E262DE2EC68E040080CF29 /* FeedView.swift */,
 				72E262A62EC68E040080CF29 /* Theme.swift */,
 				72E262F02EC68E040080CF29 /* Library */,
@@ -630,6 +636,8 @@
 				FFFF00072EF9000000000007 /* ImmersiveManifestView.swift in Sources */,
 				AAAA11112EFA000000000001 /* MuseAgentService.swift in Sources */,
 				AAAA11132EFA000000000002 /* MuseUserProfileService.swift in Sources */,
+				NNR00012EFA100000000001 /* NotificationRouter.swift in Sources */,
+				RCPS00012EFA10000000002 /* RevenueCatPaywallScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

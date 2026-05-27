@@ -1052,6 +1052,7 @@ class NotificationService: ObservableObject {
         let message = notificationMessages.randomElement() ?? notificationMessages[0]
         content.body = String(format: message, reminder.sessionType.rawValue.lowercased())
         content.sound = UNNotificationSound(named: UNNotificationSoundName("notisound.wav"))
+        content.userInfo = NotificationRouter.userInfo(for: reminder.sessionType)
         
         let calendar = Calendar.current
         let components = calendar.dateComponents([.hour, .minute], from: reminder.time)
@@ -1117,7 +1118,7 @@ class NotificationService: ObservableObject {
     private func scheduleAffirmationNotifications() {
         guard affirmationNotificationCount > 0, !affirmationCategories.isEmpty else { return }
         
-        let allContent = loadAffirmationsContent()
+        let allContent = loadFilteredAffirmations()
         guard !allContent.isEmpty else { return }
         
         // Get the cycling index and advance it
@@ -1128,12 +1129,13 @@ class NotificationService: ObservableObject {
             for i in 0..<affirmationNotificationCount {
                 // Get content at current index, cycling through all
                 let contentIndex = (cycleIndex + (day * affirmationNotificationCount) + i) % allContent.count
-                let content = allContent[contentIndex]
+                let affirmation = allContent[contentIndex]
                 
                 scheduleDailyContentNotification(
                     identifier: "affirmation_day\(day)_\(i)",
                     title: "✨ Daily Affirmation",
-                    body: content,
+                    body: affirmation.text,
+                    userInfo: NotificationRouter.userInfo(for: affirmation),
                     index: i,
                     totalCount: affirmationNotificationCount,
                     daysFromNow: day
@@ -1151,7 +1153,7 @@ class NotificationService: ObservableObject {
     private func scheduleQuoteNotifications() {
         guard quoteNotificationCount > 0, !quoteCategories.isEmpty else { return }
         
-        let allContent = loadQuotesContent()
+        let allContent = loadFilteredQuotes()
         guard !allContent.isEmpty else { return }
         
         // Get the cycling index and advance it
@@ -1162,12 +1164,13 @@ class NotificationService: ObservableObject {
             for i in 0..<quoteNotificationCount {
                 // Get content at current index, cycling through all
                 let contentIndex = (cycleIndex + (day * quoteNotificationCount) + i) % allContent.count
-                let content = allContent[contentIndex]
+                let quote = allContent[contentIndex]
                 
                 scheduleDailyContentNotification(
                     identifier: "quote_day\(day)_\(i)",
                     title: "💭 Daily Quote",
-                    body: content,
+                    body: "\"\(quote.text)\" — \(quote.author)",
+                    userInfo: NotificationRouter.userInfo(for: quote),
                     index: i,
                     totalCount: quoteNotificationCount,
                     daysFromNow: day
@@ -1182,11 +1185,20 @@ class NotificationService: ObservableObject {
         print("📱 Scheduled \(7 * quoteNotificationCount) quote notifications, cycling from index \(cycleIndex) to \(newIndex)")
     }
     
-    private func scheduleDailyContentNotification(identifier: String, title: String, body: String, index: Int, totalCount: Int, daysFromNow: Int) {
+    private func scheduleDailyContentNotification(
+        identifier: String,
+        title: String,
+        body: String,
+        userInfo: [String: Any],
+        index: Int,
+        totalCount: Int,
+        daysFromNow: Int
+    ) {
         let notificationContent = UNMutableNotificationContent()
         notificationContent.title = title
         notificationContent.body = body
         notificationContent.sound = UNNotificationSound(named: UNNotificationSoundName("notisound.wav"))
+        notificationContent.userInfo = userInfo
         
         // Generate consistent time based on index, spread throughout the day
         let startHour = 8
@@ -1236,14 +1248,13 @@ class NotificationService: ObservableObject {
         }
     }
     
-    private func loadAffirmationsContent() -> [String] {
+    private func loadFilteredAffirmations() -> [Affirmation] {
         guard let path = Bundle.main.path(forResource: "affirmations", ofType: "json"),
               let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
               let affirmations = try? JSONDecoder().decode([Affirmation].self, from: data) else {
             return []
         }
         
-        // Shuffle based on a daily seed for variety, but consistent within the day
         let daySeed = Calendar.current.component(.dayOfYear, from: Date())
         var rng = SeededRandomNumberGenerator(seed: UInt64(daySeed))
         
@@ -1254,17 +1265,16 @@ class NotificationService: ObservableObject {
             filtered = affirmations.filter { affirmationCategories.contains($0.category) }
         }
         
-        return filtered.map { $0.text }.shuffled(using: &rng)
+        return filtered.shuffled(using: &rng)
     }
     
-    private func loadQuotesContent() -> [String] {
+    private func loadFilteredQuotes() -> [Quote] {
         guard let path = Bundle.main.path(forResource: "quotes", ofType: "json"),
               let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
               let quotes = try? JSONDecoder().decode([Quote].self, from: data) else {
             return []
         }
         
-        // Shuffle based on a daily seed for variety, but consistent within the day
         let daySeed = Calendar.current.component(.dayOfYear, from: Date())
         var rng = SeededRandomNumberGenerator(seed: UInt64(daySeed))
         
@@ -1275,7 +1285,7 @@ class NotificationService: ObservableObject {
             filtered = quotes.filter { quoteCategories.contains($0.category) }
         }
         
-        return filtered.map { "\"\($0.text)\" — \($0.author)" }.shuffled(using: &rng)
+        return filtered.shuffled(using: &rng)
     }
     
     private func saveContentSettings() {
